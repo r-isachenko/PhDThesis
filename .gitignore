@@ -1,6 +1,5 @@
 *.DS_Store
 *papers/
-*figs/
 
 #Tex
 *.log
