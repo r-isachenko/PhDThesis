@@ -4,7 +4,7 @@
 %% Need package `geometry'.
 %%Author: Andrew Martovlos <martin@meduniv.lviv.ua>, 2002
 
-%% изменено размер шрифта в подписи рисунков - Igor Iskakov <iskakov@ngs.ru>, 2009
+%% пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - Igor Iskakov <iskakov@ngs.ru>, 2009
 %%
 %% Class: dissert
 %% Options: a4paper+, draft, final+, leqno, fleqn, openbib ('+' default)
