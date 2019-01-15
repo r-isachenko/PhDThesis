@@ -211,3 +211,238 @@ QPFS матрица~$\bQ$ и вектор~$\bb$ имеют вид
 		\UNTIL{$\frac{\| \bw^k - \bw^{k-1} \|}{\| \bw^k \|} < \varepsilon$}
 	\end{algorithmic}
 \end{algorithm}
+
+
+  \section*{Эксперимент}
+  Целью вычислительного эксперимента является исследование свойств предложенного алгоритма и сравнение его с другими методами. 
+  
+  Исследована зависимость параметров алгоритма QPFS для задач~\eqref{eq:lin_reg_nonlin_reg},~\eqref{eq:lin_reg_log_reg}. 
+  Предположим, что вектор параметров~$\bw^0$ лежит вблизи оптимального вектора параметров~$\bw^*$. 
+  Рассмотрим отрезок
+\[
+\bw_{\beta} = \beta \bw^* + (1 - \beta) \bw^0; \, \beta \in [0, 1] .
+\]
+
+Сгенерируем синтетический набор данных с 300 объектами и 7 признаками для задачи логистической регрессии. 
+Ландшафт функции ошибки~\eqref{eq:log_loss} на сетке двух случайно выбранных параметров показан на рис.~\ref{fig:log_reg_error}.
+Поверхность функции ошибки выпуклая с вытянутыми линиями уровня вдоль некоторых параметров модели.
+Добавим случайный шум к оптимальным параметрам~$\bw^*$, чтобы получить точку~$\bw^0$. Поведение вектора~$\bb$ на отрезке между~$\bw^0$ и~$\bw^*$ показано на рис.~\ref{fig:log_reg_b_wrt_beta}.
+Компоненты~$\bb$ начинают резко уменьшаться, приближаясь к оптимальной точке.
+\begin{figure}
+	\centering
+	\begin{minipage}{.47\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{figs/ch3/log_reg_error}
+		\caption{Ландшафт функции ошибки для логистической регрессии}
+		\label{fig:log_reg_error}
+	\end{minipage}%
+	\begin{minipage}{.47\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{figs/ch3/log_reg_b_wrt_beta}
+		\caption{Релевантности параметров для логистической регрессии}
+		\label{fig:log_reg_b_wrt_beta}
+	\end{minipage}
+\end{figure}
+
+Для модели нелинейной регрессии используется классический набор данных Boston Housing с 506 объектами и 13 признаками.
+Для простоты нейронная сеть содержит два скрытых нейрона.
+Ландшафт функции ошибок для модели нейронной сети является более сложным. 
+Он не выпуклый и может содержать несколько локальных минимумов.
+Двумерный ландшафт функции ошибок для этого набора данных показан на рис.~\ref{fig:neural_error}. 
+Сетка строится для двух случайных весов из матрицы~$\bW_1$.
+Мы используем ту же стратегию для исследования того, как вектор~$\bb$ изменяется от~$\bw^0$ до~$\bw^*$. 
+Результат показан на рис.~\ref{fig:neural_b_wrt_beta}.
+Компоненты вектора $\bb$ становятся близки к нулю вблизи оптимума. 
+При достижении оптимального значения различные веса влияют на остатки модели~$\bz$.
+\begin{figure}
+	\centering
+	\begin{minipage}{.5\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{figs/ch3/neural_error}
+		\caption{Ландшафт функции ошибки для нейронной сети}
+		\label{fig:neural_error}
+	\end{minipage}%
+	\begin{minipage}{.5\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{figs/ch3/neural_b_wrt_beta}
+		\caption{Релевантности параметров первого слоя для модели нейронной сети}
+		\label{fig:neural_b_wrt_beta}
+	\end{minipage}
+\end{figure}
+
+На рис.~\ref{fig:irls_qpfs_2d} показан процесс оптимизации для предложенного алгоритма в случае логистической регрессии с двумя параметрами модели. 
+Даже для двумерной задачи решение метода Ньютона нестабильно и число обусловленности матрицы Гессиана~$\bH$ может быть чрезвычайно большим. 
+На каждом шаге алгоритма процедура QPFS выбирает параметры для оптимизации. 
+В данном примере предложенный алгоритм выбирает и обновляет только один параметр на каждой итерации на первых шагах. 
+Это делает алгоритм более устойчивым.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.6\linewidth]{figs/ch3/irls_qpfs_2d}	 
+	\caption{Оптимизационный процесс предложенного алгоритма QPFS+Ньютон для модели логистической регрессии}
+	\label{fig:irls_qpfs_2d}
+\end{figure}
+
+На рис.~\ref{fig:active_params_wrt_iters} показаны наборы активных параметров на итерациях для набора данных Boston Housing и нейронной сети с двумя скрытыми нейронами. 
+Темные ячейки соответствуют активным параметрам, которые мы оптимизируем.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=\linewidth]{figs/ch3/active_params_wrt_iters}	
+	\caption{Множества активных параметров на протяжении оптимизационного процесса}
+	\label{fig:active_params_wrt_iters}
+\end{figure}
+
+В рассмотренных примерах число обусловленности~$\kappa(\bH)$ для метода Ньютона на некоторых итерациях было чрезвычайно большим. 
+Выбор активных параметров позволил значительно сократить число обусловленности. 
+
+Мы сравнили предложенный алгоритм с существующими методами, а именно градиентным спуском~(GD), моментом Нестерова, Adam и оригинальным алгоритмом Ньютона. 
+Проведены эксперименты для моделей нелинейной и логистической регрессий. 
+Наборы данных были выбраны из репозитория UCI~\cite{uci2017}. 
+Результаты показаны в таблицах~\ref{tbl:nonlin_reg_results} и \ref{tbl:log_reg_results}. 
+Для каждого набора данных две строки содержат ошибки для тренировочной~(первая строка) и тестовой~(вторая строка) выборок. 
+В таблице~\ref{tbl:nonlin_reg_results} приведена квадратичная ошибка, в таблице~\ref{tbl:log_reg_results}~-- кросс-энтропия.
+Чтобы найти среднюю ошибку и ее стандартное отклонение использовалась процедура кросс валидации на 5 фолдов. 
+Предложенный алгоритм показывает меньшую ошибку на трех из четырех наборов данных для нелинейной регрессии и среди двух из трех наборов данных для логистической регрессии.
+
+\begin{table}[!ht]
+\footnotesize
+	\caption{Средняя квадратичная ошибка на тренировочной и тестовой выборках для модели нелинейной регрессии}
+	\label{tbl:nonlin_reg_results}
+	\centering
+	\begin{tabular}{|l|c|c|c|c|c|c|}
+		\hline
+		Выборка & \begin{tabular}[c]{@{}c@{}}\ $m$ \\ \ $n$ \end{tabular} 
+		& GD 
+		& Нестеров 
+		& ADAM 
+		& Ньютон 
+		&
+		\begin{tabular}[c]{@{}c@{}}QPFS+Ньютон\\ \end{tabular} \\ 
+		\hline
+		Boston House
+		& 506
+		& $27.2\pm4.6$
+		& $46.0\pm11.0$
+		& $35.4\pm2.5$           
+		& $22.1\pm15.2$            
+		& $20.9\pm10.4$   \\  
+		Prices
+		&\multicolumn{1}{c|}{13}
+		& \multicolumn{1}{c|}{$32.4\pm5.6$}
+		& \multicolumn{1}{c|}{$53.3\pm11.5$}
+		& \multicolumn{1}{c|}{$37.8\pm7.0$}
+		& \multicolumn{1}{c|}{$28.9\pm13.6$}
+		& \multicolumn{1}{c|}{$\mathbf{24.5\pm9.4}$}\\ 
+		\hline
+		Communities
+		& 1994
+		& $48.0\pm6.4$
+		& $31.4\pm2.8$
+		& $23.3\pm3.7$        
+		& $18.3\pm3.4$          
+		&  $26.7\pm3.1$  \\ 
+		and Crime
+		&\multicolumn{1}{c|}{99}
+		& \multicolumn{1}{c|}{$47,5\pm6.5$}
+		& \multicolumn{1}{c|}{$32.9\pm4.3$}
+		& \multicolumn{1}{c|}{$28,1\pm4.5$}
+		& \multicolumn{1}{c|}{$28.8\pm3.6$}
+		& \multicolumn{1}{c|}{$\mathbf{28.4\pm3.0}$} \\ 
+		\hline
+		Forest
+		& 517
+		& $18.9\pm0.4$
+		& $1.83\pm0.4$
+		& $1.81\pm0.6$             
+		& $17.7\pm0.4$             
+		& $17.9\pm0.4$   \\ 
+		Fires
+		&\multicolumn{1}{c|}{10}
+		& \multicolumn{1}{c|}{$\mathbf{20.0\pm2.1}$}
+		& \multicolumn{1}{c|}{ $20.2\pm2.2$}
+		& \multicolumn{1}{c|}{ $\mathbf{20.0\pm2.0}$}
+		& \multicolumn{1}{c|}{ $20.6\pm1.4$}
+		& \multicolumn{1}{c|}{ $20.2\pm2.2$} \\ 
+		\hline
+		Residential
+		& 372
+		&  $51.6\pm17.7$
+		&  $32.6\pm19.5$
+		&  $30.0\pm24.8$            
+		&  $35.5\pm24.7$            
+		&   $30.3\pm10.7$ \\ 
+		Building
+		&\multicolumn{1}{c|}{103}
+		& \multicolumn{1}{c|}{ $53.7\pm13.9$}
+		& \multicolumn{1}{c|}{ $34.1\pm13.6$}
+		& \multicolumn{1}{c|}{ $34.1\pm19.4$}
+		& \multicolumn{1}{c|}{ $35.0\pm15.6$}
+		& \multicolumn{1}{c|}{ $\mathbf{30.9\pm5.3}$} \\ 
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}[!ht]
+\footnotesize
+	\caption{Среднее значение кросс-энтропии на тренировочной и тестовой выборках для модели логистической регрессии}
+	\label{tbl:log_reg_results}
+	\centering
+	\begin{tabular}{|l|c|c|c|c|c|c|}
+		\hline
+		Выборка & \begin{tabular}[c]{@{}c@{}}\ $m$ \\ \ $n$ \end{tabular} 
+		& GD 
+		& Нестеров 
+		& ADAM 
+		& Ньютон 
+		&
+		\begin{tabular}[c]{@{}c@{}}QPFS+Ньютон\\ \end{tabular} \\ 
+		\hline
+		Breast
+		& 569
+		& $0.6\pm0.1$
+		& $0.4\pm0.1$
+		& $0.8\pm0.2$           
+		& $0.3\pm0.1$            
+		& $0.2\pm0.1$   \\  
+		Cancer
+		&\multicolumn{1}{c|}{30}
+		& \multicolumn{1}{c|}{$\mathbf{0.9\pm0.2}$}
+		& \multicolumn{1}{c|}{$1.0\pm0.7$}
+		& \multicolumn{1}{c|}{$1.2\pm0.2$}
+		& \multicolumn{1}{c|}{$1.0\pm0.2$}
+		& \multicolumn{1}{c|}{$1.1\pm0.3$}\\ 
+		\hline
+		Cardiotocography
+		& 2126
+		& $11.5\pm4.7$
+		& $11.5\pm4.7$
+		& $8.8\pm4.4$        
+		& $11.5\pm5.7$          
+		&  $7.7\pm4.2$  \\
+		
+		&\multicolumn{1}{c|}{21}
+		& \multicolumn{1}{c|}{$11.6\pm5.8$}
+		& \multicolumn{1}{c|}{$11.5\pm5.7$}
+		& \multicolumn{1}{c|}{$9.0\pm2.6$}
+		& \multicolumn{1}{c|}{$11.5\pm4.7$}
+		& \multicolumn{1}{c|}{$\mathbf{7.7\pm4.7}$} \\ 
+		\hline
+		Climate Model
+		& 540
+		& $1.2\pm0.1$
+		& $1.0\pm0.2$
+		& $1.5\pm0.2$             
+		& $1.0\pm0.5$             
+		& $0.8\pm0.3$   \\ 
+		Simulation Crashes
+		&\multicolumn{1}{c|}{18}
+		& \multicolumn{1}{c|}{$1.4\pm2.0$}
+		& \multicolumn{1}{c|}{ $1.3\pm0.7$}
+		& \multicolumn{1}{c|}{ $1.8\pm0.3$}
+		& \multicolumn{1}{c|}{ $1.2\pm0.5$}
+		& \multicolumn{1}{c|}{ $\mathbf{1.1\pm0.4}$} \\ 
+		\hline
+	\end{tabular}
+\end{table}
+
