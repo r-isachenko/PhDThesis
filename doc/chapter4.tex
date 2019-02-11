@@ -167,7 +167,7 @@ a: \mathbf{X} \to Y.
 \]
 Данную модель представим в виде суперпозиции
 \begin{equation}
-\label{eq:classifiers}
+\label{ch4:eq:classifiers}
 a(\mathbf{x}) = b \circ \mathbf{f} \circ G(\mathbf{x}, \{\mathbf{c}_e\}_{e = 1} ^ K),
 \end{equation}
 где $G$~--- процедура выравнивания временных рядов относительно центроидов классов~$\{\mathbf{c}_e\}_{e = 1} ^ K$, $\mathbf{f}$~--- алгоритм метрического обучения, $b$~--- алгоритм многоклассовой классификации.
@@ -322,7 +322,7 @@ Q(\mathbf{L}) = \mu Q_1(\mathbf{L}) + (1 - \mu) Q_2(\mathbf{L}) \rightarrow \min
 \end{figure}
 
 
-Таблица~\ref{tbl:clusteing_results} показывает результаты вычислительного эксперимента на реальных
+Таблица~\ref{ch4:tbl:clusteing_results} показывает результаты вычислительного эксперимента на реальных
 данных.
 Алгоритм был применен к $5$ выборкам, взятых из репозитория UCI~\cite{uci2017}.
 Оценкой качества кластеризации служит число правильно кластеризованных объектов.
@@ -331,7 +331,7 @@ Q(\mathbf{L}) = \mu Q_1(\mathbf{L}) + (1 - \mu) Q_2(\mathbf{L}) \rightarrow \min
 \begin{table} %[!ht]
 \centering
 \caption{Результаты кластеризации}
-\label{tbl:clusteing_results}
+\label{ch4:tbl:clusteing_results}
 
 \vspace{2ex}
 

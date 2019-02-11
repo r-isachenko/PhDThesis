@@ -1,23 +1,23 @@
 \chapter{Порождение признаков с помощью метамоделей}
 
 
-\section{Problem Statement}
+\section{Постановка задачи}
 Временные ряды акселерометра образуют множество~$\mathcal{S}$ сегментов~$s$ фиксированной длины~$T$:
 \begin{equation}
 s = [x_1, \dots, x_T]^{T} \in \bbR^T.
-\label{eq::time_series}
+\label{ch5:eq:time_series}
 \end{equation}
 Необходимо построить модель классификации~$f: \bbR^T \rightarrow Y$, которая будет ставить в соответствие каждому сегменту из множества~$\mathcal{S}$ метку класса из конечного множества~$Y$.
 Обозначим за
 \begin{equation}
 	\mathcal{D} = \{(s_i, y_i)\}_{i=1}^m
-	\label{eq::sample}
+	\label{ch5:eq:sample}
 \end{equation}
 исходная выборка, где $s_i \in \mathcal{S}$ и $y_i = f(s_i)\in Y$.
 
 Авторы предлагают построить модель~$f$ в в де суперпозиции $f=f(\mathbf{g})$.
 Функция $\mathbf{g}: \bbR^T \rightarrow \bbR^n$ является отображением из пространства~$\bbR^{T} $ в признаковое пространство~$G \subset \bbR^n$.
-Имея функцию порождения признаков~$\mathbf{g}$, преобразуем исходную выборку~\eqref{eq::sample} в
+Имея функцию порождения признаков~$\mathbf{g}$, преобразуем исходную выборку~\eqref{ch5:eq:sample} в
 \[
 	\mathcal{D}_G = \{(\mathbf{g}_i, y_i)\}_{i=1}^m,
 \]
@@ -27,7 +27,7 @@ s = [x_1, \dots, x_T]^{T} \in \bbR^T.
 Оптимальные параметры~$\hat{\mathbf{\theta}}$ определяются оптимизацией функции ошибки классификации
 \begin{equation}
 \hat{\mathbf{\theta}} = \argmin_{\mathbf{\theta}} L(\mathbf{\theta}, \mathcal{D}_G, \mathbf{\mu}).
-\label{eq::optimal_classification_params}
+\label{ch5:eq:optimal_classification_params}
 \end{equation}
 Вектор~$\mathbf{\mu}$ является внешним параметром для заданной модели классификации. 
 Примеры таких параметров и функций ошибки для различных моделей классификации приведены ниже.
@@ -35,7 +35,7 @@ s = [x_1, \dots, x_T]^{T} \in \bbR^T.
 Чтобы сравнить качество классификации с прошлыми результатами~\cite{karasikov2016feature,ivkin2015ts}, в качестве метрики качества используется точность классификации:
 \begin{equation}
 	\mathrm{accuracy} = \frac{1}{m} \sum_{i=1}^{m} \left[f\left(\mathbf{g}(s_i), \hat{\mathbf{\theta}} \right)= y_i\right].
-	\label{eq::accuracy}
+	\label{ch5:eq:accuracy}
 \end{equation}
 
 \section{Порождение признаков}
@@ -51,7 +51,7 @@ s = [x_1, \dots, x_T]^{T} \in \bbR^T.
 \mathbf{g}(s) = [g_1(s), \dots, g_n(s)]^{\T}.
 \]
 
-В работе~\cite{kwapisz2011activity} авторы предлагают использовать экспертные функции, приведенные в таблице~\ref{tbl::expert_functions}.
+В работе~\cite{kwapisz2011activity} авторы предлагают использовать экспертные функции, приведенные в таблице~\ref{ch5:tbl:expert_functions}.
 Такая процедура порождения признаков генерирует признаковое описание временного ряда~$\mathbf{g}(s) \in \bbR^{40}$.
 
 \begin{table}[ht]
@@ -65,7 +65,7 @@ s = [x_1, \dots, x_T]^{T} \in \bbR^T.
 		Mean absolute deviation & $\frac{1}{T} \sum_{t=1}^{T} |x_t - \bar{x}|$    \\ \hline
 		Distribution            &  Histogram values with 10 bins    \\ \hline
 	\end{tabular}
-	\label{tbl::expert_functions}
+	\label{ch5:tbl:expert_functions}
 \end{table}
 
 \subsubsection{Авторегрессионная модель.}
@@ -81,17 +81,17 @@ x_t = w_0 + \sum_{j=1}^{n-1} w_j x_{t-j} + \epsilon_t,
 
 \begin{equation}
 \mathbf{g}(s) = \hat{\mathbf{w}} = \argmin_{\mathbf{w} \in \bbR^{n}} \left( \sum_{t=n}^{T} \|x_t - \hat{x}_t\|^2\right).
-\label{eq::autoregressive_description}
+\label{ch5:eq:autoregressive_description}
 \end{equation}
-Задача~\eqref{eq::autoregressive_description} эквивалентна задаче линейной регрессии.
+Задача~\eqref{ch5:eq:autoregressive_description} эквивалентна задаче линейной регрессии.
 Поэтому для каждого временного ряда~$s$ необходимо решить задачу линейной регрессии размера $n$.
-Пример аппроксимации временного ряда авторегрессионной моделью представлен на Рис.~\ref{fig::ar_example}.
+Пример аппроксимации временного ряда авторегрессионной моделью представлен на Рис.~\ref{ch5:fig:ar_example}.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=1\linewidth]{figs/ch5/ar_example.png}
 	\caption{Time series approximation using autoregressive model with order $n = 20$}
-	\label{fig::ar_example}
+	\label{ch5:fig:ar_example}
 \end{figure}
 
 \subsubsection{Анализ сингулярного спектра.}
@@ -124,7 +124,7 @@ x_{T-n+1} & x_{T-n+2} & \dots & x_T
 	\centering
 	\includegraphics[width=1\linewidth]{figs/ch5/spline_example.png}
 	\caption{Time series approximation using three order splines}
-	\label{fig::spline_example}
+	\label{ch5:fig:spline_example}
 \end{figure}
 Оптимальные параметры сплайна являются решением системы с дополнительными условиями равенства производных до второго порядка включительно на концах отрезков.
 Обозначим каждый отрезок-сегмент $p_i(t)$ $i = 1, \dots, M$ и весь сплайн $S(t)$. Тогда система уравнений принимает вид
@@ -147,7 +147,7 @@ p_i(\xi_{i-1}) &= x_{i-1},\: p_i(\xi_i) = x_i, \quad i = 1, \dots, M.
 \mathbf{g}(s) = \left[\mathbf{w}_1, \dots, \mathbf{w}_{M}\right]^{\T}.
 \]
 
-Рис.~\ref{fig::spline_example} показывает аппроксимацию временного ряда с использованием модели сплайнов.
+Рис.~\ref{ch5:fig:spline_example} показывает аппроксимацию временного ряда с использованием модели сплайнов.
 По сравнению с авторегрессионной моделью сплайны строят более гладкую аппроксимацию, используя такое же количество параметров.
 
 \section{Классификация временных рядов}
@@ -156,7 +156,7 @@ p_i(\xi_{i-1}) &= x_{i-1},\: p_i(\xi_i) = x_i, \quad i = 1, \dots, M.
 Использовались три модели классификации: логистическая регрессия, SVM и случайный лес.
 
 \subsubsection{Логистическая регрессия.}
-Оптимальные параметры модели $\hat{\mathbf{w}}, \hat{b}$  в случае логистической регрессии определяются минимизацией функции ошибки~\eqref{eq::optimal_classification_params}
+Оптимальные параметры модели $\hat{\mathbf{w}}, \hat{b}$  в случае логистической регрессии определяются минимизацией функции ошибки~\eqref{ch5:eq:optimal_classification_params}
 
 \begin{equation*}
 L(\mathbf{\theta}, \mathcal{D}_G, \mu) = \sum_{i=1}^{m} \log\bigl(1 + \exp(-y_i [\mathbf{w}^{\T} \mathbf{g}_i + b])\bigl) + \frac{\mu}{2} \|\mathbf{w}\|^2, \:\:\mbox{where}\:\: \mathbf{\theta}  = \begin{bmatrix}
@@ -202,9 +202,9 @@ L(\mathbf{\theta}, \mathcal{D}_G, \mu) = \sum_{i=1}^{m} \log\bigl(1 + \exp(-y_i 
 Данные WISDM содержат 4321 временной ряд.
 Каждый временной ряд прнадлежит к одному из 6 классов. 
 Данные USC-HAD содержат 13620 временных рядов, принадлежащих одному из 12 классов.  
-В таблице~\ref{tbl::activities_distributions} представлено распределение временных рядов по классам для каждого датасета.
+В таблице~\ref{ch5:tbl:activities_distributions} представлено распределение временных рядов по классам для каждого датасета.
 Длина временного ряда равна 200.
-На рис.~\ref{fig::ts_example} представлен пример одного из временных рядов.
+На рис.~\ref{ch5:fig:ts_example} представлен пример одного из временных рядов.
 
 \begin{table}[!ht]
 	\centering
@@ -245,14 +245,14 @@ L(\mathbf{\theta}, \mathcal{D}_G, \mu) = \sum_{i=1}^{m} \log\bigl(1 + \exp(-y_i 
 			&Total              & \multicolumn{2}{l}{13620}\\ 
 			\hline
 	\end{tabular}}
-	\label{tbl::activities_distributions}
+	\label{ch5:tbl:activities_distributions}
 \end{table}
 
 \begin{figure}[!ht]
 	\centering
 	\includegraphics[width=1\linewidth]{figs/ch5/ts_example.png}
 	\caption{Time series example}
-	\label{fig::ts_example}
+	\label{ch5:fig:ts_example}
 \end{figure}
 
 \begin{figure}[!ht]
@@ -262,7 +262,7 @@ L(\mathbf{\theta}, \mathcal{D}_G, \mu) = \sum_{i=1}^{m} \log\bigl(1 + \exp(-y_i 
 	\subfloat{
 		\includegraphics[width=0.49\linewidth]{figs/ch5/uschad_methods.png}}
 	\caption{Multiclass accuracy score}
-	\label{fig::accuracy_results}
+	\label{ch5:fig:accuracy_results}
 \end{figure}
 
 В эксперименте для каждого датасета были порождены признаки одним из методов: экспертные функции, авторегрессионная модель, SSA и сплайны.
@@ -297,7 +297,7 @@ CV(K) = \frac{1}{K}\sum_{k=1}^{K} L(f_k, \mathcal{D}\setminus \mathcal{C}_k),
 	\subfloat[USC-HAD dataset]{
 		\includegraphics[width=0.66\linewidth]{figs/ch5/hist_uschad_svm_all.png}}\\
 	\caption{Accuracy scores of classification of each class using all features}
-	\label{fig::feature_union_results}
+	\label{ch5:fig:feature_union_results}
 \end{figure}
 
 Для аппроксимации временных рядов кубическими сплайнами~\cite{deboor1978splines} использовалась библиотека $scipy$. 
@@ -321,7 +321,7 @@ CV(K) = \frac{1}{K}\sum_{k=1}^{K} L(f_k, \mathcal{D}\setminus \mathcal{C}_k),
 		Jogging& 0.98 & 0.99 & 0.99 & 0.80 & 0.99 & 0.99 & 0.99 & 0.92 & 0.99 & 0.99 & 0.99 & 0.93 \\
 		Downstairs& 0.93 & 0.96 & 0.94 & 0.92 & 0.96 & 0.97 & 0.96 & 0.92 & 0.96 & 0.98 & 0.97 & 0.92 \\ \hline
 	\end{tabular}
-	\label{tbl::wisdm_methods_results}
+	\label{ch5:tbl:wisdm_methods_results}
 \end{table}
 
 \begin{table}[!ht]
@@ -346,10 +346,10 @@ CV(K) = \frac{1}{K}\sum_{k=1}^{K} L(f_k, \mathcal{D}\setminus \mathcal{C}_k),
 		Walking-left& 0.89 & 0.91 & 0.90 & 0.88 & 0.97 & 0.93 & 0.97 & 0.93 & 0.95 & 0.91 & 0.97 & 0.93 \\
 		Running& 0.99 & 0.99 & 0.99 & 0.92 & 1.00 & 0.99 & 1.00 & 0.97 & 1.00 & 1.00 & 0.95 & 0.98\\ \hline
 	\end{tabular}
-	\label{tbl::uschad_methods_results}
+	\label{ch5:tbl:uschad_methods_results}
 \end{table}
 
-На рис.~\ref{fig::accuracy_results} показано качество классификации~\eqref{eq::accuracy} для двух датасетов.
+На рис.~\ref{ch5:fig:accuracy_results} показано качество классификации~\eqref{ch5:eq:accuracy} для двух датасетов.
 Для данных WISDM сплайны дали самое слабое качество классификации.
 Результаты для экспертных функций, авторегрессионной модели и SSA схожи.
 Для данных USC-HAD результат более восприимчив к выбору модели классификации. 
@@ -357,13 +357,13 @@ CV(K) = \frac{1}{K}\sum_{k=1}^{K} L(f_k, \mathcal{D}\setminus \mathcal{C}_k),
 Для датасета USC-HAD модель с использованием аппроксимации сплайнами
 показала сравнимое с другими методами качество. 
 
-В Табл.~\ref{tbl::wisdm_methods_results} и Табл.~\ref{tbl::uschad_methods_results} представлены результаты классификации~\eqref{eq::accuracy} для каждого класса в отдельности.
+В Табл.~\ref{ch5:tbl:wisdm_methods_results} и Табл.~\ref{ch5:tbl:uschad_methods_results} представлены результаты классификации~\eqref{ch5:eq:accuracy} для каждого класса в отдельности.
 Первая строка в обеих таблицах демонстрирует точность по всем классам для каждой модели и процедуры генерации признаков.
 Следующие строки соответствуют бинарным точностям по каждому из классов.
 Для данных WISDM лучшее качество имеют наименее активные классы, такие как Standing и Sitting. 
 Для USC-HAD заметного выделения качества для определенных классов не наблюдается.
 
 Также был проведён эксперимент с использованием объединённого множества всех 193 сгенерированных признаков.
-Результаты представлены на Рис.~\ref{fig::feature_union_results}. Соответствие между номера классов и видами активности приведено в Табл.~\ref{tbl::activities_distributions}. 
+Результаты представлены на Рис.~\ref{ch5:fig:feature_union_results}. Соответствие между номера классов и видами активности приведено в Табл.~\ref{ch5:tbl:activities_distributions}. 
 Объединение признаков для обучения одной модели позволило увеличить качество. 
 Для данных WISDM все точности классификации по классам больше $97 \%$, а для USC-HAD выше $93 \%$.
