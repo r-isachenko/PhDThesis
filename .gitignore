@@ -2,9 +2,11 @@
 *papers/
 
 #Tex
+*.out
 *.log
 *.aux
 *.bbl
 *.blg
 *.synctex.gz
 *.toc
+*eps-converted-to.pdf

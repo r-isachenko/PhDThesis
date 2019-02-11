@@ -1,79 +1,79 @@
 \chapter{Выбор параметров нелинейных моделей}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Задача оптимизации}
+\section{Выбор параметров для обучения моделей}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Модель $f( \bx, \bw)$ с параметрами $\bw \in \mathbb{R}^p$ предсказывает целевую переменную~$y \in \bbY$ по объекту~$\bx \in \bbR^{n}$. Пространство~$\bbY$ представляет собой бинарные метки классов~$\{0, 1\}$ для задачи двухклассовой классификации и~$\bbR$ для задачи регрессии.
+Модель $f( \bx, \btheta)$ с параметрами $\btheta \in \mathbb{R}^p$ предсказывает целевую переменную~$y \in \bbY$ по объекту~$\bx \in \bbR^{n}$. Пространство~$\bbY$ представляет собой бинарные метки классов~$\{0, 1\}$ для задачи двухклассовой классификации и~$\bbR$ для задачи регрессии.
 Даны матрица плана~$\bX = [\bx_1, \dots, \bx_m]^{\T} \in \bbR^{m \times n}$ и целевой вектор~$\by = [y_1, \dots, y_m]^{\T} \in \bbY^{m}$. 
-Цель состоит в нахождении оптимальных параметров~$\bw^*$.
-Параметры~$\bw$ вычисляются минимизацией функции ошибки:
+Цель состоит в нахождении оптимальных параметров~$\btheta^*$.
+Параметры~$\btheta$ вычисляются минимизацией функции ошибки:
 \begin{equation}
-\bw^* = \argmin_{\bw \in \bbR^p} \cL(\bw, \bX, \by, f).
+\btheta^* = \argmin_{\btheta \in \bbR^p} \cL(\btheta, \bX, \by).
 \label{ch3:eq:error_function}
 \end{equation}
-В качестве функции ошибки~$\cL (\bw, \bX, \by, f)$ рассматриваются квадратичная ошибка для задачи регрессии:
+В качестве функции ошибки~$\cL (\btheta, \bX, \by)$ рассматриваются квадратичная ошибка для задачи регрессии:
 \begin{equation}
-\cL(\bw, \bX, \by, f) = \frac 12 \| \by - \mathbf{f}(\bX, \bw) \|_2^2 = \frac 12 \sum_{i=1}^m \bigl( y_i - f(\bx_i,  \bw)\bigr)^2,
+\cL(\btheta, \bX, \by) = \frac 12 \| \by - \mathbf{f}(\bX, \btheta) \|_2^2 = \frac 12 \sum_{i=1}^m \bigl( y_i - f(\bx_i,  \btheta)\bigr)^2,
 \label{ch3:eq:squared_error}
 \end{equation}
 и функция кросс-энтропии для задачи бинарной классификации: 
 \begin{equation}
-\cL(\bw, \bX, \by, f) = \sum_{i=1}^m \bigl[y_i \log f (\bx_i , \bw) + (1-y_i) \log \bigl(1 - f (\bx_i , \bw)\bigr)\bigr].
+\cL(\btheta, \bX, \by) = \sum_{i=1}^m \bigl[y_i \log f (\bx_i , \btheta) + (1-y_i) \log \bigl(1 - f (\bx_i , \btheta)\bigr)\bigr].
 \label{ch3:eq:log_loss}
 \end{equation}
 
 Задача~\eqref{ch3:eq:error_function} решается с помощью итеративной процедуры оптимизации. 
-Для получения параметров на шаге~$k$ текущие параметры $\bw^{k-1}$ обновляются по следующему правилу:
+Для получения параметров на шаге~$k$ текущие параметры $\btheta^{k-1}$ обновляются по следующему правилу:
 \begin{equation}
-\bw^k = \bw^{k - 1} + \Delta \bw^{k - 1}.
+\btheta^k = \btheta^{k - 1} + \Delta \btheta^{k - 1}.
 \label{ch3:eq:update_rule}
 \end{equation}
-Авторы используют метод оптимизации Ньютона для выбора вектора обновлений~$\Delta \bw$.
+Авторы используют метод оптимизации Ньютона для выбора вектора обновлений~$\Delta \btheta$.
 
 Метод Ньютона нестабилен и вычислительно сложен. 
 В данной статье предлагается стабильный алгоритм Ньютона. 
-Перед шагом градиента предлагается выбрать подмножество активных параметров модели, которые оказывают наибольшее влияние на функцию ошибки~$\cL (\bw, \bX, \by, f)$.
+Перед шагом градиента предлагается выбрать подмножество активных параметров модели, которые оказывают наибольшее влияние на функцию ошибки~$\cL (\btheta, \bX, \by)$.
 Обновление параметров производится только для отобранного множества индексов~$\cA = \{j: a_j = 1, \ba \in \{0, 1\}^p\}$
 
 \begin{align*}
-\bw_{\cA}^k &= \bw_{\cA}^{k - 1} + \Delta \bw_{\cA}^{k - 1}, \quad \bw_{\cA} = \{w_j: j \in \cA \}; \\
-\bw_{\bar{\cA}}^k &= \bw_{\bar{\cA}}^{k - 1}, \quad \bw_{\bar{\cA}} = \{w_j: j \notin \cA \}.
+\btheta_{\cA}^k &= \btheta_{\cA}^{k - 1} + \Delta \btheta_{\cA}^{k - 1}, \quad \btheta_{\cA} = \{\theta_j: j \in \cA \}; \\
+\btheta_{\bar{\cA}}^k &= \bw_{\bar{\cA}}^{k - 1}, \quad \btheta_{\bar{\cA}} = \{\theta_j: j \notin \cA \}.
 \end{align*}
 Чтобы выбрать оптимальное подмножество индексов~$\cA$, из всех возможных $2^p - 1$~подмножеств, вводится функция ошибки
 \begin{equation}
-\ba = \argmin_{\ba' \in \{0, 1\}^p} S(\ba', \bX, \by, f, \bw),
+\ba = \argmin_{\ba' \in \{0, 1\}^p} S(\ba', \bX, \by, \btheta),
 \label{ch3:eq:subset_selection}
 \end{equation}
 аналогичная функции ошибки~\eqref{ch2:eq:feature_selection} для задачи выбора признаков. 
-Задача~\eqref{ch3:eq:subset_selection} решается на каждом шаге $k$ процесса оптимизации для текущих параметров~$\bw^k$.
+Задача~\eqref{ch3:eq:subset_selection} решается на каждом шаге $k$ процесса оптимизации для текущих параметров~$\btheta^k$.
 
 Алгоритм QPFS используется для решения задачи~\eqref{ch3:eq:subset_selection}.
-QPFS выбирает подмножество параметров~$\ba$ для вектора обновлений~$ \Delta \bw$, которые оказывают наибольшее влияние на вектор остатков и являются попарно независимыми.
-Функция ошибки~\eqref{ch2:eq:qpfs_problem} соответствует функции ошибки~$S(\ba, \bX, \by, f, \bw)$
+QPFS выбирает подмножество параметров~$\ba$ для вектора обновлений~$ \Delta \btheta$, которые оказывают наибольшее влияние на вектор остатков и являются попарно независимыми.
+Функция ошибки~\eqref{ch2:eq:qpfs_problem} соответствует функции ошибки~$S(\ba, \bX, \by, \btheta)$
 \begin{equation}
-\ba = \argmax_{\ba' \in \{1, 0\}^p} S(\ba', \bX, \by, f, \bw) \Leftrightarrow \argmin_{\ba  \in \bbR^p_+, \, \|\ba\|_1=1} \bigl[\ba^{\T} \bQ \ba - \alpha \cdot \mathbf{b}^{\T} \ba \bigr].
+\ba = \argmax_{\ba' \in \{1, 0\}^p} S(\ba', \bX, \by, \btheta) \Leftrightarrow \argmin_{\ba  \in \bbR^p_+, \, \|\ba\|_1=1} \bigl[\ba^{\T} \bQ \ba - \alpha \cdot \mathbf{b}^{\T} \ba \bigr].
 \end{equation}
 В работе показано, что для модели нелинейной регрессии с квадратичной функцией ошибки~\eqref{ch3:eq:squared_error} и для модели логистической регрессии с кросс-энтропией~\eqref{ch3:eq:log_loss}, каждый шаг оптимизации эквивалентен задаче линейной регрессии~\eqref{ch2:eq:linear_regression}.
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Метод Ньютона}
+\section{Метод Ньютона решения задачи настройки параметров}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Метод Ньютона использует условие оптимизации первого порядка для задачи~\eqref{ch3:eq:error_function} и линеаризует градиент $S (\bw)$
+Метод Ньютона использует условие оптимизации первого порядка для задачи~\eqref{ch3:eq:error_function} и линеаризует градиент $S (\btheta)$
 \[
-\nabla S (\bw + \Delta \bw) = \nabla S(\bw) + \bH \cdot \Delta \bw = 0,
+\nabla S (\btheta + \Delta \btheta) = \nabla S(\btheta) + \bH \cdot \Delta \btheta = 0,
 \]
 \[
-\Delta \bw = - \bH^{-1} \nabla S(\bw).
+\Delta \btheta = - \bH^{-1} \nabla S(\btheta).
 \]
-где $\bH = \nabla^2 S(\bw)$ является Гессианом матрицы функции ошибки $S(\bw)$.
+где $\bH = \nabla^2 S(\btheta)$ является Гессианом матрицы функции ошибки $S(\btheta)$.
 
-Итерация~\eqref{ch3:eq:update_rule} метода Ньютона~--
+Итерация~\eqref{ch3:eq:update_rule} метода Ньютона имеет вид
 \[
-\bw^k = \bw^{k-1} - \bH^{-1} \nabla S(\bw).
+\btheta^k = \btheta^{k-1} - \bH^{-1} \nabla S(\btheta).
 \]
 Каждая итерация инвертирует матрицу Гессиана.
 Мерой плохой обусловленности для матрицы Гессиана~$\bH$ является число обусловленности
@@ -85,97 +85,93 @@ QPFS выбирает подмножество параметров~$\ba$ для
 
 Размер шага метода Ньютона может быть чрезмерно большим. Для управления размером шага обновлений добавим параметр $\eta$ в правило обновления~\eqref{ch3:eq:update_rule}
 \[
-\bw^k = \bw^{k - 1} + \eta \Delta \bw^{k - 1}, \quad \eta \in [0, 1].
+\btheta^k = \btheta^{k - 1} + \eta \Delta \btheta^{k - 1}, \quad \eta \in [0, 1].
 \]
 
 Для выбора соответствующего размера шага~$\eta$ используется правило Армихо. Выбирается максимальное~$\eta$ так, чтобы выполнялось следующее условие
 \[
-S(\bw^{k - 1} + \eta \Delta \bw^{k - 1}) < S(\bw^{k - 1}) + \gamma \eta \nabla S^{\T}(\bw^{k-1})\bw^{k - 1}, \quad \gamma \in [0, 0.5].
+S(\btheta^{k - 1} + \eta \Delta \btheta^{k - 1}) < S(\btheta^{k - 1}) + \gamma \eta \nabla S^{\T}(\btheta^{k-1})\btheta^{k - 1}, \quad \gamma \in [0, 0.5].
 \]
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Модели нелинейной и логистической регрессии}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Модель нелинейной регрессии}
-Предположим, что модель $f (\bx , \bw)$ близка к линейной в окрестности точки $\bw + \Delta \bw$
+\subsection*{Модель нелинейной регрессии}
+Предположим, что модель $f (\bx , \btheta)$ близка к линейной в окрестности точки $\btheta + \Delta \btheta$
 \[
-\mathbf{f}(\bX , \bw + \Delta \bw) \approx \mathbf{f}(\bX , \bw) + \bJ \cdot \Delta  \bw,
+\mathbf{f}(\bX , \btheta + \Delta \btheta) \approx \mathbf{f}(\bX , \btheta) + \bJ \cdot \Delta  \btheta,
 \]
 где $\mathbf{J} \in \bbR^{m \times p}$ является матрицы Якоби
 \begin{equation}
 \bJ = 
 \begin{pmatrix}
-\frac{\partial f(\bx_1 , \bw)}{\partial w_1} & \dots & 
-\frac{\partial f(\bx_1 , \bw)}{\partial w_p} \\
+\frac{\partial f(\bx_1 , \btheta)}{\partial \theta_1} & \dots & 
+\frac{\partial f(\bx_1 , \btheta)}{\partial \theta_p} \\
 \dots & \dots & \dots \\
-\frac{\partial f(\bx_m , \bw)}{\partial w_1} & \dots & 
-\frac{\partial f(\bx_m , \bw)}{\partial w_p}
+\frac{\partial f(\bx_m , \btheta)}{\partial \theta_1} & \dots & 
+\frac{\partial f(\bx_m , \btheta)}{\partial \theta_p}
 \end{pmatrix}.
 \end{equation}
-В соответствии с этим предположением градиент~$\nabla S(\bw)$ и Гессиан матрицы~$\bH$ функции ошибки~\eqref{ch3:eq:squared_error} равняются
+В соответствии с этим предположением градиент~$\nabla S(\btheta)$ и Гессиан матрицы~$\bH$ функции ошибки~\eqref{ch3:eq:squared_error} равняются
 \begin{equation}
-\nabla S(\bw) = \bJ^{\T} (\by - \mathbf{f}), \quad \bH = \bJ^{\T} \bJ.
+\nabla S(\btheta) = \bJ^{\T} (\by - \mathbf{f}), \quad \bH = \bJ^{\T} \bJ.
 \label{ch3:eq:nonlin_reg_deriv}
 \end{equation}
 Это приводит к методу Гаусса-Ньютона и правилу обновления~\eqref{ch3:eq:update_rule}
 \[
-\bw^k = \bw^{k - 1} + (\bJ^{\T} \bJ)^{-1}\bJ^{\T}(\mathbf{f} - \by).
+\btheta^k = \btheta^{k - 1} + (\bJ^{\T} \bJ)^{-1}\bJ^{\T}(\mathbf{f} - \by).
 \]
-Вектор обновления~$\Delta \bw$ является решением задачи линейной регрессии
+Вектор обновления~$\Delta \btheta$ является решением задачи линейной регрессии
 \begin{equation}
-\| \bz - \bF \Delta \bw \|_2^2 \rightarrow \min_{\Delta \bw \in \bbR^{p}},
+\| \be - \bF \Delta \btheta \|_2^2 \rightarrow \min_{\Delta \btheta \in \bbR^{p}},
 \label{ch3:eq:lin_reg_nonlin_reg}
 \end{equation}
-где $\bz = \mathbf{f} - \by$ и $\bF = \bJ$.
+где $\be = \mathbf{f} - \by$ и $\bF = \bJ$.
 
-В качестве нелинейной модели рассматривается модель двухслойной нейронной сеть. В этом случае модель~$f (\bx, \bw)$ задается
+В качестве нелинейной модели рассматривается модель двухслойной нейронной сеть. В этом случае модель~$f (\bx, \btheta)$ задается
 следующим образом:
 \[
-f(\bx, \bw) = \sigma(\bx^{\T} \bW_1) \bw_2.
+f(\bx, \btheta) = \sigma(\bx^{\T} \bW_1) \bw_2.
 \]
-Здесь~$\bW_1 \in \bbR^{N \times h}$~-- это матрица весов, которые соединяют исходные признаки с $h$ скрытыми нейронами. Функция нелинейности $\sigma(\cdot)$ применяется поэлементно. Веса~$\bw_2 \in \bbR^{h \times 1}$ соединяют скрытые нейроны с выходом. 
-Вектор параметров модели~$\bw$ представляет собой объединение векторизованных матриц~$\bW_1$, $\bw_2$.
+Здесь~$\bW_1 \in \bbR^{m \times h}$~-- это матрица весов, которые соединяют исходные признаки с $h$ скрытыми нейронами. Функция нелинейности $\sigma(\cdot)$ применяется поэлементно. Веса~$\bw_2 \in \bbR^{h \times 1}$ соединяют скрытые нейроны с выходом. 
+Вектор параметров модели~$\btheta$ представляет собой объединение векторизованных матриц~$\bW_1$, $\bw_2$.
 
-\subsection{Модель логистической регрессии}
+\subsection*{Модель логистической регрессии}
 
-Для логистической регрессии модель имеет вид $f(\bx , \bw) = \sigma(\bx^{\T} \bw)$ с сигмоидной функцией активации~$\sigma(\cdot)$.
+Для логистической регрессии модель имеет вид $f(\bx , \btheta) = \sigma(\bx^{\T} \btheta)$ с сигмоидной функцией активации~$\sigma(\cdot)$.
 Градиент и Гессиан функции ошибки~\eqref{ch3:eq:log_loss} равны
 \begin{equation}
-\nabla S(\bw) = \bX^{\T} (\mathbf{f} - \by), \quad \bH = \bX^{\T} \bR \bX,
+\nabla S(\btheta) = \bX^{\T} (\mathbf{f} - \by), \quad \bH = \bX^{\T} \bR \bX,
 \label{ch3:eq:log_reg_deriv}
 \end{equation}
-где $\bR$~-- это диагональная матрица с диагональными элементами $f(\bx_i , \bw) \cdot (1 - f(\bx_i , \bw))$.
+где $\bR$~-- это диагональная матрица с диагональными элементами $f(\bx_i , \btheta) \cdot (1 - f(\bx_i , \btheta))$.
 
 Правило обновления~\eqref{ch3:eq:update_rule} в этом случае
 \[
-\bw^k = \bw^{k - 1} + (\bX^{\T} \bR \bX)^{-1} \bX^{\T} (\by - \mathbf{f}).
+\btheta^k = \btheta^{k - 1} + (\bX^{\T} \bR \bX)^{-1} \bX^{\T} (\by - \mathbf{f}).
 \]
 Этот алгоритм известен как итеративный алгоритм взвешенных наименьших квадратов (IRLS). Вектор обновлений $\Delta \bw$ является решением задачи линейной регрессии
 \begin{equation}
-\| \bz - \bF \Delta \bw \|_2^2 \rightarrow \min_{\Delta \bw \in \bbR^{p}},
+\| \be - \bF \Delta \btheta \|_2^2 \rightarrow \min_{\Delta \btheta \in \bbR^{p}},
 \label{ch3:eq:lin_reg_log_reg}
 \end{equation}
-где $\bz = \bR^{-1/2} (\by - \mathbf{f})$ и $\bF = \bR^{1/2}\bX$.
+где $\be = \bR^{-1/2} (\by - \mathbf{f})$ и $\bF = \bR^{1/2}\bX$.
 
-\section{Алгоритм QPFS+Ньютон}
+\section{Метод Ньютона с выбором параметром с помощью квадратичного программирования}
 
 Предлагается реализовать алгоритм QPFS для решения задач~\eqref{ch3:eq:lin_reg_nonlin_reg} и \eqref{ch3:eq:lin_reg_log_reg}. 
 QPFS матрица~$\bQ$ и вектор~$\bb$ имеют вид
 \[
-\bQ = \text{Sim} (\bF), \quad \bb = \text{Rel} (\bF, \bz).
+\bQ = \text{Sim} (\bF), \quad \bb = \text{Rel} (\bF, \be).
 \]
 
 Выборочный коэффициент корреляции равен нулю для ортогональных векторов.
-Покажем, что в оптимальной точке~$\bw^*$ вектор~$\bz$ ортогонален столбцам матрицы~$\bF$. 
-В этом случае вектор~$\bb = \text{Rel} (\bF, \bz)$ равен нулю. Это означает, что член, учитывающий релевантность, в данном случае исключается.
+Покажем, что в оптимальной точке~$\btheta^*$ вектор~$\be$ ортогонален столбцам матрицы~$\bF$. 
+В этом случае вектор~$\bb = \text{Rel} (\bF, \be)$ равен нулю. Это означает, что член, учитывающий релевантность, в данном случае исключается.
 Условие оптимизации первого порядка гарантирует это свойство для модели нелинейной регрессии
 \[
-\bF^{\T} \bz = \bJ^{\T} (\mathbf{f} - \by) = - \nabla S(\bw^*) = \boldsymbol{0},
+\bF^{\T} \be = \bJ^{\T} (\mathbf{f} - \by) = - \nabla S(\btheta^*) = \boldsymbol{0},
 \]
 и для модели логистической регрессии
 \[
-\bF^{\T} \bz = \bX \bR^{-1/2} \bR^{1/2} (\by - \mathbf{f}) = \bX^{\T} (\by - \mathbf{f}) = \nabla S(\bw^*) = \boldsymbol{0}.
+\bF^{\T} \be = \bX \bR^{-1/2} \bR^{1/2} (\by - \mathbf{f}) = \bX^{\T} (\by - \mathbf{f}) = \nabla S(\btheta^*) = \boldsymbol{0}.
 \]
 Псевдокод предлагаемого алгоритма приведён в алгоритме~\ref{pc:QPFSNewton}.
 
@@ -186,47 +182,46 @@ QPFS матрица~$\bQ$ и вектор~$\bb$ имеют вид
 		\REQUIRE $\varepsilon$~-- допустимое отклонение;\\
 		\hspace{1.07cm}$\tau$~-- пороговое значение;\\
 		\hspace{1.07cm}$\gamma$~-- параметр правила Армихо.
-		\ENSURE $\bw^*$;
-		\STATE  инициализировать $\bw^0$;
+		\ENSURE $\btheta^*$;
+		\STATE  инициализировать $\btheta^0$;
 		\STATE $k := 1$;
 		\REPEAT
-		\STATE вычислить $\bz$ и $\bF$ для~\eqref{ch3:eq:lin_reg_nonlin_reg} или~\eqref{ch3:eq:lin_reg_log_reg} ;
+		\STATE вычислить $\be$ и $\bF$ для~\eqref{ch3:eq:lin_reg_nonlin_reg} или~\eqref{ch3:eq:lin_reg_log_reg} ;
 		\vspace{0.1cm}
-		\STATE $\bQ := \text{Sim} (\bF)$, $\bb := \text{Rel}(\bF, \bz)$, $\alpha = \frac{\overline{\bQ}}{\overline{\bQ} + \overline{\bb}}$;
+		\STATE $\bQ := \text{Sim} (\bF)$, $\bb := \text{Rel}(\bF, \be)$, $\alpha = \frac{\overline{\bQ}}{\overline{\bQ} + \overline{\bb}}$;
 		\vspace{0.1cm}
 		\STATE $\ba := \argmin_{\ba \geq 0, \, \|\ba\|_1=1}\ba^{\T} \bQ \ba - \alpha \cdot \mathbf{b}^{\T} \ba$;
 		\vspace{0.1cm}
 		\STATE $\cA := \{j: a_j = 1\}$;
 		\vspace{0.1cm}
-		\STATE вычислить $\nabla S(\bw^{k-1})$, $\bH$ для \eqref{ch3:eq:nonlin_reg_deriv} или \eqref{ch3:eq:log_reg_deriv};
+		\STATE вычислить $\nabla S(\btheta^{k-1})$, $\bH$ для \eqref{ch3:eq:nonlin_reg_deriv} или \eqref{ch3:eq:log_reg_deriv};
 		\vspace{0.1cm}
-		\STATE $\Delta \bw^{k-1} = - \bH^{-1} \nabla S(\bw^{k-1})$;
+		\STATE $\Delta \btheta^{k-1} = - \bH^{-1} \nabla S(\btheta^{k-1})$;
 		\vspace{0.1cm}
-		\STATE $\eta := \text{ArmijoRule}(\bw^{k-1}, \gamma)$;
+		\STATE $\eta := \text{ArmijoRule}(\btheta^{k-1}, \gamma)$;
 		\vspace{0.1cm}
-		\STATE $\bw_{\cA}^k = \bw_{\cA}^{k - 1} + \eta \Delta \bw_{\cA}^{k - 1}$;
+		\STATE $\btheta_{\cA}^k = \btheta_{\cA}^{k - 1} + \eta \Delta \btheta_{\cA}^{k - 1}$;
 		\vspace{0.1cm}
 		\STATE $k := k + 1$;
 		\vspace{0.1cm}
-		\UNTIL{$\frac{\| \bw^k - \bw^{k-1} \|}{\| \bw^k \|} < \varepsilon$}
+		\UNTIL{$\frac{\| \btheta^k - \btheta^{k-1} \|}{\| \btheta^k \|} < \varepsilon$}
 	\end{algorithmic}
 \end{algorithm}
 
+  \section{Вычислительный эксперимент}
+Целью вычислительного эксперимента является исследование свойств предложенного алгоритма и сравнение его с другими методами. 
 
-  \section*{Эксперимент}
-  Целью вычислительного эксперимента является исследование свойств предложенного алгоритма и сравнение его с другими методами. 
-  
-  Исследована зависимость параметров алгоритма QPFS для задач~\eqref{ch3:eq:lin_reg_nonlin_reg},~\eqref{ch3:eq:lin_reg_log_reg}. 
-  Предположим, что вектор параметров~$\bw^0$ лежит вблизи оптимального вектора параметров~$\bw^*$. 
-  Рассмотрим отрезок
+Исследована зависимость параметров алгоритма QPFS для задач~\eqref{ch3:eq:lin_reg_nonlin_reg},~\eqref{ch3:eq:lin_reg_log_reg}. 
+Предположим, что вектор параметров~$\btheta^0$ лежит вблизи оптимального вектора параметров~$\btheta^*$. 
+Рассмотрим отрезок
 \[
-\bw_{\beta} = \beta \bw^* + (1 - \beta) \bw^0; \, \beta \in [0, 1] .
+\btheta_{\beta} = \beta \btheta^* + (1 - \beta) \btheta^0; \, \beta \in [0, 1] .
 \]
 
 Сгенерируем синтетический набор данных с 300 объектами и 7 признаками для задачи логистической регрессии. 
 Ландшафт функции ошибки~\eqref{ch3:eq:log_loss} на сетке двух случайно выбранных параметров показан на рис.~\ref{ch3:fig:log_reg_error}.
 Поверхность функции ошибки выпуклая с вытянутыми линиями уровня вдоль некоторых параметров модели.
-Добавим случайный шум к оптимальным параметрам~$\bw^*$, чтобы получить точку~$\bw^0$. Поведение вектора~$\bb$ на отрезке между~$\bw^0$ и~$\bw^*$ показано на рис.~\ref{ch3:fig:log_reg_b_wrt_beta}.
+Добавим случайный шум к оптимальным параметрам~$\btheta^*$, чтобы получить точку~$\btheta^0$. Поведение вектора~$\bb$ на отрезке между~$\btheta^0$ и~$\btheta^*$ показано на рис.~\ref{ch3:fig:log_reg_b_wrt_beta}.
 Компоненты~$\bb$ начинают резко уменьшаться, приближаясь к оптимальной точке.
 \begin{figure}
 	\centering
@@ -250,10 +245,10 @@ QPFS матрица~$\bQ$ и вектор~$\bb$ имеют вид
 Он не выпуклый и может содержать несколько локальных минимумов.
 Двумерный ландшафт функции ошибок для этого набора данных показан на рис.~\ref{ch3:fig:neural_error}. 
 Сетка строится для двух случайных весов из матрицы~$\bW_1$.
-Мы используем ту же стратегию для исследования того, как вектор~$\bb$ изменяется от~$\bw^0$ до~$\bw^*$. 
+Мы используем ту же стратегию для исследования того, как вектор~$\bb$ изменяется от~$\btheta^0$ до~$\btheta^*$. 
 Результат показан на рис.~\ref{ch3:fig:neural_b_wrt_beta}.
 Компоненты вектора $\bb$ становятся близки к нулю вблизи оптимума. 
-При достижении оптимального значения различные веса влияют на остатки модели~$\bz$.
+При достижении оптимального значения различные веса влияют на остатки модели~$\be$.
 \begin{figure}
 	\centering
 	\begin{minipage}{.5\textwidth}
@@ -285,7 +280,7 @@ QPFS матрица~$\bQ$ и вектор~$\bb$ имеют вид
 
 На рис.~\ref{ch3:fig:active_params_wrt_iters} показаны наборы активных параметров на итерациях для набора данных Boston Housing и нейронной сети с двумя скрытыми нейронами. 
 Темные ячейки соответствуют активным параметрам, которые мы оптимизируем.
-
+ 
 \begin{figure}[!ht]
 	\centering
 	\includegraphics[width=\linewidth]{figs/ch3/active_params_wrt_iters}	
