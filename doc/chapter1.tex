@@ -5,26 +5,52 @@
 \section{Основные определения}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+Задача декодирования формулируется следующим образом. 
+Требуется найти зависимость между двумя наборами данных $\bX$ и $\bY$.
+Предполагается, что данные имеют высокую избыточную размерность. 
+Модель машинного обучения, построенная на таких данных, оказывается неустойчивой.
+Зависимости в данных могут быть как линейными, так и существенно нелинейными.
+
+Формализуем описанную задачу.
+
+\begin{definition}
+	Назовём примером пару $(\bx, \by)$, состоящую из объекта $\bx \in \bbR^n$ и ответа $\by \in \bbR^r$. В случае задачи построения прогностической регрессионной модели $\bx$ является независимой переменной, $\by$~-- целевой переменной. При $r=1$ имеем стандартную постановку задачи линейной регрессии.
+\end{definition}
+
+\begin{definition}
+	Выборкой $\mathcal{D}=(\bX, \bY)$ будем называть заданное множество примеров $\{(\bx_i, \by_i)\}_{i=1}^m$. Здесь $\bX \in \bbR^{m \times n}$~-- матрица объектов, $\bY \in \mathbb{R}^{n \times k}$~-- матрица ответов:
+	\begin{equation*}
+	\bX = [\bx_1, \dots, \bx_m]^{\T} =  [\bchi_1, \dots, \bchi_n]; \quad \bY = [\by_1, \dots, \by_m]^{\T} =  [\bnu_1, \dots, \bnu_r].
+	\end{equation*}
+	
+	Столбцы~$\bchi_j, j=1, \dots, n$ матрицы~$\bX$ являются признаками объекта, столбцы~$\bnu_j, j=1, \dots, r$ матрицы ~$\bY$ являются целевыми столбцами.
+	
+\end{definition}
+
+Рассмотрим постановку задачи многомерной линейной регрессии. 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Задача восстановления регрессии}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Цель задачи регрессии~-- построить прогноз целевой переменной~$\by \in \bbR^r$ с $r$ компонентами по набору независимых переменных~$\bx \in \bbR^n$, где $n$~-- число признаков.
-Предполагается, что между объектом~$\bx$ и целевой переменной~$\by$ существует линейная зависимость следующего вида:
+Предполагается, что между объектами $\bx$ и ответами $\by$ существует зависимость
 \begin{equation}
-\by = \bTheta \bx+ \boldsymbol{\varepsilon}.
-\label{ch1:eq:model}
+\by = f(\bx, \bTheta) + \boldsymbol{\varepsilon},
+\label{eq:reg}
 \end{equation}
-Здесь $\bTheta \in \bbR^{r \times n}$~-- матрица параметров модели, $\boldsymbol{\varepsilon} \in \bbR^{r}$ представляет собой вектор остатков.
-Дана наблюдаемая выборка $\left( \bX, \bY \right)$, где $\bX \in \bbR^{m \times n}$~-- матрица плана, $\bY \in \bbR^{m \times r}$~-- целевая матрица:
-\begin{equation*}
-\bX = [\bx_1, \dots, \bx_m]^{\T} =  [\bchi_1, \dots, \bchi_n]; \quad \bY = [\by_1, \dots, \by_m]^{\T} =  [\bnu_1, \dots, \bnu_r].
-\end{equation*}
-Столбцы~$\bchi_j, j=1, \dots, n$ матрицы~$\bX$ являются признаками объекта, столбцы~$\bnu_j, j=1, \dots, r$ матрицы ~$\bY$ являются целевыми столбцами.
+где $f: \bbR^m \to \bbR^r$~-- параметрическая функция регрессионной зависимости, $\bepsilon$~-- вектор регрессивных остатков. 
+Необходимо восстановить зависимость $f$ по заданной наблюдаемой выборке~$\mathcal{D}$.
+
+Предположим, что зависимость $f(\bx, \bTheta)$ линейная:
+\begin{equation}
+\by = f(\bx, \bTheta) + \bepsilon = \bTheta \bx+ \bepsilon,
+\label{eq:linear_regression_model}
+\end{equation}
+\noindent где $\bTheta \in \bbR^{r \times n}$~-- матрица параметров модели.
 
 Необходимо найти матрицу параметров модели~$\bTheta$ при известном наборе данных~$\left( \bX, \bY \right)$.
 Оптимальные параметры~$\bTheta$ определяются минимизацией функции ошибки.
-Определим квадратичную функцию потерь следующим образом:
+Примером такой функции является квадратичная функция потерь:
 \begin{equation}
 \cL(\bTheta, \bX, \bY) = {\left\| \underset{m \times r}{\mathbf{Y}}  - \underset{m \times n}{\bX} \cdot \underset{r \times n}{\bTheta}^{\T} \right\| }_2^2 \rightarrow\min_{\bTheta}.
 \label{ch1:eq:loss_function}
@@ -38,6 +64,147 @@
 Если существует вектор~$\boldsymbol{\alpha} \neq \bZero_n$ такой, что $\bX \boldsymbol{\alpha}= \bZero_m$, то добавление~$\boldsymbol{\alpha}$ к любому столбцу матрицы~$\bTheta$ не меняет значение функции потерь~$\cL(\bTheta, \bX, \bY)$.
 В этом случае матрица~$\bX^{\T} \bX$ близка к сингулярной и не обратима.
 Чтобы избежать сильной линейной зависимости между признаками, используются методы снижения размерности и выбора признаков.
+
+\subsection{Задача декодирования}
+
+Для борьбы с линейной зависимостью используются методы снижения размерности, путем перехода в низкоразмерное латентное пространство.
+
+\begin{definition}
+	Функция $\varphi_1: \mathbb{R}^{m} \to \mathbb{R}^{p}$, переводящая исходных данных в латентное пространство, называется функций кодирования.
+\end{definition}
+
+\begin{definition}
+	Функция $\varphi_2: \mathbb{R}^{k} \to \mathbb{R}^{p}$, переводящая данные из латентного пространства в исходное, называется функций декодирования.
+\end{definition}
+
+\begin{definition}
+	Функция $g: \mathbb{R}^{n}\times \mathbb{R}^{n} \to \mathbb{R}$, связывающая два низкоразмерных латентных представления, называется функций согласования.
+\end{definition}
+
+Общая схема модели выглядит следующим образом:
+\begin{equation}
+\begin{tikzpicture}
+\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
+{
+	\underset{n \times m}{\bX} & \underset{n \times k}{\bY} \\
+	\underset{n \times p}{\mathbf{T}} &  \underset{n \times p}{\mathbf{U}} \\};
+\path[-stealth]
+(m-2-1) edge node [right] {$\varphi_2$} (m-1-1)
+(m-2-2) edge node [left] {$\psi_2$} (m-1-2)
+(m-1-1) edge [bend right] node [left] {$\varphi_1$} (m-2-1)
+(m-1-2) edge [bend left] node [right] {$\psi_1$} (m-2-2)
+(m-2-1) edge [<->] node [above] {$g$} (m-2-2);
+\end{tikzpicture},
+\label{eq:scheme}
+\end{equation}
+
+где $\varphi_1: \mathbb{R}^{m} \to \mathbb{R}^{p}$~--  функция кодирования объектов; $\psi_1: \mathbb{R}^{k} \to \mathbb{R}^{p}$~--  функция кодирования ответов;$\varphi_2: \mathbb{R}^{p} \to \mathbb{R}^{m}$~--  функция декодирования объектов; $\psi_2: \mathbb{R}^{p} \to \mathbb{R}^{k}$ -  функция декодирования ответов; $\bT = [\varphi_1(\bx_1), \cdots, \varphi_1(\bx_n)]^{\T}  \in \mathbb{R}^{n\times p}$ и $\bU =[\psi_1(\by_1), \cdots, \psi_1(\by_n)]^{\T} \in \mathbb{R}^{n\times p}$~-- матрицы представлений данных в латентном пространстве низкой размерности; $g: \mathbb{R}^{n} \times \mathbb{R}^{n} \to \mathbb{R}$~-- функция согласования.
+
+Оптимальные параметры $\theta_{\varphi_1}^{*}, \theta_{\psi_1}^{*}$ для функций кодирования $\varphi_1$  и $\psi_1$ находятся из следующей задачи параметрической оптимизации:
+\begin{equation}
+(\theta_{\varphi_1}^{*}, \theta_{\psi_1}^{*}) = \argmax_{(\theta_{\varphi_1}, \theta_{\psi_1})} [g(\varphi_1(\bX; \theta_{\varphi_1}), \psi_1(\bY; \theta_{\psi_1})))].
+\label{eq:argmax}
+\end{equation}
+
+Так как параметры функции кодирования подбирались из условия максимизации функции согласования~\eqref{eq:argmax} , то после перехода в латентное пространство между $\mathbf{T}$ и $\mathbf{U}$ существует зависимость
+\begin{equation}
+\bU = h(\bT) +  \boldsymbol{\eta},
+\label{eq:reg2}
+\end{equation}
+где $h: \mathbb{R}^{n \times p} \to \mathbb{R}^{n \times p}$~-- функция регрессионной зависимости,  $\boldsymbol{\eta}$~-- матрица регрессивных ошибок.
+
+Оптимальная $h$ находится минимизацией функции ошибки. Используем квадратичную функцию ошибки потерь $\mathcal{L}$ на $\bT$ и $\bU$:
+\begin{equation}
+\mathcal{L}(h | {\bT}, {\bU}) = {\left\| \underset{n \times p}{\bU}  - h(\underset{m \times p}{\bT}) \right\| }_2^2 \rightarrow\min_{h}.
+\label{eq:loss_function}
+\end{equation}
+
+Финальная прогностическая модель имеет вид:
+$\widehat{\by} = \psi_2(h(\varphi_1(\bx)))$, то есть
+
+\begin{equation}
+f = \psi_2 \circ h \circ \varphi_1
+\label{eq:f}
+\end{equation}
+
+\subsection{Метод Главных Компонент (PCA)}
+
+PCA~-- способ уменьшения размерности данных, сохраняющий максимальную дисперсию. PCA представляет собой ортогональное линейное преобразование исходного признакового пространства в новое пространство меньшей размерности. Первый базисный вектор строится так, чтобы выборочная дисперсия данных вдоль него была максимальной:
+\begin{equation}
+\bp_1 = \argmax_{\|\bp\|_{2} = 1} [\textit{var}(\bX \textbf{p})],
+\label{eq:PCA}
+\end{equation}
+где $var(\bX \textbf{p}) = \frac{1}{n} (\bX \textbf{p})^{\T}\bX \textbf{p}$ обозначает выборочную дисперсию.
+
+Функция кодирования $\varphi_1: \mathbb{R}^{m} \to \mathbb{R}^{p}$ примет вид:
+\begin{equation}
+\varphi_1(\bx) = \bP^{\T}\bx,
+\label{eq:PCA2}
+\end{equation}
+где $\textbf{P} = [\textbf{p}_1, \dots, \textbf{p}_{p}].$
+
+PCA не согласует объекты и ответы. Из-за этого некоторые зависимости могут быть не учтены.
+
+
+\subsection{PLS}
+
+PLS - алгоритм для моделирования связи между двумя наборами данных $\bX$ и $\bY$. Алгоритм проецирует $\bX$ и $\bY$ на латентное пространство $\mathbb{R}^{p}$ меньшей размерности. PLS находит матрицы исходных данных $\bX$ и $\bY$ в латентном пространстве $\textbf{T}$ и $\textbf{U}$ соответственно.
+
+Матрица объектов $\bX$ и целевая матрица $\bY$ проецируются на латентное пространство следующим образом:
+\begin{equation}
+\underset{n \times m}{\bX}  = \underset{n \times p}{\textbf{T}} \cdot \underset{p \times m}{\textbf{P}}^{\T} +  \underset{n \times m}{\textbf{F}},
+\label{eq:PLSpr1}
+\end{equation}
+\begin{equation}
+\underset{n \times k}{\bY}  = \underset{n \times p}{\textbf{U}} \cdot \underset{p \times k}{\bQ}^{\T} + \underset{n \times k}{\textbf{E}},
+\label{eq:PLSpr2}
+\end{equation}
+где $\textbf{T}$ и $\textbf{U}$ - матрицы описания объектов и исходов в латентном пространстве; $\textbf{P}$ и $\textbf{Q}$ - матрицы перехода из латентного пространства в исходное; $\textbf{F}$, $\textbf{E}$ - матрицы остатков.
+
+Для PLS  функции кодирования имеют вид:
+\begin{equation}
+\varphi_1(\bx) = \bW_{\bx}^{\T}\bx , \;\;
+\psi_1(\bY) = \bW_{\by}^{\T}\by ,
+\end{equation} 
+где матрицы весов $\bW_{\bx} \in \mathbb{R}^{m \times p}, \bW_{\by} \in \mathbb{R}^{k \times p}$. Столбцы матриц весов $\bw_{\bx}^{*}$ и $\bw_{\by}^{*}$ 
+находятся путем максимизации функции согласования $g(\bX \bw_{\bx}, \bY \bw_{\by}) = cov (\bX \bw_{\bx}, \bY \bw_{\by})^{2}$:
+\begin{equation}
+(\bw_{\bx}^{*}, \bw_{\by}^{*}) = \argmax_{\|\bw_{\by}\|_{2}=\|\bw_{\by}\|_{2}=1}[ cov(\bX \bw_{\bx}, \bY \bw_{\by})^{2}]
+\label{eq:PLSpr3}
+\end{equation}
+где $cov(\bX \bw_{\bx}, \bY \bw_{\by})$~-- выборочная ковариация между векторами.
+
+Функции декодирования принимают следующий вид:
+\begin{equation}
+\varphi_2(\bt) = \bP\bt, \;\;
+\psi_2(\bu) = \bQ\bu.
+\end{equation} 
+
+\subsection{CCA}
+
+Канонический корреляционный анализ (CCA) находит два набора базисных векторов $\{\bw_{\bx_i}\}_{i=1}^{p}, \; \bw_{\bx} \in \mathbb{R}^{m}$ и $\{\bw_{\by_i}\}_{i=1}^{p}, \; \bw_{\by} \in \mathbb{R}^{k}$, один для $\bX$ и другой для $\bY$, так что коэффициент корреляция между проекциями переменных на эти базисные векторы была максимальной. Функция согласования для CCA
+\begin{equation}
+g(\bX \bw_{\bx}, \bY \bw_{\by}) = corr(\bX \bw_{\bx}, \bY \bw_{\by}),
+\end{equation} 
+где $corr(\bX \bw_{\bx}, \bY \bw_{\by})$~-- коэффициент корреляции между векторами.
+
+Таким образом, функии кодирования
+\begin{equation}
+\varphi_1(\bx) = \bW_{\bx}^{\T}\bx , \;\;
+\psi_1(\bY) = \bW_{\by}^{\T}\by ,
+\end{equation}
+
+где первые столбцы матриц весов находится, как вектора максимизирующие функцию согласования $g$. Далее ищутся вектора, максимизирующие $g$, но с ограничением, что они не коррелируют с первой парой векторов. Процедура продолжается до тех пор, пока количество векторов не станет равным $p$. 
+\subsection{Deep CCA}
+
+Deep CCA~-- нелинейной модификация CCA. DCCA преобразует исходные данные с помощью многослойной нейронной сети таким образом, что результирующее представление становится согласованным. Предполагается, что есть $d$ слоев нейроной сети. 
+
+Выходом первого слоя для экземпляра $\bx$ будет $\mathbf{h}_1 = s(\bW^{1}_{\bx}\bx + \bb^{1}_{\bx}) \in \mathbb{R}^{c_1}$, где $\bW_{\bx}^{1} \in \mathbb{R}^{c_1 \times m}$~-- матрица весов, $\bb_{x}^{1} \in \mathbb{R}^{c_1}$~-- вектор смещения, $s: \mathbb{R} \to \mathbb{R}$~-- нелинейная функция, которая действует покомпонентно. Далее выход первого слоя используется для вычисления выхода второго слоя $\mathbf{h}_{2} = s(\bW^{2}_{\bx}\mathbf{h}_{1} + \bb^{2}_{\bx}) \in \mathbb{R}^{c_2}$ и так далее до тех пор пока не будет найдено конечное представление $\varphi_1(\bx) = s(\bW^{d}_{\bx}\mathbf{h}_{d-1} + \bb^{d}_{\bx}) \in \mathbb{R}^{p}$. Аналогично находится представление для $\by$: $\psi_1(\by) = s(\bW^{d}_{\by}\mathbf{h}_{d-1} + \bb^{d}_{\by}) \in \mathbb{R}^{p}.$
+
+Обозначим $\theta_{\bx}$, $\theta_{\by}$~-- параметры для функций кодирования, то есть матрицы весов и векторы смещений. Оптимальные параметры $\theta_{\bx}^{*}$, $\theta_{\by}^{*}$ находятся из задачи оптимизации:
+\begin{equation}
+(\theta_{\bx}^{*}, \theta_{\by}^{*}) = \argmax _{(\theta_{\bx}, \theta_{\by})} [g(\varphi_1(\bX; \theta_{\bx}), \psi_1(\bY; \theta_{2}))] = \argmax _{(\theta_{\bx}, \theta_{\by})} [corr(\varphi_1(\bX; \theta_{\bx}), \psi_1(\bY; \theta_{2}))].
+\end{equation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Метод проекции в скрытое пространство}
@@ -204,15 +371,15 @@
 \end{equation}
 где $\bW^* = \bW (\bP^{\T} \bW)^{-1}$. 
 
-Матрица параметров модели~\ref{ch1:eq:model} находится из уравнений~\eqref{ch1:eq:PLS_Y},~\eqref{ch1:eq:W*}
+Матрица параметров модели~\ref{ch1:eq:linear_regression_model} находится из уравнений~\eqref{ch1:eq:PLS_Y},~\eqref{ch1:eq:W*}
 \begin{equation*}
 \bY = \bT \bQ^{\T} + \bE = \bX \bW^* \bQ^{\T} + \bE = \bX \bTheta + \bE.
 \label{ch1:eq:pls_model}
 \end{equation*}
-Таким образом, параметры модели~\eqref{ch1:eq:model} равны
+Таким образом, параметры модели~\eqref{ch1:eq:linear_regression_model} равны
 \begin{equation}
 \bTheta = \bW (\bP^{\T} \bW)^{-1} \bQ^{\T}.
-\label{ch1:eq:model_parameters}
+\label{ch1:eq:linear_regression_model_parameters}
 \end{equation}
 
 Финальная модель~\eqref{ch1:eq:pls_model} является линейной, низкоразмерной в скрытом пространстве. 
