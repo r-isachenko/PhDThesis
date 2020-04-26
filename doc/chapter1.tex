@@ -17,11 +17,11 @@
 Пусть $\bx \in \bbX \subset \bbR^n$~-- независимая переменная, $\by \in \bbY \subset \bbR^r$~-- целевая переменная.
 
 \begin{definition}
-	Назовём примером пару $(\bx, \by)$, состоящую из реализации независимой переменной $\bx \in \bbX^n$ и целевой переменной $\by \in \bbY^r$. 
+	Назовём \textit{примером} пару $(\bx, \by)$, состоящую из реализации независимой переменной $\bx \in \bbX$ и целевой переменной $\by \in \bbY$. 
 \end{definition}
 
 \begin{definition}
-	Выборкой $\mathcal{D}=(\bX, \bY)$ будем называть заданное множество примеров $\{(\bx_i, \by_i)\}_{i=1}^m$. Здесь $\bX \in \bbR^{m \times n}$~-- матрица независимой переменной, $\bY \in \bbR^{n \times k}$~-- матрица целевой переменной:
+	\textit{Выборкой} $\cD=(\bX, \bY)$ будем называть заданное множество примеров $\{(\bx_i, \by_i)\}_{i=1}^m$. Здесь $\bX \in \bbR^{m \times n}$~-- матрица независимой переменной, $\bY \in \bbR^{n \times k}$~-- матрица целевой переменной:
 	\begin{equation*}
 	\bX = [\bx_1, \dots, \bx_m]^{\T} =  [\bchi_1, \dots, \bchi_n]; \quad \bY = [\by_1, \dots, \by_m]^{\T} =  [\bnu_1, \dots, \bnu_r].
 	\end{equation*}
@@ -30,65 +30,148 @@
 	
 \end{definition}
 
+\begin{definition}
+Назовём \textit{моделью} отображение $f: \bbX \rightarrow \bbY$ из пространства независимой переменной в пространство целевой переменной.
+\end{definition}
+
+Задача восстановления регрессии состоит в нахождении оптимальной модели $f^*$ по известной выборке $\cD$. Под оптимальностью понимается нахождение такой модели, которая бы доставляла минимум некоторой функции ошибки
+\begin{equation}
+	f^* = \argmin_f \cL(f, \bX, \bY).
+	\label{ch1:eq:loss_min}
+\end{equation}
+
+Задача поиска оптимальной модели является задачей функциональной оптимизации. 
+Для сужения пространства поиска моделей будем рассматривать параметрические модели $f(\bx, \bW)$, где $\bW$ являются \textit{параметрами модели}. 
+Тогда задача~\eqref{ch1:eq:loss_min} сводится к задаче поиска набора оптимальных параметров
+\begin{equation}
+\bW^* = \argmin_\bW \cL(\bW, \bX, \bY).
+\label{ch1:eq:loss_min_param}
+\end{equation}
+
+В данной диссертации рассматривается случай, когда размерность пространств~$\bbX$, $\bbY$ является избыточной. 
+В таком случае решение задачи~\eqref{ch1:eq:loss_min_param} оказывается неустойчивым. 
+В качестве примера такой неустойчивости в разделе~\ref{ch1:sec_lin_reg} рассматривается случай линейной регрессии.
+
+Для решения данной проблемы применяются методы регуляризации, выбора признаков и снижения размерности пространства.
+В данной работе рассматриваются методы снижения размерности пространства и выбора признаков.
+
+Для постановки задачи декодирования введём предположения о структурах пространств $\bbX$ и $\bbY$.
+ 
 \begin{assumption}
 	Рассмотрим случай, когда пространства $\bbX$ и $\bbY$ избыточны. Это означает, что объекты $\bx$ и $\by$ живут на некоторых многообразиях низкой размерности. В простейшем случае такие многообразия могут являться линейными подпространствами.
 \end{assumption}
 
 \begin{definition}
-	Назовём пространство $\bbT \subset \bbR^l$ скрытым пространством для пространства $\bbX$, если существуют функция $\varphi_1: \bbX \to \bbT$ и функция $\varphi_2: \bbT  \to \bbX$ такие что
+	Назовём пространство $\bbT \subset \bbR^l$ \textit{скрытым пространством} для пространства $\bbX \in \bbR^n$ ($l \leq n$), если существуют функция $\varphi_e: \bbX \to \bbT$ и функция $\varphi_d: \bbT  \to \bbX$ такие что
 	\[
-		\forall \bx \in \bbX \quad \exists \bt \in \bbT: \varphi_2 (\varphi_1(\bx)) = \varphi_2(\bt) = \bx.
+		\forall \bx \in \bbX \quad \exists \bt \in \bbT: \varphi_d (\varphi_e(\bx)) = \varphi_d(\bt) = \bx.
 	\]
-	Функцию $\varphi_1(\bx)$ будем называть функцией кодирования объекта $\bx$, функцию $\varphi_2(\bt)$ будем называть функцией декодирования. 
-\end{definition}
-
-
-Аналогично введём определение скрытого пространства для целевого пространства $\bbY$.
-
-\begin{definition}
-	Назовём пространство $\bbU \subset \bbR^s$ скрытым пространством для пространства $\bbY$, если существуют функция $\psi_1: \bbY \to \bbU$ и функция $\psi_2: \bbU  \to \bbY$ такие что
+	Функцию $\varphi_e(\bx)$ будем называть \textit{функцией кодирования} объекта $\bx$, функцию $\varphi_d(\bt)$ будем называть \textit{функцией декодирования}. 
+	
+	
+	Аналогично введём определение \textit{скрытого пространства}~$\bbU \subset \bbR^s$ для целевого пространства $\bbY$, \textit{функции кодирования} $\psi_e: \bbY \to \bbU$ и \textit{декодирования} $\psi_d: \bbU  \to \bbY$
 	\[
-	\forall \by \in \bbY \quad  \exists \bu \in \bbU: \psi_2 (\psi_1(\by)) = \psi_2(\bu) = \by.
+	\forall \by \in \bbY \quad  \exists \bu \in \bbU: \psi_d (\psi_e(\by)) = \psi_d(\bu) = \by.
 	\]
-	Функцию $\psi_1(\by)$ будем называть функцией кодирования объекта $\by$, функцию $\psi(\bu)$ будем называть функцией декодирования. 
 \end{definition}
 
 \begin{definition}
-	Пространство $\bbZ$ будем называть согласующим пространством, если существуют функция $\varphi_3: \bbT \to \bbZ$ и функция $\psi_3: \bbU \to \bbZ$ такие что 
-	\[
-	\forall (\bx, \by) \quad \exists \bz \in \bbZ: \varphi_3(\varphi(\bx)) = \varphi_3(\bt) = \bz = \psi_3(\bu) = \psi_3(\psi_1(\by)). 
-	\]
+	Будем говорить, что пространство $\bbX \in \bbR^n$ имеет \textit{внутреннюю структуру}, если существует скрытое пространство~$\bbT \subset \bbR^l$ такое, что $l \ll n$.
 \end{definition}
 
-Общая схема задачи декодирования выглядит следующим образом:
+\begin{definition}
+	Пространство $\bbZ$ будем называть \textit{согласующим пространством} для пространств $\bbT$ и $\bbU$, если существуют \textit{функции согласования} $\varphi_a: \bbT \to \bbZ$, $\psi_a: \bbU \to \bbZ$ и \textit{функции рассогласования} $\varphi_m: \bbZ \to \bbT$, $\psi_m: \bbZ \to \bbU$ такие что 
+	\begin{align}
+		\forall (\bt, \bu) \quad \exists \bz \in \bbZ:  \varphi_a(\bt) = \bz = \psi_a(\bu); \quad \varphi_m(\bz) = \bt; \quad \psi_m(\bz) = \bu. 
+	\end{align}
+\end{definition}
+
+\begin{assumption}
+	Предположим, что в задаче предсказания~\eqref{ch1:eq:loss_min} пространства $\bbX$ и $\bbY$ имеют внутреннюю структуру, то есть существуют скрытые пространства $\bbT$ и $\bbU$ существенно меньшей размерности. 
+	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует согласующее пространство~$\bbZ$
+	\[
+	\forall (\bx, \by) \quad \exists \bz \in \bbZ: \varphi_a(\varphi_e(\bx)) = \varphi_a(\bt) = \bz = \psi_a(\bu) = \psi_a(\psi_e(\by)). 
+	\]
+	
+	Тогда общая схема задачи декодирования принимает вид следующей коммутативной диаграммы:
+	\begin{equation}
+	\begin{tikzpicture}
+	\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
+	{
+		\bbX \subset \bbR^n & & \bbY \subset \bbR^r \\
+		\bbT \subset \bbR^l & & \bbU \subset \bbR^s \\
+		&  \bbZ \subset \bbR^d & \\};
+	\path[-stealth]
+	(m-1-1) edge node [above] {$f$} (m-1-3)
+	(m-2-1) edge [bend right=10] node [right] {$\varphi_d$} (m-1-1)
+	(m-2-3) edge [bend left=10] node [left] {$\psi_d$} (m-1-3)
+	(m-1-1) edge [bend right=10] node [left] {$\varphi_e$} (m-2-1)
+	(m-1-3) edge [bend left=10] node [right] {$\psi_e$} (m-2-3)
+	(m-2-1) edge [bend left=10] node [right] {$\varphi_a$} (m-3-2)
+	(m-2-3) edge [bend right=10] node [left] {$\psi_a$} (m-3-2)
+	(m-3-2) edge [bend left=10] node [left] {$\varphi_m$} (m-2-1)
+	(m-3-2) edge [bend right=10] node [right] {$\psi_m$} (m-2-3);
+	\end{tikzpicture}
+	\label{ch1:eq:decoding_scheme}
+	\end{equation}
+\end{assumption}
+
 \begin{equation}
 \begin{tikzpicture}
 \matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
 {
-	\bbX \subset \bbR^n & & \bbY \subset \bbR^r \\
-	\bbT \subset \bbR^l & & \bbU \subset \bbR^s \\
-	&  \bbZ \subset \bbR^d & \\};
+	\bbX \subset \bbR^n & \bbY \subset \bbR^r \\
+	\bbT \subset \bbR^l & \bbU \subset \bbR^s \\};
 \path[-stealth]
-(m-2-1) edge node [right] {$\varphi_2$} (m-1-1)
-(m-2-3) edge node [left] {$\psi_2$} (m-1-3)
-(m-1-1) edge [bend right] node [left] {$\varphi_1$} (m-2-1)
-(m-1-3) edge [bend left] node [right] {$\psi_1$} (m-2-3)
-(m-2-1) edge node [right] {$\varphi_3$} (m-3-2)
-(m-2-3) edge node [left] {$\psi_3$} (m-3-2);
+(m-1-1) edge node [above] {$f$} (m-1-2)
+(m-2-1) edge [bend right=10] node [right] {$\varphi_d$} (m-1-1)
+(m-2-2) edge [bend left=10] node [left] {$\psi_d$} (m-1-2)
+(m-1-1) edge [bend right=10] node [left] {$\varphi_e$} (m-2-1)
+(m-1-2) edge [bend left=10] node [right] {$\psi_e$} (m-2-2)
+(m-2-1) edge node [above] {$h$} (m-2-2);
 \end{tikzpicture}
-\label{ch1:eq:decoding_scheme}
 \end{equation}
+
+\begin{equation}
+\begin{tikzpicture}
+\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
+{
+	\bbX \subset \bbR^n & & & \bbY \subset \bbR^r \\
+	& \hat{\bbX} \subset \bbR^n & \hat{\bbY} \subset \bbR^r & \\
+	 \bbT \times \mathbb{E} & \bbT \subset \bbR^l & \bbU \subset \bbR^s & \bbU \times \mathbb{E}\\};
+\path[-stealth]
+(m-1-1) edge node [above] {$f$} (m-2-3)
+(m-1-1) edge node {} (m-2-2)
+(m-1-1) edge node [left] {$\varphi_e$} (m-3-2)
+(m-1-4) edge node [right] {$\psi_e$} (m-3-3)
+(m-1-4) edge node {} (m-2-3)
+(m-3-1) edge node {} (m-1-1)
+(m-3-1) edge node {} (m-3-2)
+(m-3-2) edge node [above] {$h$} (m-3-3)
+(m-3-2) edge node [right] {$\varphi_d$} (m-2-2)
+(m-3-3) edge node [left] {$\psi_d$} (m-2-3)
+(m-3-4) edge node {} (m-1-4)
+(m-3-4) edge node {} (m-3-3);
+\end{tikzpicture}
+\end{equation}
+
+\begin{definition}
+	Согласно схеме~\eqref{ch1:eq:decoding_scheme}, определим модель декодирования $f: \bbX \rightarrow \bbY$ как суперпозицию
+	 \[
+	 	f = \psi_d \circ \psi_m \circ \varphi_a \circ \varphi_e.
+	 \]
+\end{definition}
 
 \hrulefill
 
 \begin{definition}
-	Функция $g: \bbR^l \times \bbR^l \to \bbR$, связывающая два низкоразмерных латентных представления, назовём функцией согласования.
+	Функция $g: \bbR^l \times \bbR^l \to \bbR$, связывающая два низкоразмерных латентных представления, назовём \textit{функцией согласования}.
 \end{definition}
-где $\varphi_1: \bbR^m \to \bbR^l$~--  функция кодирования объектов; $\psi_1: \bbR^r \to \bbR^l$~--  функция кодирования ответов; $\varphi_2: \bbR^l \to \bbR^n$~--  функция декодирования объектов; $\psi_2: \bbR^l \to \bbR^r$~--  функция декодирования ответов; $\bT = [\varphi_1(\bx_1), \cdots, \varphi_1(\bx_m)]^{\T}  \in \bbR^{m\times l}$ и $\bU =[\psi_1(\by_1), \cdots, \psi_1(\by_m)]^{\T} \in \bbR^{m\times l}$~-- матрицы представлений данных в латентном пространстве низкой размерности; $g: \bbR^l \times \bbR^l \to \bbR$~-- функция согласования.
+где $\varphi_e: \bbR^m \to \bbR^l$~--  функция кодирования объектов; $\psi_e: \bbR^r \to \bbR^l$~--  функция кодирования ответов; $\varphi_d: \bbR^l \to \bbR^n$~--  функция декодирования объектов; $\psi_d: \bbR^l \to \bbR^r$~--  функция декодирования ответов; $\bT = [\varphi_e(\bx_1), \cdots, \varphi_e(\bx_m)]^{\T}  \in \bbR^{m\times l}$ и $\bU =[\psi_e(\by_1), \cdots, \psi_e(\by_m)]^{\T} \in \bbR^{m\times l}$~-- матрицы представлений данных в латентном пространстве низкой размерности; $g: \bbR^l \times \bbR^l \to \bbR$~-- функция согласования.
 
-Оптимальные параметры $\bW_{\varphi_1}^{*}, \bW_{\psi_1}^{*}$ для функций кодирования $\varphi_1$  и $\psi_1$ находятся из следующей задачи параметрической оптимизации:
+Оптимальные параметры $\bW_{\varphi_e}^{*}, \bW_{\psi_e}^{*}$ для функций кодирования $\varphi_e$  и $\psi_e$ находятся из следующей задачи параметрической оптимизации:
 \begin{equation}
-(\bW_{\varphi_1}^{*}, \bW_{\psi_1}^{*}) = \argmax_{(\bW_{\varphi_1}, \bW_{\psi_1})} [g(\varphi_1(\bX; \bW_{\varphi_1}), \psi_1(\bY; \bW_{\psi_1})))].
+(\bW_{\varphi_e}^{*}, \bW_{\psi_e}^{*}) = \argmax_{(\bW_{\varphi_e}, \bW_{\psi_e})} [g(\varphi_e(\bX; \bW_{\varphi_e}), \psi_e(\bY; \bW_{\psi_e})))].
 \label{ch1:eq:alignment_argmax}
 \end{equation}
 
@@ -106,10 +189,10 @@
 \end{equation}
 
 Финальная прогностическая модель имеет вид:
-$\widehat{\by} = \psi_2(h(\varphi_1(\bx)))$, то есть
+$\widehat{\by} = \psi_d(h(\varphi_e(\bx)))$, то есть
 
 \begin{equation}
-f = \psi_2 \circ h \circ \varphi_1
+f = \psi_d \circ h \circ \varphi_e
 \label{eq:f}
 \end{equation}
 
@@ -122,7 +205,8 @@ f = \psi_2 \circ h \circ \varphi_1
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Задача восстановления регрессии}
+\section{Линейная регрессия}
+\label{ch1:sec_lin_reg}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Предполагается, что между объектами $\bx$ и ответами $\by$ существует зависимость вида
@@ -162,9 +246,9 @@ f = \psi_2 \circ h \circ \varphi_1
 Для устранения линейной зависимости и снижения размерности входного пространства объектов широко используется метод главных компонент~(PCA). 
 Метод PCA находит низкоразмерное представление матрицы~$\bX = \bT \bP^{\T}$, такое что новое представление~$\bT \in \bbR^{m \times l}$ содержит максимальную долю дисперсии исходной матрицы.
 
-Преобразование PCA задается ортогональной матрицей $\bP$. Функция кодирования объектов имеет вид $\varphi_1(\bx) = \bP^{\T}\bx$. Функция декодирования объектов имеет вид $\varphi_2(\bt) = \bP\bt$. 
+Преобразование PCA задается ортогональной матрицей $\bP$. Функция кодирования объектов имеет вид $\varphi_e(\bx) = \bP^{\T}\bx$. Функция декодирования объектов имеет вид $\varphi_d(\bt) = \bP\bt$. 
 
-Функция кодирования и декодирования ответов являются тождественными преобразованиями $\psi_1(\by) =  \by = \bu = \psi_2(\bu)$. Преобразование $h$ является линейным.
+Функция кодирования и декодирования ответов являются тождественными преобразованиями $\psi_e(\by) =  \by = \bu = \psi_d(\bu)$. Преобразование $h$ является линейным.
 
 Метод PCA не согласует объекты $\bx$ и ответы $\by$.
 
@@ -197,8 +281,8 @@ f = \psi_2 \circ h \circ \varphi_1
 
 Для PLS  функции кодирования имеют вид:
 \begin{equation}
-\varphi_1(\bx) = \bW_{\bx}^{\T}\bx , \;\;
-\psi_1(\bY) = \bW_{\by}^{\T}\by ,
+\varphi_e(\bx) = \bW_{\bx}^{\T}\bx , \;\;
+\psi_e(\bY) = \bW_{\by}^{\T}\by ,
 \end{equation} 
 где матрицы весов $\bW_{\bx} \in \mathbb{R}^{m \times p}, \bW_{\by} \in \mathbb{R}^{k \times p}$. Столбцы матриц весов $\bw_{\bx}^{*}$ и $\bw_{\by}^{*}$ 
 находятся путем максимизации функции согласования $g(\bX \bw_{\bx}, \bY \bw_{\by}) = cov (\bX \bw_{\bx}, \bY \bw_{\by})^{2}$:
@@ -210,8 +294,8 @@ f = \psi_2 \circ h \circ \varphi_1
 
 Функции декодирования принимают следующий вид:
 \begin{equation}
-\varphi_2(\bt) = \bP\bt, \;\;
-\psi_2(\bu) = \bQ\bu.
+\varphi_d(\bt) = \bP\bt, \;\;
+\psi_d(\bu) = \bQ\bu.
 \end{equation} 
 
 Псевдокод метода регрессии PLS приведен в алгоритме~\ref{PLSR_code}.
@@ -375,8 +459,8 @@ g(\bX \bw_{\bx}, \bY \bw_{\by}) = corr(\bX \bw_{\bx}, \bY \bw_{\by}),
 
 Таким образом, функии кодирования
 \begin{equation}
-\varphi_1(\bx) = \bW_{\bx}^{\T}\bx , \;\;
-\psi_1(\bY) = \bW_{\by}^{\T}\by ,
+\varphi_e(\bx) = \bW_{\bx}^{\T}\bx , \;\;
+\psi_e(\bY) = \bW_{\by}^{\T}\by ,
 \end{equation}
 
 где первые столбцы матриц весов находится, как вектора максимизирующие функцию согласования $g$. Далее ищутся вектора, максимизирующие $g$, но с ограничением, что они не коррелируют с первой парой векторов. Процедура продолжается до тех пор, пока количество векторов не станет равным $p$. 
@@ -384,11 +468,11 @@ g(\bX \bw_{\bx}, \bY \bw_{\by}) = corr(\bX \bw_{\bx}, \bY \bw_{\by}),
 
 Deep CCA~-- нелинейной модификация CCA. DCCA преобразует исходные данные с помощью многослойной нейронной сети таким образом, что результирующее представление становится согласованным. Предполагается, что есть $d$ слоев нейроной сети. 
 
-Выходом первого слоя для экземпляра $\bx$ будет $\mathbf{h}_1 = s(\bW^{1}_{\bx}\bx + \bb^{1}_{\bx}) \in \mathbb{R}^{c_1}$, где $\bW_{\bx}^{1} \in \mathbb{R}^{c_1 \times m}$~-- матрица весов, $\bb_{x}^{1} \in \mathbb{R}^{c_1}$~-- вектор смещения, $s: \mathbb{R} \to \mathbb{R}$~-- нелинейная функция, которая действует покомпонентно. Далее выход первого слоя используется для вычисления выхода второго слоя $\mathbf{h}_{2} = s(\bW^{2}_{\bx}\mathbf{h}_{1} + \bb^{2}_{\bx}) \in \mathbb{R}^{c_2}$ и так далее до тех пор пока не будет найдено конечное представление $\varphi_1(\bx) = s(\bW^{d}_{\bx}\mathbf{h}_{d-1} + \bb^{d}_{\bx}) \in \mathbb{R}^{p}$. Аналогично находится представление для $\by$: $\psi_1(\by) = s(\bW^{d}_{\by}\mathbf{h}_{d-1} + \bb^{d}_{\by}) \in \mathbb{R}^{p}.$
+Выходом первого слоя для экземпляра $\bx$ будет $\mathbf{h}_1 = s(\bW^{1}_{\bx}\bx + \bb^{1}_{\bx}) \in \mathbb{R}^{c_1}$, где $\bW_{\bx}^{1} \in \mathbb{R}^{c_1 \times m}$~-- матрица весов, $\bb_{x}^{1} \in \mathbb{R}^{c_1}$~-- вектор смещения, $s: \mathbb{R} \to \mathbb{R}$~-- нелинейная функция, которая действует покомпонентно. Далее выход первого слоя используется для вычисления выхода второго слоя $\mathbf{h}_{2} = s(\bW^{2}_{\bx}\mathbf{h}_{1} + \bb^{2}_{\bx}) \in \mathbb{R}^{c_2}$ и так далее до тех пор пока не будет найдено конечное представление $\varphi_e(\bx) = s(\bW^{d}_{\bx}\mathbf{h}_{d-1} + \bb^{d}_{\bx}) \in \mathbb{R}^{p}$. Аналогично находится представление для $\by$: $\psi_e(\by) = s(\bW^{d}_{\by}\mathbf{h}_{d-1} + \bb^{d}_{\by}) \in \mathbb{R}^{p}.$
 
 Обозначим $\theta_{\bx}$, $\theta_{\by}$~-- параметры для функций кодирования, то есть матрицы весов и векторы смещений. Оптимальные параметры $\theta_{\bx}^{*}$, $\theta_{\by}^{*}$ находятся из задачи оптимизации:
 \begin{equation}
-(\theta_{\bx}^{*}, \theta_{\by}^{*}) = \argmax _{(\theta_{\bx}, \theta_{\by})} [g(\varphi_1(\bX; \theta_{\bx}), \psi_1(\bY; \theta_{2}))] = \argmax _{(\theta_{\bx}, \theta_{\by})} [corr(\varphi_1(\bX; \theta_{\bx}), \psi_1(\bY; \theta_{2}))].
+(\theta_{\bx}^{*}, \theta_{\by}^{*}) = \argmax _{(\theta_{\bx}, \theta_{\by})} [g(\varphi_e(\bX; \theta_{\bx}), \psi_e(\bY; \theta_{2}))] = \argmax _{(\theta_{\bx}, \theta_{\by})} [corr(\varphi_e(\bX; \theta_{\bx}), \psi_e(\bY; \theta_{2}))].
 \end{equation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
