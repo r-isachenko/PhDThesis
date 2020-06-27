@@ -9,4 +9,6 @@
 *.blg
 *.synctex.gz
 *.toc
+*.nav
+*.snm
 *eps-converted-to.pdf

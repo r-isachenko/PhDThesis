@@ -76,21 +76,21 @@
 \end{definition}
 
 \begin{definition}
-	Будем говорить, что пространство $\bbX \in \bbR^n$ имеет \textit{внутреннюю структуру}, если существует скрытое пространство~$\bbT \subset \bbR^l$ такое, что $l \ll n$.
+	Будем считать, что пространство $\bbT \subset \bbR^l$ задаёт \textit{внутреннюю структуру} пространства $\bbX \in \bbR^n$, если пространство $\bbT$ является скрытым для пространства $\bbX$.
 \end{definition}
 
 \begin{definition}
-	Пространство $\bbZ$ будем называть \textit{согласующим пространством} для пространств $\bbT$ и $\bbU$, если существуют \textit{функции согласования} $\varphi_a: \bbT \to \bbZ$, $\psi_a: \bbU \to \bbZ$ и \textit{функции рассогласования} $\varphi_m: \bbZ \to \bbT$, $\psi_m: \bbZ \to \bbU$ такие что 
-	\begin{align}
-		\forall (\bt, \bu) \quad \exists \bz \in \bbZ:  \varphi_a(\bt) = \bz = \psi_a(\bu); \quad \varphi_m(\bz) = \bt; \quad \psi_m(\bz) = \bu. 
-	\end{align}
+	Между пространствами $\bbX$ и $\bbY$ существует \textit{согласующее отображение}, если существуют пространства $\bbT$ и $\bbU$, задающие внутренние структуры для пространств $\bbX$ и $\bbY$ соответственно, и существует \textit{функция согласования} $g: \bbT \rightarrow \bbU$, такая что
+	\[
+	 \forall \bu \in \bbU \quad \exists \bt:  \bu = g(\bt).
+	\]
 \end{definition}
 
 \begin{assumption}
-	Предположим, что в задаче предсказания~\eqref{ch1:eq:loss_min} пространства $\bbX$ и $\bbY$ имеют внутреннюю структуру, то есть существуют скрытые пространства $\bbT$ и $\bbU$ существенно меньшей размерности. 
-	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует согласующее пространство~$\bbZ$
+	Предположим, что в задаче предсказания~\eqref{ch1:eq:loss_min} пространства $\bbT$ и $\bbU$ задают внутреннюю структуру пространств $\bbX$ и $\bbY$. 
+	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует функция согласования~$g: \bbT \rightarrow \bbU$. Тогда выполнено
 	\[
-	\forall (\bx, \by) \quad \exists \bz \in \bbZ: \varphi_a(\varphi_e(\bx)) = \varphi_a(\bt) = \bz = \psi_a(\bu) = \psi_a(\psi_e(\by)). 
+	\forall \by \in \bbY \quad \exists \bx \in \bbX: \by = \psi_d(\bu) = \psi_d(g(\bt)) = \psi_d(g(\phi_e(\bx))). 
 	\]
 	
 	Тогда общая схема задачи декодирования принимает вид следующей коммутативной диаграммы:
@@ -98,69 +98,81 @@
 	\begin{tikzpicture}
 	\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
 	{
-		\bbX \subset \bbR^n & & \bbY \subset \bbR^r \\
-		\bbT \subset \bbR^l & & \bbU \subset \bbR^s \\
-		&  \bbZ \subset \bbR^d & \\};
+		\bbX \subset \bbR^n & \bbY \subset \bbR^r \\
+		\bbT \subset \bbR^l & \bbU \subset \bbR^s \\};
 	\path[-stealth]
-	(m-1-1) edge node [above] {$f$} (m-1-3)
+	(m-1-1) edge node [above] {$f$} (m-1-2)
 	(m-2-1) edge [bend right=10] node [right] {$\varphi_d$} (m-1-1)
-	(m-2-3) edge [bend left=10] node [left] {$\psi_d$} (m-1-3)
+	(m-2-2) edge [bend left=10] node [left] {$\psi_d$} (m-1-2)
 	(m-1-1) edge [bend right=10] node [left] {$\varphi_e$} (m-2-1)
-	(m-1-3) edge [bend left=10] node [right] {$\psi_e$} (m-2-3)
-	(m-2-1) edge [bend left=10] node [right] {$\varphi_a$} (m-3-2)
-	(m-2-3) edge [bend right=10] node [left] {$\psi_a$} (m-3-2)
-	(m-3-2) edge [bend left=10] node [left] {$\varphi_m$} (m-2-1)
-	(m-3-2) edge [bend right=10] node [right] {$\psi_m$} (m-2-3);
+	(m-1-2) edge [bend left=10] node [right] {$\psi_e$} (m-2-2)
+	(m-2-1) edge node [above] {$h$} (m-2-2);
 	\end{tikzpicture}
 	\label{ch1:eq:decoding_scheme}
 	\end{equation}
 \end{assumption}
 
-\begin{equation}
-\begin{tikzpicture}
-\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
-{
-	\bbX \subset \bbR^n & \bbY \subset \bbR^r \\
-	\bbT \subset \bbR^l & \bbU \subset \bbR^s \\};
-\path[-stealth]
-(m-1-1) edge node [above] {$f$} (m-1-2)
-(m-2-1) edge [bend right=10] node [right] {$\varphi_d$} (m-1-1)
-(m-2-2) edge [bend left=10] node [left] {$\psi_d$} (m-1-2)
-(m-1-1) edge [bend right=10] node [left] {$\varphi_e$} (m-2-1)
-(m-1-2) edge [bend left=10] node [right] {$\psi_e$} (m-2-2)
-(m-2-1) edge node [above] {$h$} (m-2-2);
-\end{tikzpicture}
-\end{equation}
-
-\begin{equation}
-\begin{tikzpicture}
-\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
-{
-	\bbX \subset \bbR^n & & & \bbY \subset \bbR^r \\
-	& \hat{\bbX} \subset \bbR^n & \hat{\bbY} \subset \bbR^r & \\
-	 \bbT \times \mathbb{E} & \bbT \subset \bbR^l & \bbU \subset \bbR^s & \bbU \times \mathbb{E}\\};
-\path[-stealth]
-(m-1-1) edge node [above] {$f$} (m-2-3)
-(m-1-1) edge node {} (m-2-2)
-(m-1-1) edge node [left] {$\varphi_e$} (m-3-2)
-(m-1-4) edge node [right] {$\psi_e$} (m-3-3)
-(m-1-4) edge node {} (m-2-3)
-(m-3-1) edge node {} (m-1-1)
-(m-3-1) edge node {} (m-3-2)
-(m-3-2) edge node [above] {$h$} (m-3-3)
-(m-3-2) edge node [right] {$\varphi_d$} (m-2-2)
-(m-3-3) edge node [left] {$\psi_d$} (m-2-3)
-(m-3-4) edge node {} (m-1-4)
-(m-3-4) edge node {} (m-3-3);
-\end{tikzpicture}
-\end{equation}
-
 \begin{definition}
 	Согласно схеме~\eqref{ch1:eq:decoding_scheme}, определим модель декодирования $f: \bbX \rightarrow \bbY$ как суперпозицию
-	 \[
-	 	f = \psi_d \circ \psi_m \circ \varphi_a \circ \varphi_e.
-	 \]
+	 \begin{equation}
+	 	f = \psi_d \circ g \circ \varphi_e.
+	 	\label{ch1:eq:def_decoding_function}
+	 \end{equation}
 \end{definition}
+
+Рассмотрим случай квадратичной функции потерь:
+\[
+\cL(f, \bX, \bY) = \sum_{i=1}^m \| \by_i - f(\bx_i) \|^2.
+\]
+
+\begin{statement}
+	\label{ch1:st:decod_lip}
+	Пусть функция декодирования $\psi_d$ модели декодирования~$f$~\eqref{ch1:eq:def_decoding_function} Липшицева с константой $L$. Тогда 
+	\[
+		\cL(f, \bX, \bY) \leq L \cdot \cL(g, \bT, \bU).
+	\]
+\end{statement}
+
+\begin{proof}
+	\begin{multline*}
+		\cL(f, \bX, \bY) = \sum_{i=1}^m \| \psi_d (g (\phi_e(\bx_i))) - \by_i \|^2  = \sum_{i=1}^m \| \psi_d (g (\bt_i)) - \psi_d (\bu_i) \|^2 \\\leq L \sum_{i=1}^m \| g (\bt_i) - \bu_i \|^2 = L \cdot \cL(g, \bT, \bU).
+	\end{multline*}
+\end{proof}
+\begin{theorem}
+	Рассмотрим две модели:
+	\begin{enumerate}
+		\item Первая модель $f_1$ доставляет минимум ошибке $\cL(f, \bX, \bY)$
+		\[
+		f_1 = \argmin_f \cL(f, \bX, \bY).
+		\]
+		При этом $\bY = f_1(\bX) + \bE_1$, где $\bE_1 \in \bbR^{m \times r}$~--- матрица ошибок модели $f_1$.
+		
+		\item Вторая модель $f_2$~--- модель декодирования~\eqref{ch1:eq:def_decoding_function} c Липшецевой функцией декодирования $\psi_d$ с константой $L$ и функцией согласования, удовлетворяющей условию
+		\[
+			g = \argmin_g \cL(g, \bT, \bU).
+		\]
+		При этом $\bU = g(\bT) + \bE_2$, где $\bE_2 \in \bbR^{m \times s}$~--- матрица ошибок функции согласования $g$.
+	\end{enumerate}
+	Пусть для константы Липшица $L$ функции декодирования $\psi_d$ выполнено следующее условие
+	\begin{equation}
+		L \leq \frac{\|\bE_1\|_F^2}{\|\bE_2\|_F^2}.
+		\label{ch1:eq:lip_ineq}
+	\end{equation}
+	Тогда функция ошибки $\cL(f_2, \bX, \bY)$ модели $f_2$ не превосходит функции ошибки $\cL(f_1, \bX, \bY)$ модели $f_1$.
+\end{theorem}
+
+\begin{proof}
+	\[
+		\mathcal{L} (f_1, \bX, \bY) = \sum_{i=1}^m \| \mathbf{f}_1(\bx_i) - \by_i\|^2 = \| \bE_1 \|_F^2.
+	\]
+	\[
+	\mathcal{L} (g, \bT, \bU) = \sum_{i=1}^m \| \mathbf{g}(\bt_i) - \bu_i\|^2 = \| \bE_2 \|_F^2.
+	\]
+	Воспользуемся утверждением~\ref{ch1:st:decod_lip} и условием~\eqref{ch1:eq:lip_ineq}
+	\[
+		\mathcal{L} (f_2, \bX, \bY) \leq L \cdot \cL(g, \bT, \bU) = L \| \bE_2 \|_F^2 \leq \| \bE_1 \|_F^2 = \cL(f_1, \bX, \bY).
+	\]
+\end{proof}
 
 \hrulefill
 
