@@ -1,443 +1,475 @@
-\chapter{Выбор параметров нелинейных моделей}
+\chapter{Выбор признаков}
+
+Задача выбора признаков заключается в поиске оптимального подмножества признаков~$\cA$ среди всех возможных $2^n - 1$ вариантов. 
+Существует взаимооднозначное отображение между подмножеством $\cA$ и булевым вектором~$\ba \in \{0, 1\}^n$, компоненты которого указывают, выбран ли признак. 
+Для нахождения оптимального вектора~$\ba$ введем функцию ошибки выбора признаков~$S(\ba, \bX, \bY)$. 
+Проблема выбора признаков принимает вид:
+\begin{equation}
+\ba = \argmin_{\ba' \in \{0, 1\}^n} S(\ba', \bX, \bY).
+\label{ch2:eq:feature_selection}
+\end{equation}
+Целью выбора признаков является построение функции~$S (\ba, \bX, \bY)$. Конкретные примеры данной функции для рассматриваемых алгоритмов выбора признаков приведены ниже и обобщены в таблице~\ref{ch2:tbl:summary}.
+
+Задача~\eqref{ch2:eq:feature_selection} имеет дискретную область определения~$\{0, 1\}^n$. Для решения данной задачи применяется релаксация задачи~\eqref{ch2:eq:feature_selection} к непрерывной области определения~$[0, 1]^n$. Релаксированная задача выбора функции имеет следующий вид:
+\begin{equation}
+\bz = \argmin_{\bz' \in [0, 1]^n} S(\bz', \bX, \bY).
+\label{ch2:eq:relaxed_feature_selection}
+\end{equation}
+
+Здесь, компоненты вектора~$\bz$~-- значения нормированных коэффициентов значимости признаков.
+Сначала решается задача~\eqref{ch2:eq:relaxed_feature_selection}, для получения вектора значимостей~$\bz$. 
+Затем решение~\eqref{ch2:eq:feature_selection} восстанавливается с помощью отсечения по порогу следующим образом:
+\begin{equation}
+\ba = [a_j]_{j=1}^n, \quad 
+a_j = \begin{cases}
+1, & z_j > \tau; \\
+0, & \text{в противном случае}.
+\end{cases}
+\label{ch2:eq:feature_threshold}
+\end{equation}
+$\tau$~-- гиперпараметр, который может быть подобран вручную или выбран с помощью кросс-валидации. 
+
+Как только решение~$\ba$ задачи~\eqref{ch2:eq:feature_selection} получено, задача~\eqref{ch1:eq:loss_function} принимает вид:
+\begin{equation*}
+\mathcal{L}(\bTheta_{\cA}, \bX_{\cA}, \bY) = {\left\| \mathbf{Y} - \bX_{\cA}\bTheta^{\T}_{\cA} \right\| }_2^2 \rightarrow\min_{\bTheta_{\cA}},
+\end{equation*}
+где индекс~$\cA$ обозначает подматрицу со столбцами, индексы которых содержатся в~$\cA$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Выбор параметров для обучения моделей}
+\section{Выбор признаков с помощью квадратичного программирования}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Модель $f( \bx, \btheta)$ с параметрами $\btheta \in \mathbb{R}^p$ предсказывает целевую переменную~$y \in \bbY$ по объекту~$\bx \in \bbR^{n}$. Пространство~$\bbY$ представляет собой бинарные метки классов~$\{0, 1\}$ для задачи двухклассовой классификации и~$\bbR$ для задачи регрессии.
-Даны матрица плана~$\bX = [\bx_1, \dots, \bx_m]^{\T} \in \bbR^{m \times n}$ и целевой вектор~$\by = [y_1, \dots, y_m]^{\T} \in \bbY^{m}$. 
-Цель состоит в нахождении оптимальных параметров~$\btheta^*$.
-Параметры~$\btheta$ вычисляются минимизацией функции ошибки:
+Если между столбцами матрицы плана~$\bX$ существует линейная зависимость, то решение задачи линейной регрессии
 \begin{equation}
-\btheta^* = \argmin_{\btheta \in \bbR^p} \cL(\btheta, \bX, \by).
-\label{ch3:eq:error_function}
+\| \bnu - \bX \btheta\|_2^2 \rightarrow\min_{\btheta \in \bbR^{n}}.
+\label{ch2:eq:linear_regression}
 \end{equation}
-В качестве функции ошибки~$\cL (\btheta, \bX, \by)$ рассматриваются квадратичная ошибка для задачи регрессии:
+оказывается неустойчивым. 
+Методы выбора признаков находят подмножество~$ \cA \in \{1, \dots, n\}$ оптимальных столбцов~$\bX$. 
+
+Алгоритм QPFS выбирает некоррелированные признаки, релевантные целевому вектору~$\bnu$.
+Чтобы формализовать этот подход, введем две функции: $\text{Sim}(\bX)$ и $\text{Rel}(\bX, \bnu)$. 
+$\text{Sim}(\bX)$ контролирует избыточность между признаками, $\text{Rel}(\bX, \bnu)$ содержит релевантности между каждым признаком и целевым вектором. 
+Мы хотим минимизировать функцию Sim и максимизировать Rel одновременно.
+
+QPFS предлагает явный способ построения функций Sim и Rel. 
+Алгоритм минимизирует следующую функцию ошибки
 \begin{equation}
-\cL(\btheta, \bX, \by) = \frac 12 \| \by - \mathbf{f}(\bX, \btheta) \|_2^2 = \frac 12 \sum_{i=1}^m \bigl( y_i - f(\bx_i,  \btheta)\bigr)^2,
-\label{ch3:eq:squared_error}
+\underbrace{\bz^{\T} \bQ \bz}_{\text{Sim}} - \alpha \cdot \underbrace{\vphantom{()} \mathbf{b}^{\T} \bz}_{\text{Rel}} \rightarrow \min_{\substack{\bz \in \bbR^n_+ \\ \|\bz\|_1=1}}.
+\label{ch2:eq:qpfs_problem}
 \end{equation}
-и функция кросс-энтропии для задачи бинарной классификации: 
+Элементы матрицы~$\bQ \in \bbR^{n \times n}$ содержат коэффициенты попарного сходства между признаками. 
+Вектор~$\mathbf{b} \in \bbR^n$ выражает сходство между каждым признаком и целевым вектором~$\bnu$.
+Нормированный вектор~$\bz$ отражает значимость каждого признака. 
+Функция ошибки~\eqref{ch2:eq:qpfs_problem} штрафует зависимые признаки функцией Sim и штрафует признаки, не релевантные к целевой переменной функцией Rel. 
+Параметр~$\alpha$ позволяет контролировать компромисс между Sim и Rel.
+Авторы оригинальной статьи QPFS~\cite{rodriguez2010quadratic} предложили способ выбора~$\alpha$, чтобы уравновесить вклад членов $\text{Sim}(\bX)$ и $\text{Rel}(\bX, \bnu)$
+
+\begin{equation*}
+\alpha = \frac{\overline{\bQ}}{\overline{\bQ} + \overline{\bb}}, \quad \text{где}\,\,\overline{\bQ} = \text{mean} (\bQ), \,\,\, \overline{\bb}= \text{mean} (\bb).
+\end{equation*}
+Чтобы выделить оптимальное подмножество признаков, применяется отсечение по порогу~\eqref{ch2:eq:feature_threshold}.
+
+Для измерения сходства используется выборочный коэффициент корреляции Пирсона между парами признаков для функции Sim, и между признаками и целевым вектором для функции Rel:
 \begin{equation}
-\cL(\btheta, \bX, \by) = \sum_{i=1}^m \bigl[y_i \log f (\bx_i , \btheta) + (1-y_i) \log \bigl(1 - f (\bx_i , \btheta)\bigr)\bigr].
-\label{ch3:eq:log_loss}
+\bQ = \left[|\text{corr}(\bchi_i, \bchi_j)|\right]_{i,j=1}^n, \quad \bb = \left[|\text{corr}(\bchi_i, \bnu)|\right]_{i=1}^n.
+\label{ch2:eq:qpfs_1d_qb}
 \end{equation}
+Здесь
+\begin{equation*}
+\text{corr}(\bchi, \bnu) = \frac{\sum_{i=1}^m(\bchi_i - \overline{\bchi})( \bnu_i - \overline{\bnu})}{\sqrt{\sum_{i=1}^m(\bchi_i - \overline{\bchi})^2\sum_{i=1}^m(\bnu_i - \overline{\bnu})^2}}.
+\end{equation*}
+Другие способы определения $\bQ$ и $\bb$ рассматриваются в~\cite{katrutsa2017comprehensive}. 
+В работе~\cite{katrutsa2017comprehensive} показано, что алгоритм QPFS превосходит многие существующие алгоритмы выбора функций на различных критериях качества.
 
-Задача~\eqref{ch3:eq:error_function} решается с помощью итеративной процедуры оптимизации. 
-Для получения параметров на шаге~$k$ текущие параметры $\btheta^{k-1}$ обновляются по следующему правилу:
-\begin{equation}
-\btheta^k = \btheta^{k - 1} + \Delta \btheta^{k - 1}.
-\label{ch3:eq:update_rule}
-\end{equation}
-Авторы используют метод оптимизации Ньютона для выбора вектора обновлений~$\Delta \btheta$.
-
-Метод Ньютона нестабилен и вычислительно сложен. 
-В данной статье предлагается стабильный алгоритм Ньютона. 
-Перед шагом градиента предлагается выбрать подмножество активных параметров модели, которые оказывают наибольшее влияние на функцию ошибки~$\cL (\btheta, \bX, \by)$.
-Обновление параметров производится только для отобранного множества индексов~$\cA = \{j: a_j = 1, \ba \in \{0, 1\}^p\}$
-
-\begin{align*}
-\btheta_{\cA}^k &= \btheta_{\cA}^{k - 1} + \Delta \btheta_{\cA}^{k - 1}, \quad \btheta_{\cA} = \{\theta_j: j \in \cA \}; \\
-\btheta_{\bar{\cA}}^k &= \bw_{\bar{\cA}}^{k - 1}, \quad \btheta_{\bar{\cA}} = \{\theta_j: j \notin \cA \}.
-\end{align*}
-Чтобы выбрать оптимальное подмножество индексов~$\cA$, из всех возможных $2^p - 1$~подмножеств, вводится функция ошибки
-\begin{equation}
-\ba = \argmin_{\ba' \in \{0, 1\}^p} S(\ba', \bX, \by, \btheta),
-\label{ch3:eq:subset_selection}
-\end{equation}
-аналогичная функции ошибки~\eqref{ch2:eq:feature_selection} для задачи выбора признаков. 
-Задача~\eqref{ch3:eq:subset_selection} решается на каждом шаге $k$ процесса оптимизации для текущих параметров~$\btheta^k$.
-
-Алгоритм QPFS используется для решения задачи~\eqref{ch3:eq:subset_selection}.
-QPFS выбирает подмножество параметров~$\ba$ для вектора обновлений~$ \Delta \btheta$, которые оказывают наибольшее влияние на вектор остатков и являются попарно независимыми.
-Функция ошибки~\eqref{ch2:eq:qpfs_problem} соответствует функции ошибки~$S(\ba, \bX, \by, \btheta)$
-\begin{equation}
-\ba = \argmax_{\ba' \in \{1, 0\}^p} S(\ba', \bX, \by, \btheta) \Leftrightarrow \argmin_{\ba  \in \bbR^p_+, \, \|\ba\|_1=1} \bigl[\ba^{\T} \bQ \ba - \alpha \cdot \mathbf{b}^{\T} \ba \bigr].
-\end{equation}
-В работе показано, что для модели нелинейной регрессии с квадратичной функцией ошибки~\eqref{ch3:eq:squared_error} и для модели логистической регрессии с кросс-энтропией~\eqref{ch3:eq:log_loss}, каждый шаг оптимизации эквивалентен задаче линейной регрессии~\eqref{ch2:eq:linear_regression}.
-
-
+Задача~\eqref{ch2:eq:qpfs_problem} является выпуклой, если матрица~$\bQ$ является неотрицательно определенной. В общем случае это не всегда верно. 
+Чтобы удовлетворить этому условию спектр матрицы~$\bQ$ смещается, и матрица~$\bQ$ заменяется на $\bQ - \lambda_{\text{min}} \mathbf{I}$, где $\lambda_{\text{min}} $ является минимальным собственным значением~$\bQ$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Метод Ньютона решения задачи настройки параметров}
+\section{Многоиндексный метод выбора признаков}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Метод Ньютона использует условие оптимизации первого порядка для задачи~\eqref{ch3:eq:error_function} и линеаризует градиент $S (\btheta)$
-\[
-\nabla S (\btheta + \Delta \btheta) = \nabla S(\btheta) + \bH \cdot \Delta \btheta = 0,
-\]
-\[
-\Delta \btheta = - \bH^{-1} \nabla S(\btheta).
-\]
-где $\bH = \nabla^2 S(\btheta)$ является Гессианом матрицы функции ошибки $S(\btheta)$.
+В данном разделе описаны предлагаемые методы выбора признаков для случая нескольких многомерной целевой переменной.
+В этом случае компоненты целевой переменной могут коррелировать между собой. 
+Предлагаются алгоритмы, учитывающие зависимости как во входном, так и в целевом пространствах.
 
-Итерация~\eqref{ch3:eq:update_rule} метода Ньютона имеет вид
-\[
-\btheta^k = \btheta^{k-1} - \bH^{-1} \nabla S(\btheta).
-\]
-Каждая итерация инвертирует матрицу Гессиана.
-Мерой плохой обусловленности для матрицы Гессиана~$\bH$ является число обусловленности
-\[
-\kappa(\bH) = \frac{\lambda_{\text{max}}(\bH)}{\lambda_{\text{min}}(\bH)},
-\]
-где $\lambda_{\text{max}}(\bH), \lambda_{\text{min}}(\bH)$ являются максимальным и минимальным собственными значениями~$\bH$. Большое число обусловленности~$\kappa (\bH)$ приводит к нестабильности процесса оптимизации.
-Предложенный алгоритм уменьшает размер матрицы Гессиана~$\bH$. В наших экспериментах это приводит к меньшему числу обусловленности~$\kappa (\bH)$.
+\subsection{Агрегация релевантностей целевых переменных}
 
-Размер шага метода Ньютона может быть чрезмерно большим. Для управления размером шага обновлений добавим параметр $\eta$ в правило обновления~\eqref{ch3:eq:update_rule}
-\[
-\btheta^k = \btheta^{k - 1} + \eta \Delta \btheta^{k - 1}, \quad \eta \in [0, 1].
-\]
-
-Для выбора соответствующего размера шага~$\eta$ используется правило Армихо. Выбирается максимальное~$\eta$ так, чтобы выполнялось следующее условие
-\[
-S(\btheta^{k - 1} + \eta \Delta \btheta^{k - 1}) < S(\btheta^{k - 1}) + \gamma \eta \nabla S^{\T}(\btheta^{k-1})\btheta^{k - 1}, \quad \gamma \in [0, 0.5].
-\]
-
-\subsection*{Модель нелинейной регрессии}
-Предположим, что модель $f (\bx , \btheta)$ близка к линейной в окрестности точки $\btheta + \Delta \btheta$
-\[
-\mathbf{f}(\bX , \btheta + \Delta \btheta) \approx \mathbf{f}(\bX , \btheta) + \bJ \cdot \Delta  \btheta,
-\]
-где $\mathbf{J} \in \bbR^{m \times p}$ является матрицы Якоби
+В работе~\cite{motrenko2018multi}, чтобы применить алгоритм QPFS к многомерному случаю ($r > 1$), релевантности признаков агрегируются по всем $r$ компонентам. Член $\text{Sim}(\bX)$ остаётся без изменений, матрица~$\bQ$ определяется как~\eqref{ch2:eq:qpfs_1d_qb}. Вектор $\bb$ агрегируется по всем компонентам целевой переменной и определяется как
+\begin{equation*}
+\bb = \left[\sum_{k=1}^r|\text{corr}(\bchi_i, \bnu_k)|\right]_{i=1}^n.
+\end{equation*}
+Недостатком такого подхода является отсутствие учёта зависимостей в столбцах матрицы~$\bY$. Рассмотрим следующий пример:
+\begin{equation*}
+\bX = [\bchi_1, \bchi_2, \bchi_3], \quad \bY = [\underbrace{\bnu_1, \bnu_1, \dots, \bnu_1}_{r-1}, \bnu_2].
+\end{equation*}
+Пусть матрица~$\bX$ содержит 3 столбца, матрица~$\bY$~-- $r$ столбцов, где первые $r-1$ компонент целевой переменной идентичны.
+Попарные сходства признаков задаются матрицей~$\bQ$.
+Матрица~$\bB$ содержит попарные сходства признаков и целевых столбцов.
+Вектор~$\bb$ получен суммированием матрицы~$\bB$ по столбцами
 \begin{equation}
-\bJ = 
-\begin{pmatrix}
-\frac{\partial f(\bx_1 , \btheta)}{\partial \theta_1} & \dots & 
-\frac{\partial f(\bx_1 , \btheta)}{\partial \theta_p} \\
-\dots & \dots & \dots \\
-\frac{\partial f(\bx_m , \btheta)}{\partial \theta_1} & \dots & 
-\frac{\partial f(\bx_m , \btheta)}{\partial \theta_p}
-\end{pmatrix}.
+\bQ = \begin{bmatrix} 1 & 0 & 0\\ 0 & 1 & 0.8 \\ 0 & 0.8 & 1 \end{bmatrix}, \quad
+\bB = \begin{bmatrix} 0.4 & \dots & 0.4 & 0 \\ 0.5 & \dots & 0.5 & 0.8 \\ 0.8 & \dots & 0.8 & 0.1 \end{bmatrix}, \quad
+\bb = \begin{bmatrix} (r-1) \cdot 0.4 + 0 \\ (r-1) \cdot 0.5 + 0.8 \\ (r-1) \cdot 0.8 + 0.1 \end{bmatrix}.
+\label{ch2:eq:qpfs_example}
 \end{equation}
-В соответствии с этим предположением градиент~$\nabla S(\btheta)$ и Гессиан матрицы~$\bH$ функции ошибки~\eqref{ch3:eq:squared_error} равняются
+\vspace{0.5cm} \\
+Пусть необходимо выбрать только 2 признака.
+В данном случае оптимальным подмножеством признаков является~$[\bchi_1, \bchi_2]$.
+Признак~$\bchi_2$ предсказывает второй целевой столбец~$\bnu_2$, комбинация признаков~$\bchi_1, \bchi_2$ прогнозирует первый целевой столбец~$\bnu_1$.
+Алгоритм QPFS для~$r=2$ дает решение~$\bz = [0.37, 0.61, 0.02]$. Это совпадает с описанным решением.
+Однако, если добавить коллинеарные столбцы в матрицу~$\bY$ и увеличить~$r$ до 5, то решением QPFS будет~$\bz = [0.40, 0.17, 0.43]$.
+Здесь потерян признак~$\bchi_2$ и выбран избыточный признак~$\bchi_3$.
+В следующих подразделах предлагаются обобщения алгоритма QPFS, которые позволяют бороться с проблемой данного примера.
+
+\subsection{Симметричный учёт значимости признаков и целевых переменных}
+Чтобы учесть зависимости в столбцах матрицы~$\bY$, обобщим функцию QPFS~\eqref{ch2:eq:qpfs_problem} для многомерного случая ($r > 1$).
+Добавим член~$\text{Sim}(\bY)$ и изменим член $\text{Rel}(\bX, \bY)$ следующим образом:
 \begin{equation}
-\nabla S(\btheta) = \bJ^{\T} (\by - \mathbf{f}), \quad \bH = \bJ^{\T} \bJ.
-\label{ch3:eq:nonlin_reg_deriv}
+\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{\bz_x^{\T} \bB \bz_y}_{\text{Rel}(\bX, \bY)} + \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1 \\ \bz_y \geq \bZero_r, \, \bOne_r^{\T}\bz_y=1}}.
+\label{ch2:eq:symimp}
 \end{equation}
-Это приводит к методу Гаусса-Ньютона и правилу обновления~\eqref{ch3:eq:update_rule}
-\[
-\btheta^k = \btheta^{k - 1} + (\bJ^{\T} \bJ)^{-1}\bJ^{\T}(\mathbf{f} - \by).
-\]
-Вектор обновления~$\Delta \btheta$ является решением задачи линейной регрессии
+Определим элементы матриц~$\bQ_x \in \bbR^{n \times n}$, $\bQ_y \in \bbR^{r \times r}$ и $\bB \in \bbR^{n \times r}$ следующим образом:
+\begin{equation*}
+\bQ_x = \left[ |\text{corr}(\bchi_i, \bchi_j)| \right]_{i,j=1}^n, \quad
+\bQ_y = \left[ |\text{corr}(\bnu_i, \bnu_j)| \right]_{i,j=1}^r, \quad
+\bB =  \left[ |\text{corr}(\bchi_i, \bnu_j)| \right]_{\substack{i=1, \dots, n \\ j=1, \dots, r}}.
+\end{equation*}
+Вектор~$\bz_x$ содержит коэффициенты значимости признаков, $\bz_y$~-- коэффициенты значимости целевых столбцов.
+Коррелированные целевые столбцы штрафуются членом~$\text{Sim}(\bY)$ и получают более низкие значения значимости.
+
+Коэффициенты $\alpha_1$, $\alpha_2$, и $\alpha_3$ контролируют влияние каждого члена на функцию~\eqref{ch2:eq:symimp} и удовлетворяют следующим условиям:
+\begin{equation*}
+\alpha_1 + \alpha_2 + \alpha_3 = 1, \quad \alpha_i \geq 0, \, i = 1, 2, 3.
+\end{equation*}
+\begin{statement}
+	Баланс между~$\text{Sim}(\bX)$, $\text{Rel}(\bX, \bY)$ и $\text{Sim}(\bY)$ в  задаче~\eqref{ch2:eq:symimp} достигается при:
+	\begin{equation}
+	\alpha_1 \propto \overline{\bQ}_y \overline{\bB} ; \quad
+	\alpha_2 \propto \overline{\bQ}_x \overline{\bQ}_y; \quad
+	\alpha_3  \propto \overline{\bQ}_x \overline{\bB}.
+	\label{ch2:eq:alpha_3}
+	\end{equation}
+	
+\end{statement}
+\begin{proof}
+	Значения $\alpha_1$, $\alpha_2$, и $\alpha_3$ получаются путем решения следующих уравнений:
+	\begin{align*}
+	&\alpha_1 + \alpha_2 + \alpha_3 = 1; \\
+	&\alpha_1 \overline{\bQ}_x = \alpha_2 \overline{\bB} = \alpha_3 \overline{\bQ}_y.
+	\end{align*}
+	Здесь~$\overline{\bQ}_x$, $\overline{\bB}$ и $\overline{\bQ}_y$ соответствующих матриц~$\bQ_x$, $\bB$ и $\bQ_y$ - средние значения членов~$\text{Sim}(\bX)$, $\text{Rel}(\bX, \bY)$ и $\text{Sim}(\bY)$.
+\end{proof}
+Для изучения зависимости~$\text{Sim}(\bY)$ на функцию~\eqref{ch2:eq:symimp}, зафиксируем соотношение между~$\alpha_1$ и $\alpha_2$:
 \begin{equation}
-\| \be - \bF \Delta \btheta \|_2^2 \rightarrow \min_{\Delta \btheta \in \bbR^{p}},
-\label{ch3:eq:lin_reg_nonlin_reg}
+\alpha_1 = \frac{(1 - \alpha_3)\overline{\bB}}{\overline{\bQ}_x + \overline{\bB}}; \quad
+\alpha_2 = \frac{(1 - \alpha_3)\overline{\bQ}_x}{\overline{\bQ}_x + \overline{\bB}}; \quad
+\alpha_3 \in [0, 1].
+\label{ch2:eq:alphas3}
 \end{equation}
-где $\be = \mathbf{f} - \by$ и $\bF = \bJ$.
 
-В качестве нелинейной модели рассматривается модель двухслойной нейронной сеть. В этом случае модель~$f (\bx, \btheta)$ задается
-следующим образом:
-\[
-f(\bx, \btheta) = \sigma(\bx^{\T} \bW_1) \bw_2.
-\]
-Здесь~$\bW_1 \in \bbR^{m \times h}$~-- это матрица весов, которые соединяют исходные признаки с $h$ скрытыми нейронами. Функция нелинейности $\sigma(\cdot)$ применяется поэлементно. Веса~$\bw_2 \in \bbR^{h \times 1}$ соединяют скрытые нейроны с выходом. 
-Вектор параметров модели~$\btheta$ представляет собой объединение векторизованных матриц~$\bW_1$, $\bw_2$.
+Применим предложенный алгоритм к приведенному примеру~\eqref{ch2:eq:qpfs_example}.
+Матрица~$\bQ$ соответствует матрице~$\bQ_x$.
+Определим матрицы~$\bQ_y$ как $\text{corr}(\bnu_1, \bnu_2) = 0.2$, а все остальные элементы зададим 1.
+Рисунок~\ref{ch2:fig:features_vs_alpha} показывает значение векторов значимостей признаков~$\bz_x$ и целевых векторов~$\bz_y$ в зависимости от значения коэффициента~$\alpha_3$.
+Если~$\alpha_3$ мало, значимости всех целевых векторов не различимы и значимость признака~$\bchi_3$ выше значимости признака~$\bchi_2$. При увеличении~$\alpha_3$ до~$0.2$, коэффициент значимости~$\bz_{y,5}$ целевого вектора~$\bnu_5$ увеличивается наряду со значимостью признака~$\bchi_2$.
 
-\subsection*{Модель логистической регрессии}
-
-Для логистической регрессии модель имеет вид $f(\bx , \btheta) = \sigma(\bx^{\T} \btheta)$ с сигмоидной функцией активации~$\sigma(\cdot)$.
-Градиент и Гессиан функции ошибки~\eqref{ch3:eq:log_loss} равны
-\begin{equation}
-\nabla S(\btheta) = \bX^{\T} (\mathbf{f} - \by), \quad \bH = \bX^{\T} \bR \bX,
-\label{ch3:eq:log_reg_deriv}
-\end{equation}
-где $\bR$~-- это диагональная матрица с диагональными элементами $f(\bx_i , \btheta) \cdot (1 - f(\bx_i , \btheta))$.
-
-Правило обновления~\eqref{ch3:eq:update_rule} в этом случае
-\[
-\btheta^k = \btheta^{k - 1} + (\bX^{\T} \bR \bX)^{-1} \bX^{\T} (\by - \mathbf{f}).
-\]
-Этот алгоритм известен как итеративный алгоритм взвешенных наименьших квадратов (IRLS). Вектор обновлений $\Delta \bw$ является решением задачи линейной регрессии
-\begin{equation}
-\| \be - \bF \Delta \btheta \|_2^2 \rightarrow \min_{\Delta \btheta \in \bbR^{p}},
-\label{ch3:eq:lin_reg_log_reg}
-\end{equation}
-где $\be = \bR^{-1/2} (\by - \mathbf{f})$ и $\bF = \bR^{1/2}\bX$.
-
-\section{Метод Ньютона с выбором параметром с помощью квадратичного программирования}
-
-Предлагается реализовать алгоритм QPFS для решения задач~\eqref{ch3:eq:lin_reg_nonlin_reg} и \eqref{ch3:eq:lin_reg_log_reg}. 
-QPFS матрица~$\bQ$ и вектор~$\bb$ имеют вид
-\[
-\bQ = \text{Sim} (\bF), \quad \bb = \text{Rel} (\bF, \be).
-\]
-
-Выборочный коэффициент корреляции равен нулю для ортогональных векторов.
-Покажем, что в оптимальной точке~$\btheta^*$ вектор~$\be$ ортогонален столбцам матрицы~$\bF$. 
-В этом случае вектор~$\bb = \text{Rel} (\bF, \be)$ равен нулю. Это означает, что член, учитывающий релевантность, в данном случае исключается.
-Условие оптимизации первого порядка гарантирует это свойство для модели нелинейной регрессии
-\[
-\bF^{\T} \be = \bJ^{\T} (\mathbf{f} - \by) = - \nabla S(\btheta^*) = \boldsymbol{0},
-\]
-и для модели логистической регрессии
-\[
-\bF^{\T} \be = \bX \bR^{-1/2} \bR^{1/2} (\by - \mathbf{f}) = \bX^{\T} (\by - \mathbf{f}) = \nabla S(\btheta^*) = \boldsymbol{0}.
-\]
-Псевдокод предлагаемого алгоритма приведён в алгоритме~\ref{pc:QPFSNewton}.
-
-\begin{algorithm}
-	\caption{QPFS + Ньютон алгоритм}
-	\label{pc:QPFSNewton}
-	\begin{algorithmic}
-		\REQUIRE $\varepsilon$~-- допустимое отклонение;\\
-		\hspace{1.07cm}$\tau$~-- пороговое значение;\\
-		\hspace{1.07cm}$\gamma$~-- параметр правила Армихо.
-		\ENSURE $\btheta^*$;
-		\STATE  инициализировать $\btheta^0$;
-		\STATE $k := 1$;
-		\REPEAT
-		\STATE вычислить $\be$ и $\bF$ для~\eqref{ch3:eq:lin_reg_nonlin_reg} или~\eqref{ch3:eq:lin_reg_log_reg} ;
-		\vspace{0.1cm}
-		\STATE $\bQ := \text{Sim} (\bF)$, $\bb := \text{Rel}(\bF, \be)$, $\alpha = \frac{\overline{\bQ}}{\overline{\bQ} + \overline{\bb}}$;
-		\vspace{0.1cm}
-		\STATE $\ba := \argmin_{\ba \geq 0, \, \|\ba\|_1=1}\ba^{\T} \bQ \ba - \alpha \cdot \mathbf{b}^{\T} \ba$;
-		\vspace{0.1cm}
-		\STATE $\cA := \{j: a_j = 1\}$;
-		\vspace{0.1cm}
-		\STATE вычислить $\nabla S(\btheta^{k-1})$, $\bH$ для \eqref{ch3:eq:nonlin_reg_deriv} или \eqref{ch3:eq:log_reg_deriv};
-		\vspace{0.1cm}
-		\STATE $\Delta \btheta^{k-1} = - \bH^{-1} \nabla S(\btheta^{k-1})$;
-		\vspace{0.1cm}
-		\STATE $\eta := \text{ArmijoRule}(\btheta^{k-1}, \gamma)$;
-		\vspace{0.1cm}
-		\STATE $\btheta_{\cA}^k = \btheta_{\cA}^{k - 1} + \eta \Delta \btheta_{\cA}^{k - 1}$;
-		\vspace{0.1cm}
-		\STATE $k := k + 1$;
-		\vspace{0.1cm}
-		\UNTIL{$\frac{\| \btheta^k - \btheta^{k-1} \|}{\| \btheta^k \|} < \varepsilon$}
-	\end{algorithmic}
-\end{algorithm}
-
-  \section{Вычислительный эксперимент}
-Целью вычислительного эксперимента является исследование свойств предложенного алгоритма и сравнение его с другими методами. 
-
-Исследована зависимость параметров алгоритма QPFS для задач~\eqref{ch3:eq:lin_reg_nonlin_reg},~\eqref{ch3:eq:lin_reg_log_reg}. 
-Предположим, что вектор параметров~$\btheta^0$ лежит вблизи оптимального вектора параметров~$\btheta^*$. 
-Рассмотрим отрезок
-\[
-\btheta_{\beta} = \beta \btheta^* + (1 - \beta) \btheta^0; \, \beta \in [0, 1] .
-\]
-
-Сгенерируем синтетический набор данных с 300 объектами и 7 признаками для задачи логистической регрессии. 
-Ландшафт функции ошибки~\eqref{ch3:eq:log_loss} на сетке двух случайно выбранных параметров показан на рис.~\ref{ch3:fig:log_reg_error}.
-Поверхность функции ошибки выпуклая с вытянутыми линиями уровня вдоль некоторых параметров модели.
-Добавим случайный шум к оптимальным параметрам~$\btheta^*$, чтобы получить точку~$\btheta^0$. Поведение вектора~$\bb$ на отрезке между~$\btheta^0$ и~$\btheta^*$ показано на рис.~\ref{ch3:fig:log_reg_b_wrt_beta}.
-Компоненты~$\bb$ начинают резко уменьшаться, приближаясь к оптимальной точке.
 \begin{figure}
 	\centering
-	\begin{minipage}{.47\textwidth}
-		\centering
-		\includegraphics[width=\linewidth]{figs/ch3/log_reg_error}
-		\caption{Ландшафт функции ошибки для логистической регрессии}
-		\label{ch3:fig:log_reg_error}
-	\end{minipage}%
-	\begin{minipage}{.47\textwidth}
-		\centering
-		\includegraphics[width=\linewidth]{figs/ch3/log_reg_b_wrt_beta}
-		\caption{Релевантности параметров для логистической регрессии}
-		\label{ch3:fig:log_reg_b_wrt_beta}
-	\end{minipage}
+	\includegraphics[width=\linewidth]{figs/ch2/features_vs_alpha.pdf}
+	\caption{Значимости признаков~$\bz_x$ и целевых векторов~$\bz_y$ в зависимости от~$\alpha_3$ для рассмотренного примера}
+	\label{ch2:fig:features_vs_alpha}
 \end{figure}
 
-Для модели нелинейной регрессии используется классический набор данных Boston Housing с 506 объектами и 13 признаками.
-Для простоты нейронная сеть содержит два скрытых нейрона.
-Ландшафт функции ошибок для модели нейронной сети является более сложным. 
-Он не выпуклый и может содержать несколько локальных минимумов.
-Двумерный ландшафт функции ошибок для этого набора данных показан на рис.~\ref{ch3:fig:neural_error}. 
-Сетка строится для двух случайных весов из матрицы~$\bW_1$.
-Мы используем ту же стратегию для исследования того, как вектор~$\bb$ изменяется от~$\btheta^0$ до~$\btheta^*$. 
-Результат показан на рис.~\ref{ch3:fig:neural_b_wrt_beta}.
-Компоненты вектора $\bb$ становятся близки к нулю вблизи оптимума. 
-При достижении оптимального значения различные веса влияют на остатки модели~$\be$.
-\begin{figure}
+\subsection{Минимаксная постановка задачи выбора признаков}
+Функция~\eqref{ch2:eq:symimp} является симметричной по отношению к~$\bz_x$ и $\bz_y$.
+Она штрафует признаки, которые коррелированы и не имеют отношения к целевым векторам.
+Кроме того, она штрафует целевые вектора, которые коррелированы между собой и недостаточно коррелируют с признаками.
+Это приводит к малым значениям значимостей для целевых векторов, которые слабо коррелируют с признаками, и большим значениям для целевых векторов, которые сильно коррелируют с признаками.
+Этот результат противоречит интуиции.
+Цель~--- предсказать все целевые вектора, особенно те, которые слабо коррелируют с признаками. Сформулируем две взаимосвязанные задачи:
+\begin{align}
+\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{ \bz_x^{\T}\mathbf{B} \bz_y}_{\text{Rel}(\bX, \bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n, \\ \bOne_n^{\T}\bz_x=1}};
+\label{ch2:eq:x_qpfs}\\
+\alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} + \alpha_2 \cdot \underbrace{ \bz_x^{\T} \mathbf{B} \bz_y}_{\text{Rel}(\bX, \bY)} \rightarrow \min_{\substack{\bz_y \geq \bZero_r,  \\ \bOne_r^{\T}\bz_y=1}}.
+\label{ch2:eq:y_qpfs}
+\end{align}
+Разница между~\eqref{ch2:eq:x_qpfs} и~\eqref{ch2:eq:y_qpfs} заключается в  знаке перед членом Rel.
+В пространстве входных объектов нерелевантные признаки должны иметь меньшие значения значимости.
+В то же время целевые вектора, не релевантные признакам, должны иметь большую значимость.
+Задачи~\eqref{ch2:eq:x_qpfs} и \eqref{ch2:eq:y_qpfs} объединяются в совместную минимакс или максмин постановку
+\begin{equation}
+\min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}} 	\max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} f(\bz_x, \bz_y), \quad \left(\text {или} \, \max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}} f(\bz_x, \bz_y)\right),
+\label{ch2:eq:minmax}
+\end{equation}
+где
+\begin{equation*}
+f(\bz_x, \bz_y) = \alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{\bz_x^{\T} \bB \bz_y}_{\text{Rel}(\bX, \bY)} - \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)}.
+\end{equation*}
+\begin{theorem}
+	Для положительно определенной матрицы~$\bQ_x$ и $\bQ_y$, максмин и минимакс задачи~\eqref{ch2:eq:minmax} имеют одинаковое оптимальное значение.
+\end{theorem}
+\begin{proof}
+	Введём обозначения
+	\begin{equation*}
+	\mathbb{C}^n = \{\bz : \bz \geq \bZero_n, \, \bOne_n^{\T}\bz=1\}, \quad \mathbb{C}^r = \{\bz : \bz \geq \bZero_r, \, \bOne_r^{\T}\bz=1\}.
+	\end{equation*}
+	Множества $\mathbb{C}^n$ и $\mathbb{C}^r$ - компактные и выпуклые. Функция $f: \mathbb{C}^n \times \mathbb{C}^r \rightarrow \bbR$ является непрерывной. Если~$\bQ_x$ и $\bQ_y$ положительно определенны, функция~$f$ выпукло-вогнутая. Т. е.,
+	$f(\cdot, \bz_y): \mathbb{C}^n \rightarrow \bbR$ выпуклая при фиксированном~$\bz_y$, а $f(\bz_x, \cdot): \mathbb{C}^r \rightarrow \bbR$ вогнута при фиксированном~$\bz_x$.
+	В этом случае по теореме Неймана о минимаксе
+	\begin{equation*}
+	\min_{\bz_x \in \mathbb{C}^n} \max_{\bz_y \in \mathbb{C}^r} f(\bz_x, \bz_y) = \max_{\bz_y \in \mathbb{C}^r} \min_{\bz_x\in \mathbb{C}^n} f(\bz_x, \bz_y).
+	\end{equation*}
+\end{proof}
+
+Для решения минимакс задачи~\eqref{ch2:eq:minmax}, зафиксируем некоторый~$\bz_x \in \mathbb{C}^n$. Для фиксированного вектора~$\bz_x$ решаем задачу
+\begin{equation}
+\max_{\bz_y \in \mathbb{C}_r} f(\bz_x, \bz_y) = \max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \bigl[\alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y - \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \bigr].
+\label{ch2:eq:fixed_ax}
+\end{equation}
+Лагранжиан для данной задачи:
+\begin{equation*}
+L(\bz_x, \bz_y, \lambda, \bmu) = \alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y - \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y + \lambda \cdot  (\bOne_r^{\T} \bz_y - 1) + \bmu^{\T} \bz_y.
+\end{equation*}
+Здесь вектор множителей Лагранжа~$\bmu$, который соответствует ограничениям на неравенства $\bz_y \geq \bZero_r$, является неотрицательным.
+Двойственной задачей является
+\begin{equation}
+\min_{\lambda, \, \bmu \geq \bZero_r} g(\bz_x, \lambda, \bmu) = \min_{\lambda, \, \bmu \geq \bZero_r}  \left[\max_{\bz_y \in \bbR^r} L(\bz_x, \bz_y, \lambda, \bmu) \right].
+\label{ch2:eq:dual}
+\end{equation}
+Для задачи квадратичного программирования~\eqref{ch2:eq:fixed_ax} с положительно определенными матрицами~$\bQ_x$ и~$\bQ_y$ выполняются условия сильной двойственности. Таким образом, оптимальное значение~\eqref{ch2:eq:fixed_ax} равно оптимальному значению~\eqref{ch2:eq:dual}. Это позволяет перейти от решения задачи~\eqref{ch2:eq:minmax} к решению задачи
+\begin{equation}
+\min_{\bz_x \in \mathbb{C}^n, \, \lambda, \, \bmu \geq \bZero_r} g(\bz_y, \lambda, \bmu).
+\label{ch2:eq:dual_maxmin}
+\end{equation}
+
+Полагая градиент~$\nabla_{\bz_y} L(\bz_x, \bz_y, \lambda, \bmu)$ равным нулю, получим оптимальное значение~$\bz_y$:
+\begin{equation}
+\bz_y = \frac{1}{2\alpha_3} \bQ_y^{-1} \left( - \alpha_2 \cdot \bB^{\T} \bz_x +\lambda \cdot \bOne_r + \bmu \right).
+\label{ch2:eq:ax}
+\end{equation}
+Двойственная функция принимает вид
+\begin{multline}
+g(\bz_x, \lambda, \bmu)
+= \max_{\bz_y \in \bbR^r} L(\bz_x, \bz_y, \lambda, \bmu) =
+\bz_x^{\T} \left( - \frac{\alpha_2^2}{4\alpha_3} \cdot \bB \bQ_y^{-1} \bB^{\T} - \alpha_1 \cdot \bQ_x\right) \bz_x \\ - \frac{1}{4 \alpha_3} \lambda^2 \cdot \bOne_r^{\T} \bQ_y^{-1} \bOne_r - \frac{1}{4 \alpha_3} \cdot \bmu^{\T} \bQ_y^{-1} \bmu + \frac{\alpha_2}{2 \alpha_3} \lambda \cdot \bOne_r^{\T} \bQ_y^{-1} \bB^{\T} \bz_x \\ - \frac{1}{2 \alpha_3} \lambda \cdot \bOne_r^{\T} \bQ_y^{-1} \bmu + \frac{\alpha_2}{2 \alpha_3} \cdot \bmu^{\T} \bQ_y^{-1} \bB^{\T} \bz_x + \lambda.
+\label{ch2:eq:dual_quadratic_form}
+\end{multline}
+Тем самым задача~\eqref{ch2:eq:dual_maxmin} является квадратичной задачей с~$n + r + 1$ переменными.
+
+\subsection{Несимметричный учёт значимостей признаков и целевых переменных}
+Естественным способом преодоления проблемы алгоритма SymImp является добавление штрафа для целевых векторов, которые коррелируют с признаками.
+Добавим линейный член~$\bb^{\T} \bz_y$ в член $\text{Rel}(\bX, \bY)$ следующим образом:
+\begin{equation}
+\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot  \underbrace{\left(\bz_x^{\T} \bB \bz_y - \bb^{\T} \bz_y \right) }_{\text{Rel}(\bX, \bY)} + \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1 \\ \bz_y \geq \bZero_r, \, \bOne_r^{\T}\bz_y=1}}.
+\label{ch2:eq:asymimp}
+\end{equation}
+\begin{statement}
+	Пусть вектор $\bb$ равен
+	\begin{equation*}
+	b_j = \max_{i=1, \dots n} [\bB]_{i, j}.
+	\end{equation*}
+	Тогда значение коэффициентов значимостей вектора~$\bz_y$ будут неотрицательными в~$\text{Rel}(\bX, \bY)$ для задачи~\eqref{ch2:eq:asymimp}.
+\end{statement}
+\begin{proof}
+	Утверждение следует из факта
+	\[
+	\sum_{i=1}^n  z_i b_{ij} \leq \left(\sum_{i=1}^n z_i \right)\max_{i=1, \dots n} b_{ij} = \max_{i=1, \dots n} b_{ij},
+	\]
+	где $z_i \geq 0$ и $\sum_{i=1}^n z_i = 1$.
+\end{proof}
+Следовательно, функция~\eqref{ch2:eq:asymimp} штрафует в меньшей мере признаки, которые имеют отношение к целевым векторам, и целевые вектора, которые недостаточно коррелированы с признаками.
+\begin{statement}
+	Баланс между членами~$\text{Sim}(\bX)$, $\text{Rel}(\bX, \bY)$ и $\text{Rel}(\bX, \bY)$ для задачи~\eqref{ch2:eq:asymimp} достигается при следующих коэффициентах:
+	\begin{equation*}
+	\alpha_1 \propto \overline{\bQ}_y \left( \overline{\bb} - \overline{\bB}\right); \quad
+	\alpha_2 \propto \overline{\bQ}_x \overline{\bQ}_y; \quad
+	\alpha_3  \propto \overline{\bQ}_x \overline{\bB}.
+	\end{equation*}
+\end{statement}
+\begin{proof}
+	Необходимые значения~$\alpha_1$, $\alpha_2$, и $\alpha_3$ являются решением следующей системы уравнений:
+	\begin{align}
+	&\alpha_1 + \alpha_2 + \alpha_3 = 1; \\
+	&\alpha_1 \overline{\bQ}_x = \alpha_2 \overline{\bB}; \label{ch2:eq:asymimp_balance1}\\
+	&\alpha_2 \left(\overline{\bb} - \overline{\bB} \right) = \alpha_3 \overline{\bQ}_y.
+	\label{ch2:eq:asymimp_balance2}
+	\end{align}
+	Здесь, в~\eqref{ch2:eq:asymimp_balance1} уравновешены $\text{Sim}(\bX)$ с первым слагаемым~$\text{Rel}(\bX, \bY)$, а в~\eqref{ch2:eq:asymimp_balance2} уравновешены $\text{Sim}(\bY)$  с~$\text{Rel}(\bX, \bY)$.
+\end{proof}
+\begin{statement}
+	Для случая $r=1$, предложенные функции~\eqref{ch2:eq:symimp},~\eqref{ch2:eq:minmax} и~\eqref{ch2:eq:asymimp} совпадают с оригинальным алгоритмом QPFS~\eqref{ch2:eq:qpfs_problem}.
+	
+	\begin{proof}
+		Если $r$ равно 1, то $\bQ_y = q_y$ - скаляр, $\bz_y = 1$ и $\bB = \bb$. Задачи~\eqref{ch2:eq:symimp},~\eqref{ch2:eq:minmax} и~\eqref{ch2:eq:asymimp} принимают вид
+		\begin{equation*}
+		\alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bb \rightarrow \min_{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1} .
+		\end{equation*}
+		При $\alpha = \frac{\alpha_2}{\alpha_1 + \alpha_2}$ последняя задачи принимает вид~\eqref{ch2:eq:qpfs_problem}.
+	\end{proof}
+\end{statement}
+
+Таблица~\ref{ch2:tbl:summary} демонстрирует основные идеи и функции ошибок для каждого алгоритма. 
+RelAgg является базовой стратегией и не учитывает корреляции в целевом пространстве.
+SymImp штрафует попарные корреляции между целевыми векторами.
+MinMax более чувствителен к целевым векторам, которые трудно предсказать.
+Стратегия Asymimp добавляет линейный член к функции SymImp, чтобы сделать вклад признаков и целевых векторов асимметричным.
+
+\begin{table}[ht]
 	\centering
-	\begin{minipage}{.5\textwidth}
-		\centering
-		\includegraphics[width=\linewidth]{figs/ch3/neural_error}
-		\caption{Ландшафт функции ошибки для нейронной сети}
-		\label{ch3:fig:neural_error}
-	\end{minipage}%
-	\begin{minipage}{.5\textwidth}
-		\centering
-		\includegraphics[width=\linewidth]{figs/ch3/neural_b_wrt_beta}
-		\caption{Релевантности параметров первого слоя для модели нейронной сети}
-		\label{ch3:fig:neural_b_wrt_beta}
-	\end{minipage}
-\end{figure}
-
-На рис.~\ref{ch3:fig:irls_qpfs_2d} показан процесс оптимизации для предложенного алгоритма в случае логистической регрессии с двумя параметрами модели. 
-Даже для двумерной задачи решение метода Ньютона нестабильно и число обусловленности матрицы Гессиана~$\bH$ может быть чрезвычайно большим. 
-На каждом шаге алгоритма процедура QPFS выбирает параметры для оптимизации. 
-В данном примере предложенный алгоритм выбирает и обновляет только один параметр на каждой итерации на первых шагах. 
-Это делает алгоритм более устойчивым.
-
-\begin{figure}[!ht]
-	\centering
-	\includegraphics[width=0.6\linewidth]{figs/ch3/irls_qpfs_2d}	 
-	\caption{Оптимизационный процесс предложенного алгоритма QPFS+Ньютон для модели логистической регрессии}
-	\label{ch3:fig:irls_qpfs_2d}
-\end{figure}
-
-На рис.~\ref{ch3:fig:active_params_wrt_iters} показаны наборы активных параметров на итерациях для набора данных Boston Housing и нейронной сети с двумя скрытыми нейронами. 
-Темные ячейки соответствуют активным параметрам, которые мы оптимизируем.
- 
-\begin{figure}[!ht]
-	\centering
-	\includegraphics[width=\linewidth]{figs/ch3/active_params_wrt_iters}	
-	\caption{Множества активных параметров на протяжении оптимизационного процесса}
-	\label{ch3:fig:active_params_wrt_iters}
-\end{figure}
-
-В рассмотренных примерах число обусловленности~$\kappa(\bH)$ для метода Ньютона на некоторых итерациях было чрезвычайно большим. 
-Выбор активных параметров позволил значительно сократить число обусловленности. 
-
-Мы сравнили предложенный алгоритм с существующими методами, а именно градиентным спуском~(GD), моментом Нестерова, Adam и оригинальным алгоритмом Ньютона. 
-Проведены эксперименты для моделей нелинейной и логистической регрессий. 
-Наборы данных были выбраны из репозитория UCI~\cite{uci2017}. 
-Результаты показаны в таблицах~\ref{ch3:tbl:nonlin_reg_results} и \ref{ch3:tbl:log_reg_results}. 
-Для каждого набора данных две строки содержат ошибки для тренировочной~(первая строка) и тестовой~(вторая строка) выборок. 
-В таблице~\ref{ch3:tbl:nonlin_reg_results} приведена квадратичная ошибка, в таблице~\ref{ch3:tbl:log_reg_results}~-- кросс-энтропия.
-Чтобы найти среднюю ошибку и ее стандартное отклонение использовалась процедура кросс валидации на 5 фолдов. 
-Предложенный алгоритм показывает меньшую ошибку на трех из четырех наборов данных для нелинейной регрессии и среди двух из трех наборов данных для логистической регрессии.
-
-\begin{table}[!ht]
-\footnotesize
-	\caption{Средняя квадратичная ошибка на тренировочной и тестовой выборках для модели нелинейной регрессии}
-	\label{ch3:tbl:nonlin_reg_results}
-	\centering
-	\begin{tabular}{|l|c|c|c|c|c|c|}
-		\hline
-		Выборка & \begin{tabular}[c]{@{}c@{}}\ $m$ \\ \ $n$ \end{tabular} 
-		& GD 
-		& Нестеров 
-		& ADAM 
-		& Ньютон 
-		&
-		\begin{tabular}[c]{@{}c@{}}QPFS+Ньютон\\ \end{tabular} \\ 
-		\hline
-		Boston House
-		& 506
-		& $27.2\pm4.6$
-		& $46.0\pm11.0$
-		& $35.4\pm2.5$           
-		& $22.1\pm15.2$            
-		& $20.9\pm10.4$   \\  
-		Prices
-		&\multicolumn{1}{c|}{13}
-		& \multicolumn{1}{c|}{$32.4\pm5.6$}
-		& \multicolumn{1}{c|}{$53.3\pm11.5$}
-		& \multicolumn{1}{c|}{$37.8\pm7.0$}
-		& \multicolumn{1}{c|}{$28.9\pm13.6$}
-		& \multicolumn{1}{c|}{$\mathbf{24.5\pm9.4}$}\\ 
-		\hline
-		Communities
-		& 1994
-		& $48.0\pm6.4$
-		& $31.4\pm2.8$
-		& $23.3\pm3.7$        
-		& $18.3\pm3.4$          
-		&  $26.7\pm3.1$  \\ 
-		and Crime
-		&\multicolumn{1}{c|}{99}
-		& \multicolumn{1}{c|}{$47,5\pm6.5$}
-		& \multicolumn{1}{c|}{$32.9\pm4.3$}
-		& \multicolumn{1}{c|}{$28,1\pm4.5$}
-		& \multicolumn{1}{c|}{$28.8\pm3.6$}
-		& \multicolumn{1}{c|}{$\mathbf{28.4\pm3.0}$} \\ 
-		\hline
-		Forest
-		& 517
-		& $18.9\pm0.4$
-		& $1.83\pm0.4$
-		& $1.81\pm0.6$             
-		& $17.7\pm0.4$             
-		& $17.9\pm0.4$   \\ 
-		Fires
-		&\multicolumn{1}{c|}{10}
-		& \multicolumn{1}{c|}{$\mathbf{20.0\pm2.1}$}
-		& \multicolumn{1}{c|}{ $20.2\pm2.2$}
-		& \multicolumn{1}{c|}{ $\mathbf{20.0\pm2.0}$}
-		& \multicolumn{1}{c|}{ $20.6\pm1.4$}
-		& \multicolumn{1}{c|}{ $20.2\pm2.2$} \\ 
-		\hline
-		Residential
-		& 372
-		&  $51.6\pm17.7$
-		&  $32.6\pm19.5$
-		&  $30.0\pm24.8$            
-		&  $35.5\pm24.7$            
-		&   $30.3\pm10.7$ \\ 
-		Building
-		&\multicolumn{1}{c|}{103}
-		& \multicolumn{1}{c|}{ $53.7\pm13.9$}
-		& \multicolumn{1}{c|}{ $34.1\pm13.6$}
-		& \multicolumn{1}{c|}{ $34.1\pm19.4$}
-		& \multicolumn{1}{c|}{ $35.0\pm15.6$}
-		& \multicolumn{1}{c|}{ $\mathbf{30.9\pm5.3}$} \\ 
-		\hline
-	\end{tabular}
+	\caption{Обзор предлагаемых обобщений многомерного QPFS алгоритма}
+	\small{
+		\begin{tabular}{c|c|c}
+			\hline
+			Алгоритм & Идея & Функция ошибки $S(\bz | \bX, \bY)$ \\
+			\hline && \\ [-.5em]
+			RelAgg & $\min \bigl[ \text{Sim}(\bX) - \text{Rel}(\bX, \bY) \bigr] $ & $\min\limits_{\bz_x} \bigl[ (1 - \alpha) \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha \cdot \bz_x^{\T} \bB \bOne_r \bigr] $ \\ &&\\[-.5em]
+			SymImp & $\begin{aligned} \min \, \bigl[ \text{Sim}(\bX) & - \text{Rel}(\bX, \bY) \\ & + \text{Sim}(\bY) \bigr] \end{aligned}$ & $ \min\limits_{\bz_x, \, \bz_y} \left[ \alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y + \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \right] $\\ &&\\ [-.5em]
+			MinMax & $\begin{aligned} &\min \, \bigl[ \text{Sim}(\bX) - \text{Rel}(\bX, \bY) \bigr]  \\ & \max \bigl[\text{Rel}(\bX, \bY) + \text{Sim}(\bY) \bigr] \end{aligned}$ & $	\min\limits_{\bz_x} 	\max\limits_{\bz_y} \bigl[\alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y - \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \bigr]$ \\ &&\\ [-.5em]
+			AsymImp & $\begin{aligned} & \min \, \bigl[ \text{Sim}(\bX) - \text{Rel}(\bX, \bY) \bigr]\\ &  \max \bigl[\text{Rel}(\bX, \bY) + \text{Sim}(\bY) \bigr] \end{aligned}$ & $\min\limits_{\bz_x, \bz_y} \bigl[ \alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \left(\bz_x^{\T} \bB \bz_y - \bb^{\T} \bz_y \right) + \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \bigr]$\\ 
+			\hline
+	\end{tabular}}
+	\label{ch2:tbl:summary}
 \end{table}
 
-\begin{table}[!ht]
-\footnotesize
-	\caption{Среднее значение кросс-энтропии на тренировочной и тестовой выборках для модели логистической регрессии}
-	\label{ch3:tbl:log_reg_results}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Вычислительный эксперимент}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Для оценки предложенных алгоритмов выбора признаков, введём критерии оценки качества выбранного количества признаков.
+Определим коэффициент мультикорреляции как среднее значение коэффициента множественной корреляции следующим образом:
+\begin{equation*}
+R^2 = \frac{1}{r} \text{tr} \left( \bC^{\T} \mathbf{R}^{-1} \bC \right); \quad \text{where }\bC = [ \text{corr}(\bchi_i, \bnu_j)]_{\substack{i=1, \dots, n \\ j=1, \dots, r}}, \, \mathbf{R} = [ \text{corr}(\bchi_i, \bchi_j)]_{i, j = 1}^n.
+\end{equation*}
+Этот коэффициент принимает значение между 0 и 1. Большее значение~$R^2$ соответствует лучшему подмножеству признаков.
+
+Нормированный среднеквадратичная ошибка (sRMSE) отображает качество прогнозирования модели. Оценка sRMSE считается на тренировочной и тестовой выборке.
+\begin{equation*}
+\text{sRMSE}(\bY, \widehat{\bY}_{\ba}) = \sqrt{\frac{\text{MSE} (\bY, \widehat{\bY}_{\ba})}{\text{MSE} (\bY, \overline{\bY})}} =  \frac{\| \bY - \widehat{\bY}_{\ba} \|_2}{\| \bY - \overline{\bY} \|_2}.
+\end{equation*}
+Здесь $\widehat{\bY}_{\ba} = \bX_{\ba} \bTheta_{\ba}^{\T}$~-- предсказание модель, $\overline{\bY}$~-- предсказание константной модели, полученное усреднением целевой переменной по всем объектам.
+Данный показатель на тестовой выборке необходимо минимизировать.
+
+Байесовский информационный критерий (BIC)~-- компромисс между качеством предсказания и размером выбранного подмножества признаков~$\|\ba\|_0 = \#\{j: a_j \neq 0\}= \sum_{j=1}^n a_j$:
+\begin{equation*}
+\text{BIC} = m \ln \left( \text{MSE} ( \bY, \widehat{\bY}_{\ba})\right) + \| \ba \|_0 \cdot \ln m,
+\end{equation*}
+Чем меньше значение BIC, тем лучше набор признаков.
+
+\subsection*{Данные}
+
+Вычислительный эксперимент проводился на данных электрокортикограмм. Описание данных приведено в Главе~1.
+
+На Рис.~\ref{ch2:fig:corr_matrix} показаны матрицы корреляций для исходных матриц~$\bX$ и~$\bY$ данных ECoG. Частоты в матрице~$\bX$ сильно коррелированы. 
+В целевой матрице~$\bY$ корреляции между осями несущественны по сравнению с корреляциями между последовательными моментами времени и эти корреляции спадают со временем.
+\begin{figure}[ht]
+	\includegraphics[width=\linewidth]{figs/ch2/corr_matrix}
+	\caption{Матрицы корреляций для матрицы плана~$\bX$ и целевой матрицы~$\bY$ для данных ECoG}
+	\label{ch2:fig:corr_matrix}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{Результаты}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Применим алгоритм SymImp QPFS для различных значений коэффициента~$\alpha_3$ согласно формуле~\eqref{ch2:eq:alphas3}.
+Зависимость значимости целевых векторов~$\bz_y$ относительно коэффициента~$\alpha_3$ для различных значений~$k$ показана на Рис.~\ref{ch2:fig:features_vs_alpha_ecog}.
+Значимости целевых векторов почти одинаковы для всех координат запястья при прогнозировании одного отсчёта времени ($k = 1$), 
+что отражает независимость между координатами $x$, $y$ и $z$.
+Для $k = 2$ и $k = 3$ значимости некоторых целевых векторов становится нулевой при увеличении~$\alpha_3$.
+Вертикальные линии соответствуют оптимальному значению~$\alpha_3$, вычисленному по~\eqref{ch2:eq:alpha_3}. 
+При этом значении $\alpha_3$ значимости компонент~$\bz_y$ совпадают. 
+Таким образом, алгоритм не учитывает различия между целевыми векторами для $k=1, 2, 3$.
+
+\begin{figure}[ht]
+	\begin{minipage}{.5\linewidth}
+		\subfloat{
+			\includegraphics[width=\linewidth]{figs/ch2/features_vs_alpha_ecog_3}}
+	\end{minipage}%
+	\begin{minipage}{.5\linewidth}
+		\subfloat{
+			\includegraphics[width=\linewidth]{figs/ch2/features_vs_alpha_ecog_6}}
+	\end{minipage}\par\medskip
+	\subfloat{
+		\includegraphics[width=\linewidth]{figs/ch2/features_vs_alpha_ecog_9}}
+	
+	\caption{Значимости целевых векторов~$\bz_y$ в зависимости от~$\alpha_3$ для алгоритма SymImp QPFS}
+	\label{ch2:fig:features_vs_alpha_ecog}
+\end{figure}
+
+Предлагаемые алгоритмы многомерного QPFS, приведенные в таблице~\ref{ch2:tbl:summary} применяются для набора данных ECoG. 
+Решим задачу выбора признаков для каждого из алгоритмов, чтобы получить вектора значимостей признаков. 
+Отсортируем по убыванию признаки по значению их значимостей. Обучим линейную модель, постепенно добавляя в неё признаки. 
+Исследуются значения описанных критериев качества при увеличении количества отобранных признаков. 
+На Рис.~\ref{ch2:fig:ecog_3_30_metrics} показаны результаты прогнозирования для случая прогнозирования $k = 30$ отсчётов времени. 
+Порог значимости признаков $\tau$ обозначен цветными тиками. 
+Пороговые значения $\tau$ для предлагаемых методов больше, чем для базового алгоритма RelAgg. 
+Алгоритм SymImp имеет большой порог, не позволяя получить малый набор признаков.
+Однако алгоритм SymImp обладает наилучшей предсказательной способностью с точки зрения sRMSE на тестовых данных.
+Второй по качеству результат по sRMSE показал алгоритм AsymImp.
+Все предложенные алгоритмы достигают меньшей ошибки на тестовой выборке по сравнению с алгоритмом RelAgg. 
+Критерий устойчивости также выше для предложенных алгоритмов.
+Алгоритм AsymImp показывает лучшие результаты с точки зрения качества прогнозирования и размера выбранного подмножества признаков.
+
+\begin{figure}[ht]
+	\includegraphics[width=\linewidth]{figs/ch2/ecog_3_30_metrics}
+	\caption{Сравнение предложенных алгоритмов выбора признаков для данных ECoG при прогнозировании $k = 30$ отсчётов времени}
+	\label{ch2:fig:ecog_3_30_metrics}
+\end{figure}
+
+Чтобы сравнить структуру выбранных подмножеств признаков и исследовать стабильность процедуры выбора признаков, используется метод генерации данных с помощью бутстрепа. 
+Генерируется множество подвыборок, выбирая объекты по одному с возвращениями. 
+Затем решается задачу выбора признаков для каждой пары матрицы плана~$bX$ и целевой матрицы~$\bY$.
+Сравниваются полученные вектора значимостей для различных подвыборок данных. 
+В качестве меры стабильности работы алгоритмов вычисляется средний попарный коэффициент корреляции Спирмена и попарное $\ell_2$ расстояние.
+В таблице~\ref{ch2:tbl:stability} показана средняя ошибка sRMSE, размер подмножества признаков и описанные статистики для каждого алгоритма. 
+Ошибка считалась на обученной линейной модели с использованием $50$ признаков с наибольшими значениями значимостей.
+Asymimp дает наименьшую ошибку на тестовой выборке. 
+Размер выбранных подмножеств объектов завышен при использовании порогового значения~$\tau=10^{-4}$. 
+Оптимальное значение~$\tau$ может быть подобрано с помощью процедуры кросс валидации.
+
+\begin{table}[ht]
+	\caption{Стабильность предложенных алгоритмов выбора признаков}
 	\centering
-	\begin{tabular}{|l|c|c|c|c|c|c|}
+	\begin{tabular}{l|ccccc}
 		\hline
-		Выборка & \begin{tabular}[c]{@{}c@{}}\ $m$ \\ \ $n$ \end{tabular} 
-		& GD 
-		& Нестеров 
-		& ADAM 
-		& Ньютон 
-		&
-		\begin{tabular}[c]{@{}c@{}}QPFS+Ньютон\\ \end{tabular} \\ 
-		\hline
-		Breast
-		& 569
-		& $0.6\pm0.1$
-		& $0.4\pm0.1$
-		& $0.8\pm0.2$           
-		& $0.3\pm0.1$            
-		& $0.2\pm0.1$   \\  
-		Cancer
-		&\multicolumn{1}{c|}{30}
-		& \multicolumn{1}{c|}{$\mathbf{0.9\pm0.2}$}
-		& \multicolumn{1}{c|}{$1.0\pm0.7$}
-		& \multicolumn{1}{c|}{$1.2\pm0.2$}
-		& \multicolumn{1}{c|}{$1.0\pm0.2$}
-		& \multicolumn{1}{c|}{$1.1\pm0.3$}\\ 
-		\hline
-		Cardiotocography
-		& 2126
-		& $11.5\pm4.7$
-		& $11.5\pm4.7$
-		& $8.8\pm4.4$        
-		& $11.5\pm5.7$          
-		&  $7.7\pm4.2$  \\
-		
-		&\multicolumn{1}{c|}{21}
-		& \multicolumn{1}{c|}{$11.6\pm5.8$}
-		& \multicolumn{1}{c|}{$11.5\pm5.7$}
-		& \multicolumn{1}{c|}{$9.0\pm2.6$}
-		& \multicolumn{1}{c|}{$11.5\pm4.7$}
-		& \multicolumn{1}{c|}{$\mathbf{7.7\pm4.7}$} \\ 
-		\hline
-		Climate Model
-		& 540
-		& $1.2\pm0.1$
-		& $1.0\pm0.2$
-		& $1.5\pm0.2$             
-		& $1.0\pm0.5$             
-		& $0.8\pm0.3$   \\ 
-		Simulation Crashes
-		&\multicolumn{1}{c|}{18}
-		& \multicolumn{1}{c|}{$1.4\pm2.0$}
-		& \multicolumn{1}{c|}{ $1.3\pm0.7$}
-		& \multicolumn{1}{c|}{ $1.8\pm0.3$}
-		& \multicolumn{1}{c|}{ $1.2\pm0.5$}
-		& \multicolumn{1}{c|}{ $\mathbf{1.1\pm0.4}$} \\ 
-		\hline
+		& sRMSE  & $\|\ba\|_0$ & Spearman $\rho$ & $\ell_2$ \\ \hline
+		RelAgg & 0.965 $\pm$ 0.002 & 26.8 $\pm$ 3.8 & 0.915 $\pm$ 0.016 & 0.145 $\pm$ 0.018   \\
+		SymImp & 0.961 $\pm$ 0.001 & 224.4 $\pm$ 9.0 & 0.910 $\pm$ 0.017 & 0.025 $\pm$ 0.002   \\
+		MinMax & 0.961 $\pm$ 0.002 & 101.0 $\pm$ 2.1& 0.932 $\pm$ 0.009 & 0.059 $\pm$ 0.004   \\
+		AsymImp & 0.955 $\pm$ 0.001 & 85.8 $\pm$ 10.2& 0.926 $\pm$ 0.011 & 0.078 $\pm$ 0.007  \\ \hline
 	\end{tabular}
+	\label{ch2:tbl:stability}
 \end{table}
 
+Для того, чтобы сравнить методы снижения размерности и выбора признаков, используется модель PLS. 
+На Рис.~\ref{ch2:fig:pls_vs_k} показана ошибка sRMSE на тренировочной и тестовой выборках в зависимости от размерности скрытого пространства~$l$.
+Ошибка на тестовой выборке достигает минимума при $l = 11$.
+Алгоритм PLS является более гибким подходом по сравнению с линейной моделью, построенной на подмножестве признаков, так как использует все исходные признаки.
+Это приводит к меньшей ошибке, но модель не является разреженной.
+
+На рис.~\ref{ch2:fig:models} проведено сравнение 3 моделей: линейной регрессии и регрессии PLS, построенной на 100 признаках QPFS, и регрессии PLS со всеми признаками.
+Линейная регрессия со всеми признаками не рассматривается, так как ее результаты близки к константному прогнозу. На рисунке также приведены результаты алгоритмов lasso и elastic net, которые широко используются для выбора признаков.
+В данном эксперименте использовался алгоритм Asymimp QPFS.
+Размерность скрытого пространства PLS $l = 15$.
+Результаты регрессии PLS значительно лучше, линейной регрессии с признаками QPFS.
+Это означает, что последняя модель не является достаточно гибкой.
+Тем не менее, лучший результат показывает модель PLS, построенная на признаках QPFS. 
+Данная модель является разреженной, так как использует только 100 исходных признаков.
+Способность модели PLS находить оптимальное скрытое представление данных улучшает предсказательную способность модели.
+
+\begin{figure}[ht]
+	\begin{minipage}{.41\linewidth}
+		\centering
+		\includegraphics[width=1.\linewidth]{figs/ch2/pls_vs_k}
+		\caption{sRMSE на тестовой выборке для модели PLS}
+		\label{ch2:fig:pls_vs_k}
+	\end{minipage}%
+	\begin{minipage}{.57\linewidth}
+		\centering
+		\includegraphics[width=1.\linewidth]{figs/ch2/models2}
+		\caption{Диаграммы размаха значений sRMSE на тестовой выборке для рассматриваемых моделей}
+		\label{ch2:fig:models}
+	\end{minipage}
+\end{figure}

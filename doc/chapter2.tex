@@ -1,475 +1,300 @@
-\chapter{Выбор признаков}
+\chapter{Постановка задачи декодирования}
 
-Задача выбора признаков заключается в поиске оптимального подмножества признаков~$\cA$ среди всех возможных $2^n - 1$ вариантов. 
-Существует взаимооднозначное отображение между подмножеством $\cA$ и булевым вектором~$\ba \in \{0, 1\}^n$, компоненты которого указывают, выбран ли признак. 
-Для нахождения оптимального вектора~$\ba$ введем функцию ошибки выбора признаков~$S(\ba, \bX, \bY)$. 
-Проблема выбора признаков принимает вид:
+Преобразование PCA задается ортогональной матрицей $\bP$. Функция кодирования объектов имеет вид $\varphi_e(\bx) = \bP^{\T}\bx$. Функция декодирования объектов имеет вид $\varphi_d(\bt) = \bP\bt$. 
+
+Функция кодирования и декодирования ответов являются тождественными преобразованиями $\psi_e(\by) =  \by = \bu = \psi_d(\bu)$. Преобразование $h$ является линейным.
+
+Метод PCA не согласует объекты $\bx$ и ответы $\by$.
+
+
+\hrulefill
+
+Для PLS  функции кодирования имеют вид:
 \begin{equation}
-\ba = \argmin_{\ba' \in \{0, 1\}^n} S(\ba', \bX, \bY).
-\label{ch2:eq:feature_selection}
-\end{equation}
-Целью выбора признаков является построение функции~$S (\ba, \bX, \bY)$. Конкретные примеры данной функции для рассматриваемых алгоритмов выбора признаков приведены ниже и обобщены в таблице~\ref{ch2:tbl:summary}.
-
-Задача~\eqref{ch2:eq:feature_selection} имеет дискретную область определения~$\{0, 1\}^n$. Для решения данной задачи применяется релаксация задачи~\eqref{ch2:eq:feature_selection} к непрерывной области определения~$[0, 1]^n$. Релаксированная задача выбора функции имеет следующий вид:
+	\varphi_e(\bx) = \bW_{\bx}^{\T}\bx , \;\;
+	\psi_e(\bY) = \bW_{\by}^{\T}\by ,
+\end{equation} 
+где матрицы весов $\bW_{\bx} \in \mathbb{R}^{m \times p}, \bW_{\by} \in \mathbb{R}^{k \times p}$. Столбцы матриц весов $\bw_{\bx}^{*}$ и $\bw_{\by}^{*}$ 
+находятся путем максимизации функции согласования $g(\bX \bw_{\bx}, \bY \bw_{\by}) = cov (\bX \bw_{\bx}, \bY \bw_{\by})^{2}$:
 \begin{equation}
-\bz = \argmin_{\bz' \in [0, 1]^n} S(\bz', \bX, \bY).
-\label{ch2:eq:relaxed_feature_selection}
+	(\bw_{\bx}^{*}, \bw_{\by}^{*}) = \argmax_{\|\bw_{\by}\|_{2}=\|\bw_{\by}\|_{2}=1}[ cov(\bX \bw_{\bx}, \bY \bw_{\by})^{2}]
+	\label{eq:PLSpr3}
 \end{equation}
+где $cov(\bX \bw_{\bx}, \bY \bw_{\by})$~-- выборочная ковариация между векторами.
 
-Здесь, компоненты вектора~$\bz$~-- значения нормированных коэффициентов значимости признаков.
-Сначала решается задача~\eqref{ch2:eq:relaxed_feature_selection}, для получения вектора значимостей~$\bz$. 
-Затем решение~\eqref{ch2:eq:feature_selection} восстанавливается с помощью отсечения по порогу следующим образом:
+Функции декодирования принимают следующий вид:
 \begin{equation}
-\ba = [a_j]_{j=1}^n, \quad 
-a_j = \begin{cases}
-1, & z_j > \tau; \\
-0, & \text{в противном случае}.
-\end{cases}
-\label{ch2:eq:feature_threshold}
-\end{equation}
-$\tau$~-- гиперпараметр, который может быть подобран вручную или выбран с помощью кросс-валидации. 
+	\varphi_d(\bt) = \bP\bt, \;\;
+	\psi_d(\bu) = \bQ\bu.
+\end{equation} 
 
-Как только решение~$\ba$ задачи~\eqref{ch2:eq:feature_selection} получено, задача~\eqref{ch1:eq:loss_function} принимает вид:
-\begin{equation*}
-\mathcal{L}(\bTheta_{\cA}, \bX_{\cA}, \bY) = {\left\| \mathbf{Y} - \bX_{\cA}\bTheta^{\T}_{\cA} \right\| }_2^2 \rightarrow\min_{\bTheta_{\cA}},
-\end{equation*}
-где индекс~$\cA$ обозначает подматрицу со столбцами, индексы которых содержатся в~$\cA$.
+\hrulefill
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Выбор признаков с помощью квадратичного программирования}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Если между столбцами матрицы плана~$\bX$ существует линейная зависимость, то решение задачи линейной регрессии
+Канонический корреляционный анализ (canonical correlation analysis, CCA) находит два набора базисных векторов $\{\bw_{\bx_i}\}_{i=1}^{p}, \; \bw_{\bx} \in \mathbb{R}^{m}$ и $\{\bw_{\by_i}\}_{i=1}^{p}, \; \bw_{\by} \in \mathbb{R}^{k}$, один для $\bX$ и другой для $\bY$, так что коэффициент корреляция между проекциями переменных на эти базисные векторы была максимальной. Функция согласования для CCA
 \begin{equation}
-\| \bnu - \bX \btheta\|_2^2 \rightarrow\min_{\btheta \in \bbR^{n}}.
-\label{ch2:eq:linear_regression}
-\end{equation}
-оказывается неустойчивым. 
-Методы выбора признаков находят подмножество~$ \cA \in \{1, \dots, n\}$ оптимальных столбцов~$\bX$. 
+	g(\bX \bw_{\bx}, \bY \bw_{\by}) = corr(\bX \bw_{\bx}, \bY \bw_{\by}),
+\end{equation} 
+где $corr(\bX \bw_{\bx}, \bY \bw_{\by})$~-- коэффициент корреляции между векторами.
 
-Алгоритм QPFS выбирает некоррелированные признаки, релевантные целевому вектору~$\bnu$.
-Чтобы формализовать этот подход, введем две функции: $\text{Sim}(\bX)$ и $\text{Rel}(\bX, \bnu)$. 
-$\text{Sim}(\bX)$ контролирует избыточность между признаками, $\text{Rel}(\bX, \bnu)$ содержит релевантности между каждым признаком и целевым вектором. 
-Мы хотим минимизировать функцию Sim и максимизировать Rel одновременно.
-
-QPFS предлагает явный способ построения функций Sim и Rel. 
-Алгоритм минимизирует следующую функцию ошибки
+Таким образом, функии кодирования
 \begin{equation}
-\underbrace{\bz^{\T} \bQ \bz}_{\text{Sim}} - \alpha \cdot \underbrace{\vphantom{()} \mathbf{b}^{\T} \bz}_{\text{Rel}} \rightarrow \min_{\substack{\bz \in \bbR^n_+ \\ \|\bz\|_1=1}}.
-\label{ch2:eq:qpfs_problem}
+	\varphi_e(\bx) = \bW_{\bx}^{\T}\bx , \;\;
+	\psi_e(\bY) = \bW_{\by}^{\T}\by ,
 \end{equation}
-Элементы матрицы~$\bQ \in \bbR^{n \times n}$ содержат коэффициенты попарного сходства между признаками. 
-Вектор~$\mathbf{b} \in \bbR^n$ выражает сходство между каждым признаком и целевым вектором~$\bnu$.
-Нормированный вектор~$\bz$ отражает значимость каждого признака. 
-Функция ошибки~\eqref{ch2:eq:qpfs_problem} штрафует зависимые признаки функцией Sim и штрафует признаки, не релевантные к целевой переменной функцией Rel. 
-Параметр~$\alpha$ позволяет контролировать компромисс между Sim и Rel.
-Авторы оригинальной статьи QPFS~\cite{rodriguez2010quadratic} предложили способ выбора~$\alpha$, чтобы уравновесить вклад членов $\text{Sim}(\bX)$ и $\text{Rel}(\bX, \bnu)$
 
-\begin{equation*}
-\alpha = \frac{\overline{\bQ}}{\overline{\bQ} + \overline{\bb}}, \quad \text{где}\,\,\overline{\bQ} = \text{mean} (\bQ), \,\,\, \overline{\bb}= \text{mean} (\bb).
-\end{equation*}
-Чтобы выделить оптимальное подмножество признаков, применяется отсечение по порогу~\eqref{ch2:eq:feature_threshold}.
+где первые столбцы матриц весов находится, как вектора максимизирующие функцию согласования $g$. Далее ищутся вектора, максимизирующие $g$, но с ограничением, что они не коррелируют с первой парой векторов. Процедура продолжается до тех пор, пока количество векторов не станет равным $p$. 
+ 
+\hrulefill
+ 
+Для постановки задачи декодирования введём предположения о структурах пространств $\bbX$ и $\bbY$.
+\begin{assumption}
+	Рассмотрим случай, когда пространства $\bbX$ и $\bbY$ избыточны. Это означает, что объекты $\bx$ и $\by$ живут на некоторых многообразиях низкой размерности. В простейшем случае такие многообразия могут являться линейными подпространствами.
+\end{assumption}
 
-Для измерения сходства используется выборочный коэффициент корреляции Пирсона между парами признаков для функции Sim, и между признаками и целевым вектором для функции Rel:
-\begin{equation}
-\bQ = \left[|\text{corr}(\bchi_i, \bchi_j)|\right]_{i,j=1}^n, \quad \bb = \left[|\text{corr}(\bchi_i, \bnu)|\right]_{i=1}^n.
-\label{ch2:eq:qpfs_1d_qb}
-\end{equation}
-Здесь
-\begin{equation*}
-\text{corr}(\bchi, \bnu) = \frac{\sum_{i=1}^m(\bchi_i - \overline{\bchi})( \bnu_i - \overline{\bnu})}{\sqrt{\sum_{i=1}^m(\bchi_i - \overline{\bchi})^2\sum_{i=1}^m(\bnu_i - \overline{\bnu})^2}}.
-\end{equation*}
-Другие способы определения $\bQ$ и $\bb$ рассматриваются в~\cite{katrutsa2017comprehensive}. 
-В работе~\cite{katrutsa2017comprehensive} показано, что алгоритм QPFS превосходит многие существующие алгоритмы выбора функций на различных критериях качества.
-
-Задача~\eqref{ch2:eq:qpfs_problem} является выпуклой, если матрица~$\bQ$ является неотрицательно определенной. В общем случае это не всегда верно. 
-Чтобы удовлетворить этому условию спектр матрицы~$\bQ$ смещается, и матрица~$\bQ$ заменяется на $\bQ - \lambda_{\text{min}} \mathbf{I}$, где $\lambda_{\text{min}} $ является минимальным собственным значением~$\bQ$.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Многоиндексный метод выбора признаков}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-В данном разделе описаны предлагаемые методы выбора признаков для случая нескольких многомерной целевой переменной.
-В этом случае компоненты целевой переменной могут коррелировать между собой. 
-Предлагаются алгоритмы, учитывающие зависимости как во входном, так и в целевом пространствах.
-
-\subsection{Агрегация релевантностей целевых переменных}
-
-В работе~\cite{motrenko2018multi}, чтобы применить алгоритм QPFS к многомерному случаю ($r > 1$), релевантности признаков агрегируются по всем $r$ компонентам. Член $\text{Sim}(\bX)$ остаётся без изменений, матрица~$\bQ$ определяется как~\eqref{ch2:eq:qpfs_1d_qb}. Вектор $\bb$ агрегируется по всем компонентам целевой переменной и определяется как
-\begin{equation*}
-\bb = \left[\sum_{k=1}^r|\text{corr}(\bchi_i, \bnu_k)|\right]_{i=1}^n.
-\end{equation*}
-Недостатком такого подхода является отсутствие учёта зависимостей в столбцах матрицы~$\bY$. Рассмотрим следующий пример:
-\begin{equation*}
-\bX = [\bchi_1, \bchi_2, \bchi_3], \quad \bY = [\underbrace{\bnu_1, \bnu_1, \dots, \bnu_1}_{r-1}, \bnu_2].
-\end{equation*}
-Пусть матрица~$\bX$ содержит 3 столбца, матрица~$\bY$~-- $r$ столбцов, где первые $r-1$ компонент целевой переменной идентичны.
-Попарные сходства признаков задаются матрицей~$\bQ$.
-Матрица~$\bB$ содержит попарные сходства признаков и целевых столбцов.
-Вектор~$\bb$ получен суммированием матрицы~$\bB$ по столбцами
-\begin{equation}
-\bQ = \begin{bmatrix} 1 & 0 & 0\\ 0 & 1 & 0.8 \\ 0 & 0.8 & 1 \end{bmatrix}, \quad
-\bB = \begin{bmatrix} 0.4 & \dots & 0.4 & 0 \\ 0.5 & \dots & 0.5 & 0.8 \\ 0.8 & \dots & 0.8 & 0.1 \end{bmatrix}, \quad
-\bb = \begin{bmatrix} (r-1) \cdot 0.4 + 0 \\ (r-1) \cdot 0.5 + 0.8 \\ (r-1) \cdot 0.8 + 0.1 \end{bmatrix}.
-\label{ch2:eq:qpfs_example}
-\end{equation}
-\vspace{0.5cm} \\
-Пусть необходимо выбрать только 2 признака.
-В данном случае оптимальным подмножеством признаков является~$[\bchi_1, \bchi_2]$.
-Признак~$\bchi_2$ предсказывает второй целевой столбец~$\bnu_2$, комбинация признаков~$\bchi_1, \bchi_2$ прогнозирует первый целевой столбец~$\bnu_1$.
-Алгоритм QPFS для~$r=2$ дает решение~$\bz = [0.37, 0.61, 0.02]$. Это совпадает с описанным решением.
-Однако, если добавить коллинеарные столбцы в матрицу~$\bY$ и увеличить~$r$ до 5, то решением QPFS будет~$\bz = [0.40, 0.17, 0.43]$.
-Здесь потерян признак~$\bchi_2$ и выбран избыточный признак~$\bchi_3$.
-В следующих подразделах предлагаются обобщения алгоритма QPFS, которые позволяют бороться с проблемой данного примера.
-
-\subsection{Симметричный учёт значимости признаков и целевых переменных}
-Чтобы учесть зависимости в столбцах матрицы~$\bY$, обобщим функцию QPFS~\eqref{ch2:eq:qpfs_problem} для многомерного случая ($r > 1$).
-Добавим член~$\text{Sim}(\bY)$ и изменим член $\text{Rel}(\bX, \bY)$ следующим образом:
-\begin{equation}
-\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{\bz_x^{\T} \bB \bz_y}_{\text{Rel}(\bX, \bY)} + \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1 \\ \bz_y \geq \bZero_r, \, \bOne_r^{\T}\bz_y=1}}.
-\label{ch2:eq:symimp}
-\end{equation}
-Определим элементы матриц~$\bQ_x \in \bbR^{n \times n}$, $\bQ_y \in \bbR^{r \times r}$ и $\bB \in \bbR^{n \times r}$ следующим образом:
-\begin{equation*}
-\bQ_x = \left[ |\text{corr}(\bchi_i, \bchi_j)| \right]_{i,j=1}^n, \quad
-\bQ_y = \left[ |\text{corr}(\bnu_i, \bnu_j)| \right]_{i,j=1}^r, \quad
-\bB =  \left[ |\text{corr}(\bchi_i, \bnu_j)| \right]_{\substack{i=1, \dots, n \\ j=1, \dots, r}}.
-\end{equation*}
-Вектор~$\bz_x$ содержит коэффициенты значимости признаков, $\bz_y$~-- коэффициенты значимости целевых столбцов.
-Коррелированные целевые столбцы штрафуются членом~$\text{Sim}(\bY)$ и получают более низкие значения значимости.
-
-Коэффициенты $\alpha_1$, $\alpha_2$, и $\alpha_3$ контролируют влияние каждого члена на функцию~\eqref{ch2:eq:symimp} и удовлетворяют следующим условиям:
-\begin{equation*}
-\alpha_1 + \alpha_2 + \alpha_3 = 1, \quad \alpha_i \geq 0, \, i = 1, 2, 3.
-\end{equation*}
-\begin{statement}
-	Баланс между~$\text{Sim}(\bX)$, $\text{Rel}(\bX, \bY)$ и $\text{Sim}(\bY)$ в  задаче~\eqref{ch2:eq:symimp} достигается при:
-	\begin{equation}
-	\alpha_1 \propto \overline{\bQ}_y \overline{\bB} ; \quad
-	\alpha_2 \propto \overline{\bQ}_x \overline{\bQ}_y; \quad
-	\alpha_3  \propto \overline{\bQ}_x \overline{\bB}.
-	\label{ch2:eq:alpha_3}
-	\end{equation}
+\begin{definition}
+	Назовём пространство $\bbT \subset \bbR^l$ \textit{скрытым пространством} для пространства $\bbX \in \bbR^n$ ($l \leq n$), если существуют функция $\varphi_e: \bbX \to \bbT$ и функция $\varphi_d: \bbT  \to \bbX$ такие что
+	\[
+		\forall \bx \in \bbX \quad \exists \bt \in \bbT: \varphi_d (\varphi_e(\bx)) = \varphi_d(\bt) = \bx.
+	\]
+	Функцию $\varphi_e(\bx)$ будем называть \textit{функцией кодирования} объекта $\bx$, функцию $\varphi_d(\bt)$ будем называть \textit{функцией декодирования}. 
 	
+	
+	Аналогично введём определение \textit{скрытого пространства}~$\bbU \subset \bbR^s$ для целевого пространства $\bbY$, \textit{функции кодирования} $\psi_e: \bbY \to \bbU$ и \textit{декодирования} $\psi_d: \bbU  \to \bbY$
+	\[
+	\forall \by \in \bbY \quad  \exists \bu \in \bbU: \psi_d (\psi_e(\by)) = \psi_d(\bu) = \by.
+	\]
+\end{definition}
+
+\begin{definition}
+	Будем считать, что пространство $\bbT \subset \bbR^l$ задаёт \textit{внутреннюю структуру} пространства $\bbX \in \bbR^n$, если пространство $\bbT$ является скрытым для пространства $\bbX$.
+\end{definition}
+
+\begin{definition}
+	Между пространствами $\bbX$ и $\bbY$ существует \textit{согласующее отображение}, если существуют пространства $\bbT$ и $\bbU$, задающие внутренние структуры для пространств $\bbX$ и $\bbY$ соответственно, и существует \textit{функция согласования} $g: \bbT \rightarrow \bbU$, такая что
+	\[
+	 \forall \bu \in \bbU \quad \exists \bt:  \bu = g(\bt).
+	\]
+\end{definition}
+
+\begin{assumption}
+	Предположим, что в задаче предсказания~\eqref{ch1:eq:loss_min} пространства $\bbT$ и $\bbU$ задают внутреннюю структуру пространств $\bbX$ и $\bbY$. 
+	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует функция согласования~$g: \bbT \rightarrow \bbU$. Тогда выполнено
+	\[
+	\forall \by \in \bbY \quad \exists \bx \in \bbX: \by = \psi_d(\bu) = \psi_d(g(\bt)) = \psi_d(g(\phi_e(\bx))). 
+	\]
+	
+	Тогда общая схема задачи декодирования принимает вид следующей коммутативной диаграммы:
+	\begin{equation}
+	\begin{tikzpicture}
+	\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
+	{
+		\bbX \subset \bbR^n & \bbY \subset \bbR^r \\
+		\bbT \subset \bbR^l & \bbU \subset \bbR^s \\};
+	\path[-stealth]
+	(m-1-1) edge node [above] {$f$} (m-1-2)
+	(m-2-1) edge [bend right=10] node [right] {$\varphi_d$} (m-1-1)
+	(m-2-2) edge [bend left=10] node [left] {$\psi_d$} (m-1-2)
+	(m-1-1) edge [bend right=10] node [left] {$\varphi_e$} (m-2-1)
+	(m-1-2) edge [bend left=10] node [right] {$\psi_e$} (m-2-2)
+	(m-2-1) edge node [above] {$h$} (m-2-2);
+	\end{tikzpicture}
+	\label{ch1:eq:decoding_scheme}
+	\end{equation}
+\end{assumption}
+
+\begin{definition}
+	Согласно схеме~\eqref{ch1:eq:decoding_scheme}, определим модель декодирования $f: \bbX \rightarrow \bbY$ как суперпозицию
+	 \begin{equation}
+	 	f = \psi_d \circ g \circ \varphi_e.
+	 	\label{ch1:eq:def_decoding_function}
+	 \end{equation}
+\end{definition}
+
+Рассмотрим случай квадратичной функции потерь:
+\[
+\cL(f, \bX, \bY) = \sum_{i=1}^m \| \by_i - f(\bx_i) \|^2.
+\]
+
+\begin{statement}
+	\label{ch1:st:decod_lip}
+	Пусть функция декодирования $\psi_d$ модели декодирования~$f$~\eqref{ch1:eq:def_decoding_function} Липшицева с константой $L$. Тогда 
+	\[
+		\cL(f, \bX, \bY) \leq L \cdot \cL(g, \bT, \bU).
+	\]
 \end{statement}
+
 \begin{proof}
-	Значения $\alpha_1$, $\alpha_2$, и $\alpha_3$ получаются путем решения следующих уравнений:
-	\begin{align*}
-	&\alpha_1 + \alpha_2 + \alpha_3 = 1; \\
-	&\alpha_1 \overline{\bQ}_x = \alpha_2 \overline{\bB} = \alpha_3 \overline{\bQ}_y.
-	\end{align*}
-	Здесь~$\overline{\bQ}_x$, $\overline{\bB}$ и $\overline{\bQ}_y$ соответствующих матриц~$\bQ_x$, $\bB$ и $\bQ_y$ - средние значения членов~$\text{Sim}(\bX)$, $\text{Rel}(\bX, \bY)$ и $\text{Sim}(\bY)$.
+	\begin{multline*}
+		\cL(f, \bX, \bY) = \sum_{i=1}^m \| \psi_d (g (\phi_e(\bx_i))) - \by_i \|^2  = \sum_{i=1}^m \| \psi_d (g (\bt_i)) - \psi_d (\bu_i) \|^2 \\\leq L \sum_{i=1}^m \| g (\bt_i) - \bu_i \|^2 = L \cdot \cL(g, \bT, \bU).
+	\end{multline*}
 \end{proof}
-Для изучения зависимости~$\text{Sim}(\bY)$ на функцию~\eqref{ch2:eq:symimp}, зафиксируем соотношение между~$\alpha_1$ и $\alpha_2$:
+\begin{theorem}
+	Рассмотрим две модели:
+	\begin{enumerate}
+		\item Первая модель $f_1$ доставляет минимум ошибке $\cL(f, \bX, \bY)$
+		\[
+		f_1 = \argmin_f \cL(f, \bX, \bY).
+		\]
+		При этом $\bY = f_1(\bX) + \bE_1$, где $\bE_1 \in \bbR^{m \times r}$~--- матрица ошибок модели $f_1$.
+		
+		\item Вторая модель $f_2$~--- модель декодирования~\eqref{ch1:eq:def_decoding_function} c Липшецевой функцией декодирования $\psi_d$ с константой $L$ и функцией согласования, удовлетворяющей условию
+		\[
+			g = \argmin_g \cL(g, \bT, \bU).
+		\]
+		При этом $\bU = g(\bT) + \bE_2$, где $\bE_2 \in \bbR^{m \times s}$~--- матрица ошибок функции согласования $g$.
+	\end{enumerate}
+	Пусть для константы Липшица $L$ функции декодирования $\psi_d$ выполнено следующее условие
+	\begin{equation}
+		L \leq \frac{\|\bE_1\|_F^2}{\|\bE_2\|_F^2}.
+		\label{ch1:eq:lip_ineq}
+	\end{equation}
+	Тогда функция ошибки $\cL(f_2, \bX, \bY)$ модели $f_2$ не превосходит функции ошибки $\cL(f_1, \bX, \bY)$ модели $f_1$.
+\end{theorem}
+
+\begin{proof}
+	\[
+		\mathcal{L} (f_1, \bX, \bY) = \sum_{i=1}^m \| \mathbf{f}_1(\bx_i) - \by_i\|^2 = \| \bE_1 \|_F^2.
+	\]
+	\[
+	\mathcal{L} (g, \bT, \bU) = \sum_{i=1}^m \| \mathbf{g}(\bt_i) - \bu_i\|^2 = \| \bE_2 \|_F^2.
+	\]
+	Воспользуемся утверждением~\ref{ch1:st:decod_lip} и условием~\eqref{ch1:eq:lip_ineq}
+	\[
+		\mathcal{L} (f_2, \bX, \bY) \leq L \cdot \cL(g, \bT, \bU) = L \| \bE_2 \|_F^2 \leq \| \bE_1 \|_F^2 = \cL(f_1, \bX, \bY).
+	\]
+\end{proof}
+
+\hrulefill
+
+\begin{definition}
+	Функция $g: \bbR^l \times \bbR^l \to \bbR$, связывающая два низкоразмерных латентных представления, назовём \textit{функцией согласования}.
+\end{definition}
+где $\varphi_e: \bbR^m \to \bbR^l$~--  функция кодирования объектов; $\psi_e: \bbR^r \to \bbR^l$~--  функция кодирования ответов; $\varphi_d: \bbR^l \to \bbR^n$~--  функция декодирования объектов; $\psi_d: \bbR^l \to \bbR^r$~--  функция декодирования ответов; $\bT = [\varphi_e(\bx_1), \cdots, \varphi_e(\bx_m)]^{\T}  \in \bbR^{m\times l}$ и $\bU =[\psi_e(\by_1), \cdots, \psi_e(\by_m)]^{\T} \in \bbR^{m\times l}$~-- матрицы представлений данных в латентном пространстве низкой размерности; $g: \bbR^l \times \bbR^l \to \bbR$~-- функция согласования.
+
+Оптимальные параметры $\bW_{\varphi_e}^{*}, \bW_{\psi_e}^{*}$ для функций кодирования $\varphi_e$  и $\psi_e$ находятся из следующей задачи параметрической оптимизации:
 \begin{equation}
-\alpha_1 = \frac{(1 - \alpha_3)\overline{\bB}}{\overline{\bQ}_x + \overline{\bB}}; \quad
-\alpha_2 = \frac{(1 - \alpha_3)\overline{\bQ}_x}{\overline{\bQ}_x + \overline{\bB}}; \quad
-\alpha_3 \in [0, 1].
-\label{ch2:eq:alphas3}
+(\bW_{\varphi_e}^{*}, \bW_{\psi_e}^{*}) = \argmax_{(\bW_{\varphi_e}, \bW_{\psi_e})} [g(\varphi_e(\bX; \bW_{\varphi_e}), \psi_e(\bY; \bW_{\psi_e})))].
+\label{ch1:eq:alignment_argmax}
 \end{equation}
 
-Применим предложенный алгоритм к приведенному примеру~\eqref{ch2:eq:qpfs_example}.
-Матрица~$\bQ$ соответствует матрице~$\bQ_x$.
-Определим матрицы~$\bQ_y$ как $\text{corr}(\bnu_1, \bnu_2) = 0.2$, а все остальные элементы зададим 1.
-Рисунок~\ref{ch2:fig:features_vs_alpha} показывает значение векторов значимостей признаков~$\bz_x$ и целевых векторов~$\bz_y$ в зависимости от значения коэффициента~$\alpha_3$.
-Если~$\alpha_3$ мало, значимости всех целевых векторов не различимы и значимость признака~$\bchi_3$ выше значимости признака~$\bchi_2$. При увеличении~$\alpha_3$ до~$0.2$, коэффициент значимости~$\bz_{y,5}$ целевого вектора~$\bnu_5$ увеличивается наряду со значимостью признака~$\bchi_2$.
+{\color{red} Изменить} Так как параметры функции кодирования подбирались из условия максимизации функции согласования~\eqref{ch1:eq:alignment_argmax} , то после перехода в латентное пространство между $\mathbf{T}$ и $\mathbf{U}$ существует зависимость
+\begin{equation}
+\bU = h(\bT) +  \boldsymbol{\eta},
+\label{ch1:eq:alignment_regression}
+\end{equation}
+где $h: \mathbb{R}^{n \times p} \to \mathbb{R}^{n \times p}$~-- функция регрессионной зависимости,  $\boldsymbol{\eta}$~-- матрица регрессивных ошибок.
 
-\begin{figure}
+Оптимальная $h$ находится минимизацией функции ошибки. Используем квадратичную функцию ошибки потерь $\mathcal{L}$ на $\bT$ и $\bU$:
+\begin{equation}
+\mathcal{L}(h | {\bT}, {\bU}) = {\left\| \underset{n \times p}{\bU}  - h(\underset{m \times p}{\bT}) \right\| }_2^2 \rightarrow\min_{h}.
+\label{ch1:eq:alignment_regression_loss}
+\end{equation}
+
+Финальная прогностическая модель имеет вид:
+$\widehat{\by} = \psi_d(h(\varphi_e(\bx)))$, то есть
+
+\begin{equation}
+f = \psi_d \circ h \circ \varphi_e
+\label{eq:f}
+\end{equation}
+
+\begin{figure}[!ht]
 	\centering
-	\includegraphics[width=\linewidth]{figs/ch2/features_vs_alpha.pdf}
-	\caption{Значимости признаков~$\bz_x$ и целевых векторов~$\bz_y$ в зависимости от~$\alpha_3$ для рассмотренного примера}
-	\label{ch2:fig:features_vs_alpha}
+	\includegraphics[width=\linewidth]{figs/ch1/Examples}
+	\caption{Примеры алгоритмов, работающих по схеме \ref{ch1:eq:decoding_scheme}}
+	\label{ch1:fig:PLSFigure}
 \end{figure}
 
-\subsection{Минимаксная постановка задачи выбора признаков}
-Функция~\eqref{ch2:eq:symimp} является симметричной по отношению к~$\bz_x$ и $\bz_y$.
-Она штрафует признаки, которые коррелированы и не имеют отношения к целевым векторам.
-Кроме того, она штрафует целевые вектора, которые коррелированы между собой и недостаточно коррелируют с признаками.
-Это приводит к малым значениям значимостей для целевых векторов, которые слабо коррелируют с признаками, и большим значениям для целевых векторов, которые сильно коррелируют с признаками.
-Этот результат противоречит интуиции.
-Цель~--- предсказать все целевые вектора, особенно те, которые слабо коррелируют с признаками. Сформулируем две взаимосвязанные задачи:
-\begin{align}
-\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{ \bz_x^{\T}\mathbf{B} \bz_y}_{\text{Rel}(\bX, \bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n, \\ \bOne_n^{\T}\bz_x=1}};
-\label{ch2:eq:x_qpfs}\\
-\alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} + \alpha_2 \cdot \underbrace{ \bz_x^{\T} \mathbf{B} \bz_y}_{\text{Rel}(\bX, \bY)} \rightarrow \min_{\substack{\bz_y \geq \bZero_r,  \\ \bOne_r^{\T}\bz_y=1}}.
-\label{ch2:eq:y_qpfs}
-\end{align}
-Разница между~\eqref{ch2:eq:x_qpfs} и~\eqref{ch2:eq:y_qpfs} заключается в  знаке перед членом Rel.
-В пространстве входных объектов нерелевантные признаки должны иметь меньшие значения значимости.
-В то же время целевые вектора, не релевантные признакам, должны иметь большую значимость.
-Задачи~\eqref{ch2:eq:x_qpfs} и \eqref{ch2:eq:y_qpfs} объединяются в совместную минимакс или максмин постановку
-\begin{equation}
-\min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}} 	\max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} f(\bz_x, \bz_y), \quad \left(\text {или} \, \max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}} f(\bz_x, \bz_y)\right),
-\label{ch2:eq:minmax}
-\end{equation}
-где
-\begin{equation*}
-f(\bz_x, \bz_y) = \alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{\bz_x^{\T} \bB \bz_y}_{\text{Rel}(\bX, \bY)} - \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)}.
-\end{equation*}
-\begin{theorem}
-	Для положительно определенной матрицы~$\bQ_x$ и $\bQ_y$, максмин и минимакс задачи~\eqref{ch2:eq:minmax} имеют одинаковое оптимальное значение.
-\end{theorem}
-\begin{proof}
-	Введём обозначения
-	\begin{equation*}
-	\mathbb{C}^n = \{\bz : \bz \geq \bZero_n, \, \bOne_n^{\T}\bz=1\}, \quad \mathbb{C}^r = \{\bz : \bz \geq \bZero_r, \, \bOne_r^{\T}\bz=1\}.
-	\end{equation*}
-	Множества $\mathbb{C}^n$ и $\mathbb{C}^r$ - компактные и выпуклые. Функция $f: \mathbb{C}^n \times \mathbb{C}^r \rightarrow \bbR$ является непрерывной. Если~$\bQ_x$ и $\bQ_y$ положительно определенны, функция~$f$ выпукло-вогнутая. Т. е.,
-	$f(\cdot, \bz_y): \mathbb{C}^n \rightarrow \bbR$ выпуклая при фиксированном~$\bz_y$, а $f(\bz_x, \cdot): \mathbb{C}^r \rightarrow \bbR$ вогнута при фиксированном~$\bz_x$.
-	В этом случае по теореме Неймана о минимаксе
-	\begin{equation*}
-	\min_{\bz_x \in \mathbb{C}^n} \max_{\bz_y \in \mathbb{C}^r} f(\bz_x, \bz_y) = \max_{\bz_y \in \mathbb{C}^r} \min_{\bz_x\in \mathbb{C}^n} f(\bz_x, \bz_y).
-	\end{equation*}
-\end{proof}
+\subsection{Deep CCA}
 
-Для решения минимакс задачи~\eqref{ch2:eq:minmax}, зафиксируем некоторый~$\bz_x \in \mathbb{C}^n$. Для фиксированного вектора~$\bz_x$ решаем задачу
-\begin{equation}
-\max_{\bz_y \in \mathbb{C}_r} f(\bz_x, \bz_y) = \max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \bigl[\alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y - \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \bigr].
-\label{ch2:eq:fixed_ax}
-\end{equation}
-Лагранжиан для данной задачи:
-\begin{equation*}
-L(\bz_x, \bz_y, \lambda, \bmu) = \alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y - \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y + \lambda \cdot  (\bOne_r^{\T} \bz_y - 1) + \bmu^{\T} \bz_y.
-\end{equation*}
-Здесь вектор множителей Лагранжа~$\bmu$, который соответствует ограничениям на неравенства $\bz_y \geq \bZero_r$, является неотрицательным.
-Двойственной задачей является
-\begin{equation}
-\min_{\lambda, \, \bmu \geq \bZero_r} g(\bz_x, \lambda, \bmu) = \min_{\lambda, \, \bmu \geq \bZero_r}  \left[\max_{\bz_y \in \bbR^r} L(\bz_x, \bz_y, \lambda, \bmu) \right].
-\label{ch2:eq:dual}
-\end{equation}
-Для задачи квадратичного программирования~\eqref{ch2:eq:fixed_ax} с положительно определенными матрицами~$\bQ_x$ и~$\bQ_y$ выполняются условия сильной двойственности. Таким образом, оптимальное значение~\eqref{ch2:eq:fixed_ax} равно оптимальному значению~\eqref{ch2:eq:dual}. Это позволяет перейти от решения задачи~\eqref{ch2:eq:minmax} к решению задачи
-\begin{equation}
-\min_{\bz_x \in \mathbb{C}^n, \, \lambda, \, \bmu \geq \bZero_r} g(\bz_y, \lambda, \bmu).
-\label{ch2:eq:dual_maxmin}
-\end{equation}
+Deep CCA~-- нелинейной модификация CCA. DCCA преобразует исходные данные с помощью многослойной нейронной сети таким образом, что результирующее представление становится согласованным. Предполагается, что есть $d$ слоев нейроной сети. 
 
-Полагая градиент~$\nabla_{\bz_y} L(\bz_x, \bz_y, \lambda, \bmu)$ равным нулю, получим оптимальное значение~$\bz_y$:
+Выходом первого слоя для экземпляра $\bx$ будет $\mathbf{h}_1 = s(\bW^{1}_{\bx}\bx + \bb^{1}_{\bx}) \in \mathbb{R}^{c_1}$, где $\bW_{\bx}^{1} \in \mathbb{R}^{c_1 \times m}$~-- матрица весов, $\bb_{x}^{1} \in \mathbb{R}^{c_1}$~-- вектор смещения, $s: \mathbb{R} \to \mathbb{R}$~-- нелинейная функция, которая действует покомпонентно. Далее выход первого слоя используется для вычисления выхода второго слоя $\mathbf{h}_{2} = s(\bW^{2}_{\bx}\mathbf{h}_{1} + \bb^{2}_{\bx}) \in \mathbb{R}^{c_2}$ и так далее до тех пор пока не будет найдено конечное представление $\varphi_e(\bx) = s(\bW^{d}_{\bx}\mathbf{h}_{d-1} + \bb^{d}_{\bx}) \in \mathbb{R}^{p}$. Аналогично находится представление для $\by$: $\psi_e(\by) = s(\bW^{d}_{\by}\mathbf{h}_{d-1} + \bb^{d}_{\by}) \in \mathbb{R}^{p}.$
+
+Обозначим $\theta_{\bx}$, $\theta_{\by}$~-- параметры для функций кодирования, то есть матрицы весов и векторы смещений. Оптимальные параметры $\theta_{\bx}^{*}$, $\theta_{\by}^{*}$ находятся из задачи оптимизации:
 \begin{equation}
-\bz_y = \frac{1}{2\alpha_3} \bQ_y^{-1} \left( - \alpha_2 \cdot \bB^{\T} \bz_x +\lambda \cdot \bOne_r + \bmu \right).
-\label{ch2:eq:ax}
+(\theta_{\bx}^{*}, \theta_{\by}^{*}) = \argmax _{(\theta_{\bx}, \theta_{\by})} [g(\varphi_e(\bX; \theta_{\bx}), \psi_e(\bY; \theta_{2}))] = \argmax _{(\theta_{\bx}, \theta_{\by})} [corr(\varphi_e(\bX; \theta_{\bx}), \psi_e(\bY; \theta_{2}))].
 \end{equation}
-Двойственная функция принимает вид
-\begin{multline}
-g(\bz_x, \lambda, \bmu)
-= \max_{\bz_y \in \bbR^r} L(\bz_x, \bz_y, \lambda, \bmu) =
-\bz_x^{\T} \left( - \frac{\alpha_2^2}{4\alpha_3} \cdot \bB \bQ_y^{-1} \bB^{\T} - \alpha_1 \cdot \bQ_x\right) \bz_x \\ - \frac{1}{4 \alpha_3} \lambda^2 \cdot \bOne_r^{\T} \bQ_y^{-1} \bOne_r - \frac{1}{4 \alpha_3} \cdot \bmu^{\T} \bQ_y^{-1} \bmu + \frac{\alpha_2}{2 \alpha_3} \lambda \cdot \bOne_r^{\T} \bQ_y^{-1} \bB^{\T} \bz_x \\ - \frac{1}{2 \alpha_3} \lambda \cdot \bOne_r^{\T} \bQ_y^{-1} \bmu + \frac{\alpha_2}{2 \alpha_3} \cdot \bmu^{\T} \bQ_y^{-1} \bB^{\T} \bz_x + \lambda.
-\label{ch2:eq:dual_quadratic_form}
-\end{multline}
-Тем самым задача~\eqref{ch2:eq:dual_maxmin} является квадратичной задачей с~$n + r + 1$ переменными.
-
-\subsection{Несимметричный учёт значимостей признаков и целевых переменных}
-Естественным способом преодоления проблемы алгоритма SymImp является добавление штрафа для целевых векторов, которые коррелируют с признаками.
-Добавим линейный член~$\bb^{\T} \bz_y$ в член $\text{Rel}(\bX, \bY)$ следующим образом:
-\begin{equation}
-\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot  \underbrace{\left(\bz_x^{\T} \bB \bz_y - \bb^{\T} \bz_y \right) }_{\text{Rel}(\bX, \bY)} + \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1 \\ \bz_y \geq \bZero_r, \, \bOne_r^{\T}\bz_y=1}}.
-\label{ch2:eq:asymimp}
-\end{equation}
-\begin{statement}
-	Пусть вектор $\bb$ равен
-	\begin{equation*}
-	b_j = \max_{i=1, \dots n} [\bB]_{i, j}.
-	\end{equation*}
-	Тогда значение коэффициентов значимостей вектора~$\bz_y$ будут неотрицательными в~$\text{Rel}(\bX, \bY)$ для задачи~\eqref{ch2:eq:asymimp}.
-\end{statement}
-\begin{proof}
-	Утверждение следует из факта
-	\[
-	\sum_{i=1}^n  z_i b_{ij} \leq \left(\sum_{i=1}^n z_i \right)\max_{i=1, \dots n} b_{ij} = \max_{i=1, \dots n} b_{ij},
-	\]
-	где $z_i \geq 0$ и $\sum_{i=1}^n z_i = 1$.
-\end{proof}
-Следовательно, функция~\eqref{ch2:eq:asymimp} штрафует в меньшей мере признаки, которые имеют отношение к целевым векторам, и целевые вектора, которые недостаточно коррелированы с признаками.
-\begin{statement}
-	Баланс между членами~$\text{Sim}(\bX)$, $\text{Rel}(\bX, \bY)$ и $\text{Rel}(\bX, \bY)$ для задачи~\eqref{ch2:eq:asymimp} достигается при следующих коэффициентах:
-	\begin{equation*}
-	\alpha_1 \propto \overline{\bQ}_y \left( \overline{\bb} - \overline{\bB}\right); \quad
-	\alpha_2 \propto \overline{\bQ}_x \overline{\bQ}_y; \quad
-	\alpha_3  \propto \overline{\bQ}_x \overline{\bB}.
-	\end{equation*}
-\end{statement}
-\begin{proof}
-	Необходимые значения~$\alpha_1$, $\alpha_2$, и $\alpha_3$ являются решением следующей системы уравнений:
-	\begin{align}
-	&\alpha_1 + \alpha_2 + \alpha_3 = 1; \\
-	&\alpha_1 \overline{\bQ}_x = \alpha_2 \overline{\bB}; \label{ch2:eq:asymimp_balance1}\\
-	&\alpha_2 \left(\overline{\bb} - \overline{\bB} \right) = \alpha_3 \overline{\bQ}_y.
-	\label{ch2:eq:asymimp_balance2}
-	\end{align}
-	Здесь, в~\eqref{ch2:eq:asymimp_balance1} уравновешены $\text{Sim}(\bX)$ с первым слагаемым~$\text{Rel}(\bX, \bY)$, а в~\eqref{ch2:eq:asymimp_balance2} уравновешены $\text{Sim}(\bY)$  с~$\text{Rel}(\bX, \bY)$.
-\end{proof}
-\begin{statement}
-	Для случая $r=1$, предложенные функции~\eqref{ch2:eq:symimp},~\eqref{ch2:eq:minmax} и~\eqref{ch2:eq:asymimp} совпадают с оригинальным алгоритмом QPFS~\eqref{ch2:eq:qpfs_problem}.
-	
-	\begin{proof}
-		Если $r$ равно 1, то $\bQ_y = q_y$ - скаляр, $\bz_y = 1$ и $\bB = \bb$. Задачи~\eqref{ch2:eq:symimp},~\eqref{ch2:eq:minmax} и~\eqref{ch2:eq:asymimp} принимают вид
-		\begin{equation*}
-		\alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bb \rightarrow \min_{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1} .
-		\end{equation*}
-		При $\alpha = \frac{\alpha_2}{\alpha_1 + \alpha_2}$ последняя задачи принимает вид~\eqref{ch2:eq:qpfs_problem}.
-	\end{proof}
-\end{statement}
-
-Таблица~\ref{ch2:tbl:summary} демонстрирует основные идеи и функции ошибок для каждого алгоритма. 
-RelAgg является базовой стратегией и не учитывает корреляции в целевом пространстве.
-SymImp штрафует попарные корреляции между целевыми векторами.
-MinMax более чувствителен к целевым векторам, которые трудно предсказать.
-Стратегия Asymimp добавляет линейный член к функции SymImp, чтобы сделать вклад признаков и целевых векторов асимметричным.
-
-\begin{table}[ht]
-	\centering
-	\caption{Обзор предлагаемых обобщений многомерного QPFS алгоритма}
-	\small{
-		\begin{tabular}{c|c|c}
-			\hline
-			Алгоритм & Идея & Функция ошибки $S(\bz | \bX, \bY)$ \\
-			\hline && \\ [-.5em]
-			RelAgg & $\min \bigl[ \text{Sim}(\bX) - \text{Rel}(\bX, \bY) \bigr] $ & $\min\limits_{\bz_x} \bigl[ (1 - \alpha) \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha \cdot \bz_x^{\T} \bB \bOne_r \bigr] $ \\ &&\\[-.5em]
-			SymImp & $\begin{aligned} \min \, \bigl[ \text{Sim}(\bX) & - \text{Rel}(\bX, \bY) \\ & + \text{Sim}(\bY) \bigr] \end{aligned}$ & $ \min\limits_{\bz_x, \, \bz_y} \left[ \alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y + \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \right] $\\ &&\\ [-.5em]
-			MinMax & $\begin{aligned} &\min \, \bigl[ \text{Sim}(\bX) - \text{Rel}(\bX, \bY) \bigr]  \\ & \max \bigl[\text{Rel}(\bX, \bY) + \text{Sim}(\bY) \bigr] \end{aligned}$ & $	\min\limits_{\bz_x} 	\max\limits_{\bz_y} \bigl[\alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y - \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \bigr]$ \\ &&\\ [-.5em]
-			AsymImp & $\begin{aligned} & \min \, \bigl[ \text{Sim}(\bX) - \text{Rel}(\bX, \bY) \bigr]\\ &  \max \bigl[\text{Rel}(\bX, \bY) + \text{Sim}(\bY) \bigr] \end{aligned}$ & $\min\limits_{\bz_x, \bz_y} \bigl[ \alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \left(\bz_x^{\T} \bB \bz_y - \bb^{\T} \bz_y \right) + \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \bigr]$\\ 
-			\hline
-	\end{tabular}}
-	\label{ch2:tbl:summary}
-\end{table}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Вычислительный эксперимент}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Для оценки предложенных алгоритмов выбора признаков, введём критерии оценки качества выбранного количества признаков.
-Определим коэффициент мультикорреляции как среднее значение коэффициента множественной корреляции следующим образом:
-\begin{equation*}
-R^2 = \frac{1}{r} \text{tr} \left( \bC^{\T} \mathbf{R}^{-1} \bC \right); \quad \text{where }\bC = [ \text{corr}(\bchi_i, \bnu_j)]_{\substack{i=1, \dots, n \\ j=1, \dots, r}}, \, \mathbf{R} = [ \text{corr}(\bchi_i, \bchi_j)]_{i, j = 1}^n.
-\end{equation*}
-Этот коэффициент принимает значение между 0 и 1. Большее значение~$R^2$ соответствует лучшему подмножеству признаков.
+Временные ряды электроэнергии состоят из почасовых записей (52512 наблюдений). 
+Строка матрицы~$\bX$~--– локальная история сигнала за одну неделю $n = 24 \times 7$. Строка матрицы~$\bY$~--- локальный прогноз потребления электроэнергии в следующие 24 часа $r = 24$. В этом случае матрицы~$\bX$ и~$\bY$ являются авторегрессионными матрицами.
 
-Нормированный среднеквадратичная ошибка (sRMSE) отображает качество прогнозирования модели. Оценка sRMSE считается на тренировочной и тестовой выборке.
-\begin{equation*}
-\text{sRMSE}(\bY, \widehat{\bY}_{\ba}) = \sqrt{\frac{\text{MSE} (\bY, \widehat{\bY}_{\ba})}{\text{MSE} (\bY, \overline{\bY})}} =  \frac{\| \bY - \widehat{\bY}_{\ba} \|_2}{\| \bY - \overline{\bY} \|_2}.
-\end{equation*}
-Здесь $\widehat{\bY}_{\ba} = \bX_{\ba} \bTheta_{\ba}^{\T}$~-- предсказание модель, $\overline{\bY}$~-- предсказание константной модели, полученное усреднением целевой переменной по всем объектам.
-Данный показатель на тестовой выборке необходимо минимизировать.
+Вычислительный эксперимент также проводился на данных электрокортикограмм (ECoG) из проекта NeuroTycho~\cite{shimoda2012decoding}.
+Данные ECoG состоят из 32-канальных сигналов напряжения, снятых с головного мозга.
+Цель состоит в предсказании по входному сигналу ECoG 3D позиции рук в последующие моменты времени.
+Исходные сигналы напряжения преобразуются в пространственно-временное представление с помощью вейвлет-преобразования с материнским вейвлетом Морле.
+Процедура извлечения признаков из исходных данных подробно описана в~\cite{chao2010long,eliseyev2016penalized}.
+Описание исходного сигнала в каждый момент времени имеет размерность 32 (каналы) $\times $ 27 (частоты) = 864.
+Каждый объект представляет собой локальный отрезок времени длительностью $\Delta t = 1s$. Временной шаг между объектами $\delta t = 0.05 s$.
+Матрицы имеют размеры $\bX \in \bbR^{18900 \times 864}$ и $\bY \in \bbR^{18900 \times 3k}$, где $k$ - число отсчётов времени прогнозирования.
+Данные разбиты на тренировочную и тестовую части в соотношении 0,67. 
+Пример исходных сигналов мозга и соответствующей траектории руки показан на рисунке~\ref{ch2:fig:ecog_data}.
 
-Байесовский информационный критерий (BIC)~-- компромисс между качеством предсказания и размером выбранного подмножества признаков~$\|\ba\|_0 = \#\{j: a_j \neq 0\}= \sum_{j=1}^n a_j$:
-\begin{equation*}
-\text{BIC} = m \ln \left( \text{MSE} ( \bY, \widehat{\bY}_{\ba})\right) + \| \ba \|_0 \cdot \ln m,
-\end{equation*}
-Чем меньше значение BIC, тем лучше набор признаков.
-
-\subsection*{Данные}
-
-Вычислительный эксперимент проводился на данных электрокортикограмм. Описание данных приведено в Главе~1.
-
-На Рис.~\ref{ch2:fig:corr_matrix} показаны матрицы корреляций для исходных матриц~$\bX$ и~$\bY$ данных ECoG. Частоты в матрице~$\bX$ сильно коррелированы. 
-В целевой матрице~$\bY$ корреляции между осями несущественны по сравнению с корреляциями между последовательными моментами времени и эти корреляции спадают со временем.
-\begin{figure}[ht]
-	\includegraphics[width=\linewidth]{figs/ch2/corr_matrix}
-	\caption{Матрицы корреляций для матрицы плана~$\bX$ и целевой матрицы~$\bY$ для данных ECoG}
-	\label{ch2:fig:corr_matrix}
-\end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection*{Результаты}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Применим алгоритм SymImp QPFS для различных значений коэффициента~$\alpha_3$ согласно формуле~\eqref{ch2:eq:alphas3}.
-Зависимость значимости целевых векторов~$\bz_y$ относительно коэффициента~$\alpha_3$ для различных значений~$k$ показана на Рис.~\ref{ch2:fig:features_vs_alpha_ecog}.
-Значимости целевых векторов почти одинаковы для всех координат запястья при прогнозировании одного отсчёта времени ($k = 1$), 
-что отражает независимость между координатами $x$, $y$ и $z$.
-Для $k = 2$ и $k = 3$ значимости некоторых целевых векторов становится нулевой при увеличении~$\alpha_3$.
-Вертикальные линии соответствуют оптимальному значению~$\alpha_3$, вычисленному по~\eqref{ch2:eq:alpha_3}. 
-При этом значении $\alpha_3$ значимости компонент~$\bz_y$ совпадают. 
-Таким образом, алгоритм не учитывает различия между целевыми векторами для $k=1, 2, 3$.
-
-\begin{figure}[ht]
-	\begin{minipage}{.5\linewidth}
-		\subfloat{
-			\includegraphics[width=\linewidth]{figs/ch2/features_vs_alpha_ecog_3}}
-	\end{minipage}%
-	\begin{minipage}{.5\linewidth}
-		\subfloat{
-			\includegraphics[width=\linewidth]{figs/ch2/features_vs_alpha_ecog_6}}
-	\end{minipage}\par\medskip
-	\subfloat{
-		\includegraphics[width=\linewidth]{figs/ch2/features_vs_alpha_ecog_9}}
-	
-	\caption{Значимости целевых векторов~$\bz_y$ в зависимости от~$\alpha_3$ для алгоритма SymImp QPFS}
-	\label{ch2:fig:features_vs_alpha_ecog}
-\end{figure}
-
-Предлагаемые алгоритмы многомерного QPFS, приведенные в таблице~\ref{ch2:tbl:summary} применяются для набора данных ECoG. 
-Решим задачу выбора признаков для каждого из алгоритмов, чтобы получить вектора значимостей признаков. 
-Отсортируем по убыванию признаки по значению их значимостей. Обучим линейную модель, постепенно добавляя в неё признаки. 
-Исследуются значения описанных критериев качества при увеличении количества отобранных признаков. 
-На Рис.~\ref{ch2:fig:ecog_3_30_metrics} показаны результаты прогнозирования для случая прогнозирования $k = 30$ отсчётов времени. 
-Порог значимости признаков $\tau$ обозначен цветными тиками. 
-Пороговые значения $\tau$ для предлагаемых методов больше, чем для базового алгоритма RelAgg. 
-Алгоритм SymImp имеет большой порог, не позволяя получить малый набор признаков.
-Однако алгоритм SymImp обладает наилучшей предсказательной способностью с точки зрения sRMSE на тестовых данных.
-Второй по качеству результат по sRMSE показал алгоритм AsymImp.
-Все предложенные алгоритмы достигают меньшей ошибки на тестовой выборке по сравнению с алгоритмом RelAgg. 
-Критерий устойчивости также выше для предложенных алгоритмов.
-Алгоритм AsymImp показывает лучшие результаты с точки зрения качества прогнозирования и размера выбранного подмножества признаков.
-
-\begin{figure}[ht]
-	\includegraphics[width=\linewidth]{figs/ch2/ecog_3_30_metrics}
-	\caption{Сравнение предложенных алгоритмов выбора признаков для данных ECoG при прогнозировании $k = 30$ отсчётов времени}
-	\label{ch2:fig:ecog_3_30_metrics}
-\end{figure}
-
-Чтобы сравнить структуру выбранных подмножеств признаков и исследовать стабильность процедуры выбора признаков, используется метод генерации данных с помощью бутстрепа. 
-Генерируется множество подвыборок, выбирая объекты по одному с возвращениями. 
-Затем решается задачу выбора признаков для каждой пары матрицы плана~$bX$ и целевой матрицы~$\bY$.
-Сравниваются полученные вектора значимостей для различных подвыборок данных. 
-В качестве меры стабильности работы алгоритмов вычисляется средний попарный коэффициент корреляции Спирмена и попарное $\ell_2$ расстояние.
-В таблице~\ref{ch2:tbl:stability} показана средняя ошибка sRMSE, размер подмножества признаков и описанные статистики для каждого алгоритма. 
-Ошибка считалась на обученной линейной модели с использованием $50$ признаков с наибольшими значениями значимостей.
-Asymimp дает наименьшую ошибку на тестовой выборке. 
-Размер выбранных подмножеств объектов завышен при использовании порогового значения~$\tau=10^{-4}$. 
-Оптимальное значение~$\tau$ может быть подобрано с помощью процедуры кросс валидации.
-
-\begin{table}[ht]
-	\caption{Стабильность предложенных алгоритмов выбора признаков}
+\begin{figure}
 	\centering
-	\begin{tabular}{l|ccccc}
-		\hline
-		& sRMSE  & $\|\ba\|_0$ & Spearman $\rho$ & $\ell_2$ \\ \hline
-		RelAgg & 0.965 $\pm$ 0.002 & 26.8 $\pm$ 3.8 & 0.915 $\pm$ 0.016 & 0.145 $\pm$ 0.018   \\
-		SymImp & 0.961 $\pm$ 0.001 & 224.4 $\pm$ 9.0 & 0.910 $\pm$ 0.017 & 0.025 $\pm$ 0.002   \\
-		MinMax & 0.961 $\pm$ 0.002 & 101.0 $\pm$ 2.1& 0.932 $\pm$ 0.009 & 0.059 $\pm$ 0.004   \\
-		AsymImp & 0.955 $\pm$ 0.001 & 85.8 $\pm$ 10.2& 0.926 $\pm$ 0.011 & 0.078 $\pm$ 0.007  \\ \hline
-	\end{tabular}
-	\label{ch2:tbl:stability}
-\end{table}
+	\includegraphics[width=\linewidth]{figs/ch2/ecog_data}
+	\caption{Сигналы мозга (левый график) и 3D координаты руки (правый график)}
+	\label{ch1:fig:ecog_data}
+\end{figure}
 
-Для того, чтобы сравнить методы снижения размерности и выбора признаков, используется модель PLS. 
-На Рис.~\ref{ch2:fig:pls_vs_k} показана ошибка sRMSE на тренировочной и тестовой выборках в зависимости от размерности скрытого пространства~$l$.
-Ошибка на тестовой выборке достигает минимума при $l = 11$.
-Алгоритм PLS является более гибким подходом по сравнению с линейной моделью, построенной на подмножестве признаков, так как использует все исходные признаки.
-Это приводит к меньшей ошибке, но модель не является разреженной.
+Введём среднеквадратичную ошибку для некоторых матриц $\mathbf{A} = [a_{ij}]$ и $\mathbf{B} = [b_{ij}]$
+\[
+\text{MSE} (\mathbf{A}, \mathbf{B}) = \sum_{i,j} (a_{ij} - b_{ij})^2.
+\]
+Для оценивания качества аппроксимации вычисляется значение нормированной среднеквадратичной ошибки
+\begin{equation}
+\text{NMSE}(\bY,  \mathbf{\hat{Y}}) = \frac{\text{MSE} (\bY, \mathbf{\hat{Y}})}{\text{MSE} (\bY, \mathbf{\bar{Y}})},
+\label{ch1:eq:nmse}
+\end{equation}
+где $\mathbf{\hat{Y}}$~--- прогноз модели, $\mathbf{\bar{Y}}$~--- константный прогноз средним значением по столбцам матрицы.
 
-На рис.~\ref{ch2:fig:models} проведено сравнение 3 моделей: линейной регрессии и регрессии PLS, построенной на 100 признаках QPFS, и регрессии PLS со всеми признаками.
-Линейная регрессия со всеми признаками не рассматривается, так как ее результаты близки к константному прогнозу. На рисунке также приведены результаты алгоритмов lasso и elastic net, которые широко используются для выбора признаков.
-В данном эксперименте использовался алгоритм Asymimp QPFS.
-Размерность скрытого пространства PLS $l = 15$.
-Результаты регрессии PLS значительно лучше, линейной регрессии с признаками QPFS.
-Это означает, что последняя модель не является достаточно гибкой.
-Тем не менее, лучший результат показывает модель PLS, построенная на признаках QPFS. 
-Данная модель является разреженной, так как использует только 100 исходных признаков.
-Способность модели PLS находить оптимальное скрытое представление данных улучшает предсказательную способность модели.
+\subsection*{Данные потребления электроэнергии}
+
+Для нахождения оптимальной размерности $l$ латентного пространства все данные потребления электроэнергии были разбиты на обучающую и валидационную части. 
+Обучающая выборка состоит из $700$ объектов, валидационная из $370$. Зависимость нормированной квадратичной ошибки~\eqref{ch1:eq:nmse} от размерности $l$ латентного пространства представлена на Рис.~\ref{ch1:fig:energy_n_comp}. 
+Сначала ошибка резко падает при увеличении размерности скрытого пространства, а затем стабилизируется.
 
 \begin{figure}[ht]
-	\begin{minipage}{.41\linewidth}
-		\centering
-		\includegraphics[width=1.\linewidth]{figs/ch2/pls_vs_k}
-		\caption{sRMSE на тестовой выборке для модели PLS}
-		\label{ch2:fig:pls_vs_k}
-	\end{minipage}%
-	\begin{minipage}{.57\linewidth}
-		\centering
-		\includegraphics[width=1.\linewidth]{figs/ch2/models2}
-		\caption{Диаграммы размаха значений sRMSE на тестовой выборке для рассматриваемых моделей}
-		\label{ch2:fig:models}
-	\end{minipage}
+	\centering
+	\includegraphics[width=0.75\linewidth]{figs/ch1/energy_n_comp}
+	\caption{Прогноз потребления электроэнергии алгоритмом PLS при размерности латентного пространства $l$=14}
+	\label{ch1:fig:energy_n_comp}
 \end{figure}
+
+Минимальная ошибка наблюдается при $l=14$. 
+Построим прогноз потребления электроэнергии при данном $l$. 
+Результат аппроксимации изображен на Рис.~\ref{ch1:fig:energy_prediction}. Алгоритм PLS восстановил авторегрессионную зависимость и обнаружил дневную сезонность.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.95\textwidth]{figs/ch1/energy_prediction}
+	\caption{Зависимость ошибки от размерности латентного пространства для данных потребления электроэнергии}
+	\label{ch1:fig:energy_prediction}
+\end{figure}
+
+\subsection*{Данные электрокортикограммы}
+
+На Рис.~\ref{ch1:fig:ecog_n_comp} представлена зависимость нормированной квадратичной ошибки~\eqref{ch1:eq:nmse} от размерности латентного пространства. Ошибка аппроксимации меняется незначительно при $l > 5$.
+Таким образом совместное описание пространственно-временного спектрального представления объектов и пространственного положения руки может быть представлено вектором размерности $l \ll n$.
+Зафиксируем $l = 5$. 
+Пример аппроксимации положения руки изображен на Рис.~\ref{ch1:fig:ecog_prediction}. 
+Сплошными линиями изображены истинные координаты руки по всем осям, пунктирными линиями показана аппроксимация методом PLS.
+ 
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.75\linewidth]{figs/ch1/ecog_n_comp}	
+	\caption{Зависимость ошибки от размерности латентного пространства для данных ECoG}
+	\label{ch1:fig:ecog_n_comp}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{figs/ch1/ecog_prediction}
+	\caption{Прогноз движения руки данных ECoG алгоритмом PLS при размерности латентного пространства $l=5$}
+	\label{ch1:fig:ecog_prediction}
+\end{figure}
+

@@ -1,369 +1,481 @@
-\chapter{Порождение признаков с помощью метамоделей}
+\chapter{Метрические методы}
 
+{\color{red} связать все определения}
+
+\section{Метрическое обучение в задачах кластеризации временных рядов}
+Пусть~$\bX = [\bx_1, \dots, \bx_m]^{\T} \in \mathbb{R}^{m \times n}$~--- матрица плана.
+Объект~$\bx_i = [x_i^1, \ldots, x_i^n]^{\T}$ задан в виде вектора в пространстве признаков.
+Требуется выявить кластерную структуру данных и разбить множество объектов~$\bX$ на множество непересекающихся кластеров,
+т.\,е.\ построить отображение
+\[
+f: \bX \to \{1, \dots, r\}.
+\]
+Обозначим~$y_i = f (\bx_i)$, $y_i \in \{1, \ldots, r\}$,~--- метка кластера объекта~$\bx_i$.
+Необходимо выбрать метки кластеров~$\{y_i\}_{i=1}^m$ таким образом, чтобы расстояния между кластерами были максимальными.
+Центроид~$\bmu$ множества объектов~$\bX$ и центроиды кластеров $\{\bmu_j\}_{j=1}^r$ вычисляются по формулам:
+\begin{equation}
+\label{mu}
+\boldsymbol{\mu} =\frac{1}{m} \sum_{i=1}^m\bx_i\,; \quad
+\boldsymbol{\mu}_j =\frac{ \sum_{i=1}^m [y_i = y_j]\bx_i } {\sum_{i=1}^m [y_i = y_j]}\,.
+\end{equation}
+Введем на множестве объектов~$\bX$ расстояние Махаланобиса
+\begin{equation}
+\label{metric}
+\rho_{\bA} (\bx_i, \bx_j) = \sqrt{(\bx_i - \bx_j)^{\top} \bA^{-1} (\bx_i - \bx_j)}\,,
+\end{equation}
+где $\mathbf{A}$~--- это матрица ковариаций множества~$\bX$
+\begin{equation}
+\label{covMatrix}
+\bA = \frac{1}{m} \sum_{i=1}^m(\bx_i - \bmu)(\bx_i - \bmu)^{\T}.
+\end{equation}
+\begin{definition}
+	Функцией ошибки кластеризации назовем межкластерное расстояние:
+	\begin{equation}
+	\cL(\{\bmu_j\}_{j=1}^r, \bX, \by)= - \sum_{j=1}^r N_j \rho_{\bA}^2(\bmu_j, \bmu)\,,
+	\label{eq:cluster_error_function}
+	\end{equation}
+	где $N_j = \sum_{i=1}^m [y_i = y_j]$~--- число объектов в кластере~$j$.
+\end{definition}
+
+Поставим задачу кластеризации как задачу минимизации функции ошибки~\eqref{eq:cluster_error_function}
+\begin{equation}
+\label{Qmax}
+сД \bigl(\{\boldsymbol{\mu}_j\}_{j=1}^r, \bX, \by \bigr) \to \min_{\boldsymbol{\mu}_j \in \bbR^{\T}}.
+\end{equation}
+Для решения этой задачи предлагается применить метод метрического обучения к ковариационной матрице~$\bA$.
+Найдем такую матрицу~$\bA$, для которой функционал качества принимает максимальное значение:
+\begin{equation}
+\label{Amax}
+\bA^* =\argmin_{\bA \in \bbR^{n \times n}} S \bigl(\{\bmu_j^*\}_{j=1}^r, \bX, \by \bigr)\,,
+\end{equation}
+где $\{\bmu_j^*\}_{j=1}^r$~--- решение задачи кластеризации~\eqref{Qmax}.
+
+\section{Алгоритм адаптивного метрического обучения}
+Для решения задач~\eqref{Qmax}, \eqref{Amax} используется алгоритм адаптивного метрического обучения.
+Предлагается понизить размерность пространства объектов~$\bX$ с помощью линейного ортогонального преобразования~$\bP \in \bbR^{n \times l}$, $\bP^{\bT} \bP = \mathbf{I}$, где новая размерность $l < n$
+\[
+\bt_i = \bP \bx_i \in \bbR^l, \quad i = 1, \dots, m.
+\]
+Центроид~$\hat{\bmu}$ множества объектов~$\{\bt_i\}_{i=1}^m$ вычисляется по формуле~\eqref{mu}. 
+Расстояния между объектами вычисляются по формуле~\eqref{metric}, где в качестве матрицы~$\hat{\mathbf{A}}$ используется матрица ковариаций~\eqref{covMatrix} множества объектов $\{\hat{\bx}_i\}_{i=1}^m$
+\[
+\hat{\mathbf{A}} =
+\frac{1}{m} \sum_{i=1}^m (\bt_i - \hat{\bmu})(\bt_i - \hat{\bmu})^{\T} =
+\frac{1}{m} \sum_{i=1}^m \bP(\bx_i - \bmu)(\bx_i - \bmu)^{\T} \bP^{\T} =  \bP \mathbf{A} \bP^{\T}.
+\]
+\begin{definition}
+	Индикаторной матрицей назовем матрицу $\bY = \{y_{ij}\} \in \bbR^{m \times r}$, где
+	\[
+	y_{ij} =
+	\begin{cases}
+	1, & \text{если $f(\bx_i) = y_j$;} \\
+	0, & \text{если $f(\bx_i) \neq y_j$.}
+	\end{cases}
+	\]
+\end{definition}
+\begin{definition}
+	Взвешенной индикаторной матрицей назовем матрицу
+	$\mathbf{L} = \bY (\bY^{\T} \bY)^{-1/2} = \{l_{ij}\} \in \bbR^{m \times r}$, элементы которой равны:
+	\[
+	l_{ij} =
+	\begin{cases}
+	\displaystyle    \frac{1}{\sqrt{N_j}}, & \text{если $f(\bx_i) = y_j$;} \\
+	0, & \text{если $f(\bx_i) \neq y_j$.}
+	\end{cases}
+	\]
+\end{definition}
+\begin{theorem}
+	C использованием данных обозначений задача кластеризации~\eqref{Qmax}
+	и~задача метрического обучения~\eqref{Amax} сводятся к общей задаче минимизации функции ошибки~\cite{ding2005equivalence}
+	\begin{equation}
+	\label{GLmax}
+	\cL = -\frac{1}{m} \text{trace} (\mathbf{L}^{\T} \bX^{\T} \bP^{\T} \hat{\mathbf{A}}^{-1} \bP \bX \mathbf{L}) = - \frac{1}{m} \text{trace} (\mathbf{L}^{\T} \bX^{\T} \bP^{\T}
+	(\bP \mathbf{A} \bP^{\T})^{-1} \bP \bX \mathbf{L}) \to \min_{\bP, \mathbf{L}}.
+	\end{equation}
+\end{theorem}
+
+Для решения задачи~\eqref{GLmax} используется EM алгоритм.
+На каждом шаге итеративно вычисляются текущие оптимальные значения матриц~$\bP$ и~$\mathbf{L}$.
+На $E$-шаге необходимо найти матрицу~$\mathbf{L}$, которая является решением оптимизационной задачи~\eqref{GLmax} при фиксированной матрице~$\bP$.
+В качестве начального приближения получим взвешенную индикаторную матрицу~$\mathbf{L}$ с помощью алгоритма кластеризации $k$-средних с евклидовой метрикой.
+На $M$-шаге производится нахождение оптимального значения матрицы~$\bP$ при фиксированной матрице~$\mathbf{L}$.
+Алгоритм завершается при стабилизации функционала~$\cL$ на последовательности итераций.
+
+\subsection*{Алгоритм $k$-средних}
+В данной работе базовым алгоритмом для сравнения является алгоритм $k$-средних.
+На первом шаге алгоритм выбирает из множества~$\bX$ случайным образом~$r$ объектов~$\{\bmu_j\}_{j=1}^r$~--- начальные центроиды кластеров.
+Для каждого объекта~$\bx_i$ вычисляется расстояние~\eqref{metric} до каждого центроида кластера~$\bmu_j$ с единичной матрицей трансформаций~$\mathbf{A}$.
+Объект~$\bx_i$ относится к кластеру, расстояние до которого оказалось наименьшим.
+Далее производится вычисление новых центроидов кластеров по формуле~\eqref{mu}.
+Алгоритм завершается, если значения центроидов кластеров стабилизируются.
+
+\subsection*{Оптимизация матрицы P с фиксированной матрицей L}
+Для любых двух квадратных матриц~$\mathbf{A}$ и~$\mathbf{B}$ справедливо $\text{trace}(\mathbf{AB}) = \text{trace}(\mathbf{BA})$.
+Данное свойство позволяет переформулировать задачу~\eqref{GLmax} следующим образом:
+\[
+\cL = -\frac{1}{m} \text{trace} (\mathbf{L}^{\T} \bX^{\T} \bP^{\T} (\bP \mathbf{A} \bP^{\T})^{-1} \bP \bX \mathbf{L}) = -\frac{1}{m} \text{trace} \bigl((\bP \mathbf{A} \bP^{\T})^{-1} \bP \bX \mathbf{LL}^{T} \bX^{\T} \bP^{\T}\bigr).
+\]
+\begin{theorem}
+	Обозначим $\mathbf{B} = \bX \mathbf{LL}^{\T} \bX^{\T}$.
+	Обозначим через $\bP = [\mathbf{v}_1, \ldots, \mathbf{v}_r]^{\bT}$ матрицу, состоящую из $r$ собственных векторов матрицы $\mathbf{A}^{-1}\mathbf{B}$, отвечающих наибольшим собственным значениям.
+	Тогда решением~(\ref{GLmax}) является ортогональная матрица, полученная $QR$-разложением матрицы~$\bP^{\T}$.
+\end{theorem}
+\begin{proof}
+Функция ошибки~$\cL$ зависит только от матрицы~$\bP$. Обозначим
+\[
+s(\bP) = \text{trace} \bigl((\bP \mathbf{A} \bP^{\T})^{-1} \bP \mathbf{B} \bP^{\T}\bigr).
+\]
+На данном шаге задача~\eqref{GLmax} принимает вид:
+\begin{gather}
+\label{Gmax}
+\bP^* = \argmax_{\bP \in \bbR^{n \times l}} s(\bP)\,; \\
+\label{Gorth}
+\bP \bP^{\T} = \mathbf{I}\,.
+\end{gather}
+Ранг произведения матриц не превосходит рангов сомножителей, поэтому ранг матрицы~$\mathbf{B}$ не превосходит $r$.
+Решением~\eqref{Gmax} является матрица $\bP = [\mathbf{v}_1, \ldots, \mathbf{v}_r]^{\T}$, состоящая
+из~$r$ собственных векторов матрицы $\mathbf{A}^{-1}\mathbf{B}$, отвечающих наибольшим собственным значениям.
+Таким образом, размерность нового пространства объектов будет равна количеству кластеров $r$.
+
+В общем случае матрица $\bP$ не является ортогональной.
+Заметим, что для любой невырожденной матрицы $\bP$ верно $s(\bP) = s(\mathbf{M} \bP)$.
+Для учета условия ортогональности~\eqref{Gorth} найдем $QR$-разложение матрицы $\bP$.
+Тогда ортогональная матрица $\bQ$ является оптимальным значением $\bP^*$.
+\end{proof}
+
+\subsection*{Оптимизация матрицы L с фиксированной матрицей P}
+\begin{theorem}
+	Обозначим $\hat{\mathbf{K}} = (1/N)\bX^{\T} \bP^{\T} \hat{\mathbf{A}}^{-1} \bP \bX$.
+	Тогда задача~\eqref{GLmax} эквивалентна задаче кластеризации $k$-средних с заданным ядром $\hat{\mathbf{K}}$~\cite{shawe2004kernel}.
+\end{theorem}
+
+При фиксированной матрице $\bP$ задача~\eqref{GLmax} принимает вид:
+\begin{equation*}
+%\label{Lmax}
+\text{trace} (\mathbf{L}^{\top} \hat{\mathbf{K}} \mathbf{L}) \to \max_{\mathbf{L} \in \bR^{m \times r}}.
+\end{equation*}
+Матрица $\hat{\mathbf{K}}$ является симметричной и неотрицательно определенной, тем самым может быть выбрана в качестве ядра.
 
 \section{Постановка задачи}
-Временные ряды акселерометра образуют множество~$\mathcal{S}$ сегментов~$s$ фиксированной длины~$T$:
-\begin{equation}
-s = [x_1, \dots, x_T]^{T} \in \bbR^T.
-\label{ch5:eq:time_series}
-\end{equation}
-Необходимо построить модель классификации~$f: \bbR^T \rightarrow Y$, которая будет ставить в соответствие каждому сегменту из множества~$\mathcal{S}$ метку класса из конечного множества~$Y$.
-Обозначим за
-\begin{equation}
-	\mathcal{D} = \{(s_i, y_i)\}_{i=1}^m
-	\label{ch5:eq:sample}
-\end{equation}
-исходная выборка, где $s_i \in \mathcal{S}$ и $y_i = f(s_i)\in Y$.
+Пусть объект $\mathbf{x}_i \in \mathbb{R}^n$~--- временной ряд, последовательность измерений некоторой исследуемой величины в различные моменты времени.
+Пусть $\mathbf{X}$~--- множество всех временных рядов фиксированной длины $n$, $Y = \{1, \dots, K\}$~--- множество меток классов.
+Пусть задана выборка $\mathfrak{D} = \{(\mathbf{x}_i, y_i)\}_{i=1}^\ell$~--- множество объектов с известными метками классов $y_i \in Y$.
 
-Авторы предлагают построить модель~$f$ в в де суперпозиции $f=f(\mathbf{g})$.
-Функция $\mathbf{g}: \bbR^T \rightarrow \bbR^n$ является отображением из пространства~$\bbR^{T} $ в признаковое пространство~$G \subset \bbR^n$.
-Имея функцию порождения признаков~$\mathbf{g}$, преобразуем исходную выборку~\eqref{ch5:eq:sample} в
+Требуется построить точную, простую, устойчивую модель классификации
 \[
-	\mathcal{D}_G = \{(\mathbf{g}_i, y_i)\}_{i=1}^m,
+a: \mathbf{X} \to Y.
 \]
-где $\mathbf{g}_i = \mathbf{g}(s_i) \in G$. 
-
-Модель классификации $f=f(\mathbf{g}, \mathbf{\theta})$ параметризована вектором~$\boldsymbol{\theta}$. 
-Оптимальные параметры~$\hat{\mathbf{\theta}}$ определяются оптимизацией функции ошибки классификации
+Данную модель представим в виде суперпозиции
 \begin{equation}
-\hat{\mathbf{\theta}} = \argmin_{\mathbf{\theta}} L(\mathbf{\theta}, \mathcal{D}_G, \mathbf{\mu}).
-\label{ch5:eq:optimal_classification_params}
+\label{ch4:eq:classifiers}
+a(\mathbf{x}) = b \circ \mathbf{f} \circ G(\mathbf{x}, \{\mathbf{c}_e\}_{e = 1} ^ K),
 \end{equation}
-Вектор~$\mathbf{\mu}$ является внешним параметром для заданной модели классификации. 
-Примеры таких параметров и функций ошибки для различных моделей классификации приведены ниже.
+где $G$~--- процедура выравнивания временных рядов относительно центроидов классов~$\{\mathbf{c}_e\}_{e = 1} ^ K$, $\mathbf{f}$~--- алгоритм метрического обучения, $b$~--- алгоритм многоклассовой классификации.
 
-Чтобы сравнить качество классификации с прошлыми результатами~\cite{karasikov2016feature,ivkin2015ts}, в качестве метрики качества используется точность классификации:
+\subsection{Выравнивание временных рядов.}
+
+Для повышения качества и устойчивости алгоритма классификации предлагается провести выравнивание временных рядов каждого класса относительно центроида.
+
+Пусть $\mathbf{X}_e$ --- множество объектов обучающей выборки $\mathfrak{D}$, принадлежащих одному классу $e \in \{1, \dots, K\}$.
+Центроидом множества объектов $\mathbf{X}_e = \{\mathbf{x}_i|y_i=e\}_{i=1}^\ell$ по расстоянию $\rho$ назовем вектор $\mathbf{c}_e \in \mathbb{R}^n$ такой, что
 \begin{equation}
-	\mathrm{accuracy} = \frac{1}{m} \sum_{i=1}^{m} \left[f\left(\mathbf{g}(s_i), \hat{\mathbf{\theta}} \right)= y_i\right].
-	\label{ch5:eq:accuracy}
+\label{centroid_task}
+\mathbf{c}_e = \mathop{\text{argmin}}\limits_{{\mathbf{c} \in \mathbb{R}^n}}\sum_{\mathbf{x}_i \in \mathbf{X}_e}
+{\rho(\mathbf{x}_i ,\mathbf{c})}.
 \end{equation}
 
-\section{Порождение признаков}
+Для нахождения центроида предлагается в качестве расстояния между временными рядами использовать путь наименьшей стоимости~\cite{goncharov2015cost}, найденный методом динамической трансформации времени.
+Псевдокод решения оптимизационной задачи~(\ref{centroid_task}) приведен в алгоритме~\ref{DBA_pseudo}.
 
-Цель данной работы~--- провести сравнение различных подходов к генерации признаков.
-В этом разделе проводится анализ рассматриваемых методов.
+\begin{algorithm}
+	\caption{Нахождение центроида $\text{DBA}(\mathbf{X}_e, \text{n\_iter})$}
+	\label{DBA_pseudo}
+	\begin{algorithmic}[1]
+		\REQUIRE $\mathbf{X}_e$~--- множество временных рядов, принадлежащих одному и тому же классу, n\_iter~--- количество итераций алгоритма.
+		\ENSURE $\mathbf{c}$~--- центроид множества $\mathbf{X}_e$.
+		
+		\STATE {задать начальное приближение приближение центроида $\mathbf{c}$;}
+		\FOR {$i = 1, \dots, \text{n\_iter}$}
+		\FOR {$\mathbf{x} \in \mathbf{X}_e$}
+		\STATE{вычислить выравнивающий путь между $\mathbf{c}$ и $\mathbf{x}$}
+		\STATEx $ \quad \quad \text{alignment}(\mathbf{x}) := \text{DTWalignment}(\mathbf{c}, \mathbf{x})$;
+		\ENDFOR
+		\STATE {объединить поэлементно множества индексов для каждого отсчета времени}
+		\STATEx {$ \quad \text{alignment} := \bigcup_{\mathbf{x} \in \mathbf{X}_e} \text{alignment}(\mathbf{x})$};
+		\STATE {$\mathbf{c} = \text{mean}(\text{alignment})$}
+		\ENDFOR
+	\end{algorithmic}
 
-\subsubsection{Экспертные функции.}
-В качестве базового подхода будем использовать экспертные функции как функции порождения признаков.
-Экспертные функции~--- это некоторые статистики~$g_j$, где $g_j: \bbR^T \rightarrow \bbR$.
-Признаковым описанием~$\mathbf{g}(s)$ объекта~$s$ являются значения заданных экспертных статистик для данного объекта
+	\textbf{DTWalignment}($\mathbf{c}$, $\mathbf{x}$)
+	\begin{algorithmic}[1]
+		\REQUIRE $\mathbf{c}, \mathbf{x}$~--- временные ряды.
+		\ENSURE alignment~--- выравнивающий путь.\COMMENT {каждый индекс временного ряда~$\mathbf{x}$ поставлен в однозначное соответствие индексу временного ряда~$\mathbf{c}$}
+		
+		\STATE {построить $n \times n$-матрицу деформаций DTW}
+		\STATEx {$\text{cost} := \text{DTW}(\mathbf{c}, \mathbf{x})$};
+		
+		\STATE {вычислить выравнивающий путь по матрице деформаций}
+		\STATEx {$\text{alignment} := \text{DTWpath}(\text{cost})$};
+	\end{algorithmic}
+\end{algorithm}
+\newpage
+Общая процедура выравнивания имеет следующий вид:
+\begin{itemize}
+	\item[1)]
+	построить множество центроидов классов $\{\mathbf{c}_e\}_{e = 1}^K$;
+	\item[2)]
+	по множеству центроидов найти пути наименьшей стоимости между каждым
+	временным рядом $\mathbf{x}_i$ и центроидом его класса $\mathbf{c}_{y_i}$;
+	\item[3)]
+	по каждому пути восстановить выравненный временной ряд;
+	\item[4)]
+	привести множества выравненных временных рядов к нулевому среднему и нормировать на дисперсию.
+\end{itemize}
+
+Результатом выравнивания должно стать множество выравненных временных рядов.
+
+\subsection{Метрическое обучение.}
+
+Введем на множестве выравненных временных рядов расстояние Махаланобиса
 \[
-\mathbf{g}(s) = [g_1(s), \dots, g_n(s)]^{\T}.
+d_\mathbf{A} (\mathbf{x}_i, \mathbf{x}_j) = \sqrt{(\mathbf{x}_i - \mathbf{x}_j)^\mathsf{T} \mathbf{A} (\mathbf{x}_i - \mathbf{x}_j)},
+\]
+где матрица трансформаций $\mathbf{A} \in \bbR^{n \times n}$ является симметричной и неотрицательно определенной ($\mathbf{A}^\mathsf{T} = \mathbf{A}$, $\mathbf{A} \succeq 0$).
+Представим матрицу $\mathbf{A}$ в виде разложения $\mathbf{A} = \mathbf{L}^\mathsf{T}  \mathbf{L}$.
+Матрица $\mathbf{L} \in \bbR^{p \times n}$~--- матрица линейного преобразования, где $p$ задает размерность преобразованного пространства. Если параметр $p < n$, то происходит снижение размерности признакового пространства.
+
+Расстояние $d_\mathbf{A} (\mathbf{x}_i, \mathbf{x}_j)$ есть евклидово расстояние между $\mathbf{Lx}_i$ и $\mathbf{Lx}_j$:
+\[
+d_\mathbf{A} (\mathbf{x}_i, \mathbf{x}_j) = \sqrt{(\mathbf{x}_i - \mathbf{x}_j)^\mathsf{T} \mathbf{L}^\mathsf{T} \mathbf{L} (\mathbf{x}_i - \mathbf{x}_j)} = \sqrt{(\mathbf{L} (\mathbf{x}_i - \mathbf{x}_j))^\mathsf{T} (\mathbf{L} (\mathbf{x}_i - \mathbf{x}_j))} = \|\mathbf{L} (\mathbf{x}_i - \mathbf{x}_j)\|_2.
 \]
 
-В работе~\cite{kwapisz2011activity} авторы предлагают использовать экспертные функции, приведенные в таблице~\ref{ch5:tbl:expert_functions}.
-Такая процедура порождения признаков генерирует признаковое описание временного ряда~$\mathbf{g}(s) \in \bbR^{40}$.
-
-\begin{table}[ht]
-	\centering
-	\caption{Expert functions}
-	\begin{tabular}{|l|c|}
-		\hline
-		\textbf{Function description}    & \textbf{Formula} \\ \hline
-		Mean                    & $\bar{x} = \frac{1}{T} \sum_{t=1}^{T} x_t$    \\ \hline
-		Standard deviation      & $\sqrt{\frac{1}{T} \sum_{t=1}^{T} (x_t - \bar{x})^2}$    \\ \hline
-		Mean absolute deviation & $\frac{1}{T} \sum_{t=1}^{T} |x_t - \bar{x}|$    \\ \hline
-		Distribution            &  Histogram values with 10 bins    \\ \hline
-	\end{tabular}
-	\label{ch5:tbl:expert_functions}
-\end{table}
-
-\subsubsection{Авторегрессионная модель.}
-Авторегрессионная модель~\cite{lukashin2003adaptive} порядка $n$
-использует параметрическую модель для аппроксимации временного ряда $s$. 
-Каждое значение временного ряда приближается линейной комбинацией предыдущих $n-1$ значений
-\begin{equation*}
-x_t = w_0 + \sum_{j=1}^{n-1} w_j x_{t-j} + \epsilon_t,
-\end{equation*}
-где $\epsilon_t$~--- регрессионные остатки.
-Оптимальные параметры $\hat{\mathbf{w}}$ авторегрессионной модели используются как признаки $\mathbf{g}(s)$.
-Данные параметры минимизируют квадратичную ошибку аппроксимации временного ряда и предсказания модели
-
+В качестве алгоритма метрического обучения в данной работе был выбран алгоритм LMNN. Данный алгоритм сочетает в себе идеи метода $k$ ближайших соседей. Первая идея заключается в минимизации расстояний между $k$ ближайшими объектами, находящимися в одном классе. Запишем функционал качества в виде
+\[
+Q_1(\mathbf{L}) = \sum_{j \rightsquigarrow i} \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 \rightarrow \min_{\mathbf{L}},
+\]
+где $j \rightsquigarrow i$ означает, что $\mathbf{x}_j$ является одним из $k$ ближайших соседей для $\mathbf{x}_i$.
+Вторая идея состоит в максимизации расстояния между каждым объектом и его объектами-нарушителями. Объектом-нарушителем для $\mathbf{x}_i$ назовем объект $\mathbf{x}_l$ такой, что
 \begin{equation}
-\mathbf{g}(s) = \hat{\mathbf{w}} = \argmin_{\mathbf{w} \in \bbR^{n}} \left( \sum_{t=n}^{T} \|x_t - \hat{x}_t\|^2\right).
-\label{ch5:eq:autoregressive_description}
+\label{impostor}
+\|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_l)\|^2 \leq \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 + 1, \quad \text{где $j \rightsquigarrow i$}.
 \end{equation}
-Задача~\eqref{ch5:eq:autoregressive_description} эквивалентна задаче линейной регрессии.
-Поэтому для каждого временного ряда~$s$ необходимо решить задачу линейной регрессии размера $n$.
-Пример аппроксимации временного ряда авторегрессионной моделью представлен на Рис.~\ref{ch5:fig:ar_example}.
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=1\linewidth]{figs/ch5/ar_example.png}
-	\caption{Time series approximation using autoregressive model with order $n = 20$}
-	\label{ch5:fig:ar_example}
-\end{figure}
-
-\subsubsection{Анализ сингулярного спектра.}
-Альтернативной гипотезой порождения признакового пространства для временного ряда является анализ сингулярного спектра (Singular Spectrum Analysis, SSA)~\cite{hassani2007singular}. 
-Для каждого временного ряда $s$ из выборки $\mathcal{D}$ строится траекторная матрица:
+Таким образом, необходимо минимизировать следующий функционал:
 \[
-\mathbf{X} = 
-\begin{pmatrix}
-x_1 & x_2 & \dots & x_n \\
-x_2 & x_3 & \dots & x_{n+1} \\
-\dots & \dots & \dots & \dots \\
-x_{T-n+1} & x_{T-n+2} & \dots & x_T
-\end{pmatrix}.
+Q_2(\mathbf{L}) = \sum_{j \rightsquigarrow i} \sum_l(1 - y_{il})\bigl[1 + \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 - \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_l)\|^2\bigr]_+ \rightarrow \min_{\mathbf{L}},
 \]
-Здесь ширина окна $n$ является внешним структурным параметром.
-Сингулярное разложение матрицы $\mathbf{X}^{\T} \mathbf{X}$:
+где $y_{il} = 1$, если $y_i = y_l$, и $y_{il} = 0$ в противном случае.
+Положительная срезка позволяет штрафовать только те объекты, которые удовлетворяют условию~(\ref{impostor}).
+
+Задача метрического обучения состоит в нахождении линейного преобразования $\mathbf{f}(\mathbf{x}) = \mathbf{Lx}$, то есть нахождении матрицы $\mathbf{L}$ в виде решения оптимизационной задачи
+\begin{equation}
+\label{Qmin}
+Q(\mathbf{L}) = \mu Q_1(\mathbf{L}) + (1 - \mu) Q_2(\mathbf{L}) \rightarrow \min_{\mathbf{L}},
+\end{equation}
+где $\mu \in (0, 1)$~--- весовой параметр, определяющий вклад каждого из функционалов.
+Задача~(\ref{Qmin}) представляет собой задачу полуопределенного программирования~\cite{vandenberghe1996semidefinite} и может быть решена существующими оптимизационными пакетами.
+
+\subsection{Классификация временных рядов.}
+
+Пусть $\mathbf{x} \in \mathbf{X}$~--- неразмеченный временной ряд. Выравниваем временной ряд $\mathbf{x}$ относительно всех центроидов классов
 \[
-\mathbf{X}^{\T} \mathbf{X} = \mathbf{U} \mathbf{\Lambda} \mathbf{U}^{\T},
+\mathbf{\hat{x}}_e = G(\mathbf{x}, \mathbf{c}_e), \quad \text{где} \quad e = \{1, \dots, K\}.
 \]
-где $\mathbf{U}$~--- унитарная матрица и $\Lambda = \mathrm{diag}(\lambda_1, \dots, \lambda_n)$ причём $\lambda_i$ собственные значения $\mathbf{X}^{\T} \mathbf{X}$. 
-Признаковое описание объекта $s$ задаётся спектром матрицы $\mathbf{X}^{\T} \mathbf{X}$:
+Отнесем временной ряд к классу, для которого минимально расстояние до соответствующего центроида. В качестве расстояния используем обученную метрику Махаланобиса с фиксированной матрицей $\mathbf{A}$
 \[
-\mathbf{g}(s) = \left[\lambda_1, \dots, \lambda_n\right]^{\T}.
+\hat{y} = \mathop{\text{argmin}}\limits_{e \in \{1, \dots, K\}}d_\mathbf{A}(\mathbf{\hat{x}}_e, \mathbf{c}_e).
 \]
-\subsubsection{Spline Approximation.}
-Предлагаемый метод аппроксимирует временные ряды с помощью сплайнов~\cite{deboor1978splines}. Сплайн определяется его параметрами: узлами и коэффициентами.
-Предполагается, что узлы сплайна $\{\xi_\ell\}_{\ell=0}^M$ равномерно распределены по временной оси.
-Кусочные модели, построенные на отрезках $[\xi_{\ell-1}; \xi_{\ell}]$, заданы коэффициентами $\{\mathbf{w}_\ell\}_{\ell=1}^{M}$.
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=1\linewidth]{figs/ch5/spline_example.png}
-	\caption{Time series approximation using three order splines}
-	\label{ch5:fig:spline_example}
-\end{figure}
-Оптимальные параметры сплайна являются решением системы с дополнительными условиями равенства производных до второго порядка включительно на концах отрезков.
-Обозначим каждый отрезок-сегмент $p_i(t)$ $i = 1, \dots, M$ и весь сплайн $S(t)$. Тогда система уравнений принимает вид
-\begin{align*}
-S(t) &= \begin{cases}
-p_1(t) = w_{10} +w_{11}t + w_{12}t^2 + w_{13}t^3, & t\in [\xi_0, \xi_1],\\
-p_2(t) = w_{20} +w_{21}t + w_{22}t^2 + w_{23}t^3, & t\in [\xi_1, \xi_2],\\
-\cdots&\cdots \\
-p_{M}(t) = w_{L0} +w_{M1}t + w_{M2}t^2 + w_{M3}t^3, & t\in [\xi_{M-1}, \xi_M],					
-\end{cases}
-\end{align*}
-%For $S(t)$ to be an interpolatory cubic spline, we must also have conditions:
-\begin{align*}
-S(\xi_t) &= x_t, \quad t = 0, \dots, M,\\
-p_i'(\xi_i) &= p_{i+1}'(\xi_i),\: p_i''(\xi_i) = p_{i+1}''(\xi_i), \quad i = 1, \dots, M-1,\\
-p_i(\xi_{i-1}) &= x_{i-1},\: p_i(\xi_i) = x_i, \quad i = 1, \dots, M.
-\end{align*}
-Объединение всех параметров сплайна задаёт признаковое описание временного ряда:
+После нахождения оптимальных центроидов классов и нахождения оптимальной матрицы трансформаций процедура классификации заключается в измерении расстояния между найденными центроидами и новыми неразмеченными объектами.
+
+Для оценки качества работы алгоритма будем вычислять ошибку классификации как долю неправильно классифицированных объектов тестовой выборки $\mathfrak{U}$:
 \[
-\mathbf{g}(s) = \left[\mathbf{w}_1, \dots, \mathbf{w}_{M}\right]^{\T}.
+\text{error} = \frac1{|\mathfrak{U}|} \sum_{i = 1} ^ {|\mathfrak{U}|} [a(\mathbf{x}_i) \ne y_i].
 \]
-
-Рис.~\ref{ch5:fig:spline_example} показывает аппроксимацию временного ряда с использованием модели сплайнов.
-По сравнению с авторегрессионной моделью сплайны строят более гладкую аппроксимацию, используя такое же количество параметров.
-
-\section{Классификация временных рядов}
-Для классификации временных рядов будем использовать подход один против всех. 
-Для каждого класса обучается бинарный классификатор, и на стадии предсказания объект классифицируется согласно наиболее уверенному классификатору.
-Использовались три модели классификации: логистическая регрессия, SVM и случайный лес.
-
-\subsubsection{Логистическая регрессия.}
-Оптимальные параметры модели $\hat{\mathbf{w}}, \hat{b}$  в случае логистической регрессии определяются минимизацией функции ошибки~\eqref{ch5:eq:optimal_classification_params}
-
-\begin{equation*}
-L(\mathbf{\theta}, \mathcal{D}_G, \mu) = \sum_{i=1}^{m} \log\bigl(1 + \exp(-y_i [\mathbf{w}^{\T} \mathbf{g}_i + b])\bigl) + \frac{\mu}{2} \|\mathbf{w}\|^2, \:\:\mbox{where}\:\: \mathbf{\theta}  = \begin{bmatrix}
-\mathbf{w} \\ b
-\end{bmatrix}.
-\end{equation*}
-
-Решающее правило $f(\mathbf{g}, \mathbf{\theta})$~--- знак линейной комбинации описания объекта $\mathbf{g}$ и параметров $\hat{\mathbf{\theta}}$
-\begin{equation*}
-\hat{y} = f(\mathbf{g}, \hat{\mathbf{\theta}}) = \sgn(\mathbf{g}^{\T} \hat{\mathbf{w}} + \hat{b}).
-\end{equation*}
-
-\subsubsection{SVM.}
-Оптимизационная задача метода SVM имеет вид
-\begin{align*}
-\hat{\mathbf{\theta}}  = \begin{pmatrix}
-\hat{\mathbf{w}} \\ \hat{b} \\ \hat{\mathbf{\xi}}
-\end{pmatrix}= \argmin_{\mathbf{w}, b, \mathbf{\xi}}  \frac{1}{2} \|\mathbf{w}\|^2 + \mu \sum_{i=1}^{m} \xi_i,\:\:
-\mbox{s.t.} \:\: &y_i \left(\mathbf{w}^{\T} \mathbf{g}_i + b\right) \geq 1 - \xi_i,\\
-&\xi_i \geq 0, \quad 1 \leq i \leq m.
-\end{align*}
-Целевая функция соответствует функции ошибки классификации $L(\mathbf{\theta}, \mathcal{D}_G, \mu)$.
-Предсказание для нового объекта вычисляется аналогично $
-\hat{y} = \sgn (\mathbf{g}^{\T} \hat{\mathbf{w}} + \hat{b})$.
-
-\subsubsection{Случайный лес.}
-Случайный лес использует идею бэггинга. 
-Идея состоит в построении многих слабых, неустойчивых классификатов на подвыборках с возвращениями и усреднения их предсказаний.
-Метод предполагает использование в качестве базовых классификаторов моделей с низким смещением и высокой дисперсией. 
-Усреднение позволяет уменьшить дисперсию.
-В случае случайного леса базовой моделью выступают решающие деревья. Идея бэггинга используется не только для самих объектов, но и для множества признаков.
-В данном случае предсказание для нового объекта получается усреднением всех предсказаний отдельных деревьев:
-
-\begin{equation*}
-\hat{y} = \sgn \left(\frac{1}{B} \sum_{i=1}^{B} \text{pred}(\mathbf{g}_i) \right),
-\end{equation*}
-где $B$~--- количество деревьев в композиции.
 
 
 \section{Вычислительный эксперимент}
-В данной работе эксперименты проводились на двух датасетах временных рядов акселерометра мобильного телефона: WISDM~\cite{wisdm} и USC-HAD~\cite{usc}. 
-Акселерометр мобильного телефона проводит измерение ускорения по трём осям с частотой 100 Hz.
-Данные WISDM содержат 4321 временной ряд.
-Каждый временной ряд прнадлежит к одному из 6 классов. 
-Данные USC-HAD содержат 13620 временных рядов, принадлежащих одному из 12 классов.  
-В таблице~\ref{ch5:tbl:activities_distributions} представлено распределение временных рядов по классам для каждого датасета.
-Длина временного ряда равна 200.
-На рис.~\ref{ch5:fig:ts_example} представлен пример одного из временных рядов.
+В целях проверки работоспособности предложенного подхода проведен вычислительный эксперимент на модельных данных. Сгенерирована выборка объектов, принадлежащих одному из двух классов, в двумерном пространстве.
+Каждый объект принадлежит многомерному нормальному распределению.
+На рис.~$1$ показано истинное распределение объектов, черным цветом выделены истинные центры классов и линии уровня функции распределения.
 
-\begin{table}[!ht]
-	\centering
-	\caption{Distributions of the classes}
-	\subfloat[WISDM]{
-		\begin{tabular}{r|l|rr}
-			\hline
-			&\textbf{Activity}   & \multicolumn{2}{l}{\textbf{\# objects}} \\
-			\hline
-			1&Standing            &229      &5.30  \% \\
-			2&Walking             &1917     &44.36 \% \\
-			3&Upstairs            &466      &10.78 \% \\
-			4&Sitting             &277      &6.41  \% \\
-			5&Jogging             &1075     &24.88 \% \\
-			6&Downstairs          &357      &8.26  \% \\
-			\hline
-			&Total & \multicolumn{2}{l}{4321}  \\
-			\hline
-	\end{tabular}}
-	\hspace{0.5cm}
-	\subfloat[USC-HAD]{
-		\begin{tabular}{r|l|rr}
-			\hline
-			&\textbf{Activity} & \multicolumn{2}{l}{\textbf{\# objects}} \\ \hline
-			1&Standing            &1167     &8.57  \% \\
-			2&Elevator-up         &764      &5.61  \% \\
-			3&Walking-forward     &1874     &13.76 \% \\
-			4&Sitting             &1294     &9.50  \% \\
-			5&Walking-downstairs  &951      &6.98  \% \\
-			6&Sleeping            &1860     &13.66 \% \\
-			7&Elevator-down       &763      &5.60  \% \\
-			8&Walking-upstairs    &1018     &7.47  \% \\
-			9&Jumping             &495      &3.63  \% \\
-			10&Walking-right       &1305     &9.58  \% \\
-			11&Walking-left        &1280     &9.40  \% \\
-			12&Running             &849      &6.23  \% \\
-			\hline 
-			&Total              & \multicolumn{2}{l}{13620}\\ 
-			\hline
-	\end{tabular}}
-	\label{ch5:tbl:activities_distributions}
-\end{table}
 
-\begin{figure}[!ht]
-	\centering
-	\includegraphics[width=1\linewidth]{figs/ch5/ts_example.png}
-	\caption{Time series example}
-	\label{ch5:fig:ts_example}
+Применим к данной выборке базовый алгоритм $k$-средних.
+Результат кластеризации показан на рис.~2, где черным цветом выделены найденные центры классов и линии уровня функции распределения, построенной по выборочной ковариационной матрице.
+
+Взяв за начальное приближение результаты работы алгоритма $k$-средних,
+проведем клас\-те\-ри\-за\-цию с помощью алгоритма адаптивного метрического обучения.
+Результаты работы алгоритма продемонстрированы на рис.~$3$.
+\begin{figure}[ht]
+    \center{\includegraphics[width=1\linewidth]{figs/ch4/true_distribution}}
+    \caption{Истинное распределение двумерных модельных данных}
 \end{figure}
 
-\begin{figure}[!ht]
-	\centering
-	\subfloat{
-		\includegraphics[width=0.49\linewidth]{figs/ch5/wisdm_methods.png}}
-	\subfloat{
-		\includegraphics[width=0.49\linewidth]{figs/ch5/uschad_methods.png}}
-	\caption{Multiclass accuracy score}
-	\label{ch5:fig:accuracy_results}
+На рисунках заметно улучшение результатов кластеризации.
+Измеренная точность кластеризации алгоритма $k$-средних составила 0,76,
+алгоритма адаптивного метрического обучения~--- 0,94, что говорит о работоспособности данного подхода.
+\begin{figure} %[!ht]
+    \center{\includegraphics[width=1\linewidth]{figs/ch4/kmeans_clustering}}
+    \caption{Результат кластеризации алгоритмом $k$-средних}
+\end{figure}
+\begin{figure} %[!ht]
+    \center{\includegraphics[width=1\linewidth]{figs/ch4/AML_clustering}}
+    \caption{Результат кластеризации алгоритмом адаптивного метрического обучения}
 \end{figure}
 
-В эксперименте для каждого датасета были порождены признаки одним из методов: экспертные функции, авторегрессионная модель, SSA и сплайны.
-Для каждой процедуры порождения признаквого описания настроивались три модели классификации: логистическая регрессия, SVM и случайный лес.
-Внешние структурные параметры (длина авторегрессионной модели $n$, ширина окна SSA $n$, число узлов сплайна $M$) настраивались процедурой кросс-валидации:
-\begin{align}\label{cv}
-CV(K) = \frac{1}{K}\sum_{k=1}^{K} L(f_k, \mathcal{D}\setminus \mathcal{C}_k),
-\end{align}
-где $C_k$~---$\frac{K-1}{K}$ доля от всей выборки, используемая для обучения модели $f_k$.
-Гиперпараметры $\boldsymbol{\mu}$ моделей классификации были настроаны той же процедурой кросс-валидации.
 
-Первый подход к порождению признаков временных рядов~---экспертные функции.
-Основной недостаток такого подхода необходимость экспертного задания функций	 и возможности вычисления их для конкретного датасета.
+Таблица~\ref{ch4:tbl:clusteing_results} показывает результаты вычислительного эксперимента на реальных
+данных.
+Алгоритм был применен к $5$ выборкам, взятых из репозитория UCI~\cite{uci2017}.
+Оценкой качества кластеризации служит число правильно кластеризованных объектов.
+При клас\-те\-ри\-за\-ции объектов на более чем два класса возникает проблема соотнесения истинных классов с полученными кластерами.
+Данная проблема была формализована в виде задачи о назначениях и решена с помощью венгерского алгоритма. Вычислительный эксперимент на реальных данных показал увеличение точности кластеризации при использовании метрического обучения.
+\begin{table} %[!ht]
+\centering
+\caption{Результаты кластеризации}
+\label{ch4:tbl:clusteing_results}
 
-Авторегрессионная модель требует задания параметра длины модели $n$. 
-Процедура кросс-валидации дала наибольшее качество при $n=20$ для обоих датасетов.
+\vspace{2ex}
 
-Модель SSA была настроена аналошгичной процедурой выбора оптимальных гиперпараметров. Конечная модель имела ширину окна $n=20$.
-
-\begin{figure}[!ht]
-	\centering
-	\subfloat[WISDM dataset]{
-		\includegraphics[width=0.33\linewidth]{figs/ch5/hist_wisdm_lr_all.png}}
-	\subfloat[USC-HAD dataset]{
-		\includegraphics[width=0.66\linewidth]{figs/ch5/hist_uschad_lr_all.png}}\\
-	\subfloat[WISDM dataset]{
-		\includegraphics[width=0.33\linewidth]{figs/ch5/hist_wisdm_rf_all.png}}
-	\subfloat[USC-HAD dataset]{
-		\includegraphics[width=0.66\linewidth]{figs/ch5/hist_uschad_rf_all.png}}\\
-	\subfloat[WISDM dataset]{
-		\includegraphics[width=0.33\linewidth]{figs/ch5/hist_wisdm_svm_all.png}}
-	\subfloat[USC-HAD dataset]{
-		\includegraphics[width=0.66\linewidth]{figs/ch5/hist_uschad_svm_all.png}}\\
-	\caption{Accuracy scores of classification of each class using all features}
-	\label{ch5:fig:feature_union_results}
-\end{figure}
-
-Для аппроксимации временных рядов кубическими сплайнами~\cite{deboor1978splines} использовалась библиотека $scipy$. 
-Узлы сплайнов $\{\xi_{\ell}\}_{\ell = 1}^M$ были распределены равномерно по временной оси.
-Значение параметра $M$ было подобрано на кросс-валидации.
-
-Для обоих датасетов процедуры порождения признаковых описаний дали следующие количества признаков: экспертные функции~---40; авторегрессионная модель~---60; анализ сингулярного спектра~---60; сплайны~---33.
-
-\begin{table}[!ht]
-	\centering
-	\caption{Binary accuracy scores for WISDM using different feature generation methods: EX~--- Expert, AR~--- Auto-Reg, SSA and  SPL for Splines}
-	\footnotesize
-	\begin{tabular}{r|rrrr|rrrr|rrrr|}
-		& \multicolumn{4}{c|}{\textbf{Logistic Regression}} & \multicolumn{4}{c|}{\textbf{Random Forest}} & \multicolumn{4}{c|}{\textbf{SVM}}          \\ \cline{2-13} 
-		& EX   & AR   & SSA   & SPL  & EX  & AR & SSA & SPL & EX & AR & SSA & SPL \\ \hline
-		All& 0.85 & 0.91 & 0.84 & 0.58 & 0.93 & 0.93 & 0.92 & 0.79 & 0.93 & 0.95 & 0.95 & 0.77 \\
-		Standing& 0.99 & 0.98 & 1.00 & 0.95 & 1.00 & 0.99 & 1.00 & 0.99 & 0.99 & 0.98 & 1.00 & 0.96 \\
-		Walking& 0.91 & 0.96 & 0.86 & 0.61 & 0.96 & 0.97 & 0.95 & 0.86 & 0.96 & 0.98 & 0.98 & 0.84 \\
-		Upstairs& 0.91 & 0.95 & 0.91 & 0.89 & 0.96 & 0.96 & 0.96 & 0.90 & 0.96 & 0.98 & 0.97 & 0.89 \\
-		Sitting& 0.99 & 0.98 & 1.00 & 0.99 & 1.00 & 0.99 & 1.00 & 1.00 & 0.99 & 0.98 & 1.00 & 1.00 \\
-		Jogging& 0.98 & 0.99 & 0.99 & 0.80 & 0.99 & 0.99 & 0.99 & 0.92 & 0.99 & 0.99 & 0.99 & 0.93 \\
-		Downstairs& 0.93 & 0.96 & 0.94 & 0.92 & 0.96 & 0.97 & 0.96 & 0.92 & 0.96 & 0.98 & 0.97 & 0.92 \\ \hline
-	\end{tabular}
-	\label{ch5:tbl:wisdm_methods_results}
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{1}{|c}{Выборка}                  & \multicolumn{2}{c|}{Качество кластеризации} \\ \cline{2-3}
+                                          & $k$-средних               & AML                 \\
+\hline
+Letter Recognition                        & 0,356                 & \textbf{0,428}             \\
+Optical Recognition of Handwritten Digits & 0,758                 & \textbf{0,790}               \\
+Seeds                                     & 0,833                 & \textbf{0,881}            \\
+Image Segmentation                        & 0,545                 & \textbf{0,737}            \\
+Breast Cancer Wisconsin                   & \textbf{0,960}                 & 0,956               \\ \hline
+\end{tabular}
 \end{table}
 
-\begin{table}[!ht]
-	\centering
-	\footnotesize
-	\caption{Binary accuracy scores for USC-HAD using different feature generation methods: EX~--- Expert, AR~--- Auto-Reg, SSA and  SPL for Splines}
-	\label{my-label}
-	\begin{tabular}{r|rrrr|rrrr|rrrr|}
-		& \multicolumn{4}{c|}{\textbf{Logistic Regression}} & \multicolumn{4}{c|}{\textbf{Random Forest}} & \multicolumn{4}{c|}{\textbf{SVM}}          \\ \cline{2-13} 
-		& EX   & AR   & SSA   & SPL  & EX  & AR & SSA & SPL & EX & AR & SSA & SPL \\ \hline
-		All& 0.67 & 0.65 & 0.64 & 0.41 & 0.87 & 0.70 & 0.84 & 0.74 & 0.80 & 0.65 & 0.82 & 0.74 \\
-		Standing& 0.94 & 0.94 & 0.92 & 0.89 & 0.98 & 0.94 & 0.97 & 0.98 & 0.95 & 0.94 & 0.97 & 0.96 \\
-		Elevator-up& 0.94 & 0.94 & 0.93 & 0.92 & 0.95 & 0.95 & 0.95 & 0.95 & 0.93 & 0.94 & 0.94 & 0.93 \\
-		Walking-forward& 0.87 & 0.87 & 0.89 & 0.70 & 0.97 & 0.89 & 0.96 & 0.88 & 0.95 & 0.87 & 0.97 & 0.91 \\
-		Sitting& 0.98 & 0.95 & 0.94 & 0.96 & 0.99 & 0.96 & 0.98 & 0.99 & 0.98 & 0.96 & 0.99 & 0.99 \\
-		Walking-downstairs& 0.95 & 0.93 & 0.93 & 0.90 & 0.99 & 0.96 & 0.98 & 0.95 & 0.98 & 0.93 & 0.98 & 0.96 \\
-		Sleeping& 1.00 & 0.98 & 0.99 & 1.00 & 1.00 & 0.98 & 1.00 & 1.00 & 1.00 & 0.98 & 1.00 & 1.00 \\
-		Elevator-down& 0.94 & 0.94 & 0.94 & 0.91 & 0.95 & 0.95 & 0.95 & 0.95 & 0.93 & 0.94 & 0.94 & 0.93 \\
-		Walking-upstairs& 0.94 & 0.95 & 0.93 & 0.92 & 0.98 & 0.95 & 0.98 & 0.96 & 0.98 & 0.95 & 0.98 & 0.96 \\
-		Jumping& 0.99 & 0.99 & 1.00 & 0.97 & 1.00 & 0.99 & 1.00 & 0.99 & 1.00 & 0.99 & 0.97 & 0.99 \\
-		Walking-right& 0.91 & 0.90 & 0.91 & 0.86 & 0.97 & 0.92 & 0.96 & 0.92 & 0.96 & 0.90 & 0.97 & 0.93 \\
-		Walking-left& 0.89 & 0.91 & 0.90 & 0.88 & 0.97 & 0.93 & 0.97 & 0.93 & 0.95 & 0.91 & 0.97 & 0.93 \\
-		Running& 0.99 & 0.99 & 0.99 & 0.92 & 1.00 & 0.99 & 1.00 & 0.97 & 1.00 & 1.00 & 0.95 & 0.98\\ \hline
-	\end{tabular}
-	\label{ch5:tbl:uschad_methods_results}
-\end{table}
 
-На рис.~\ref{ch5:fig:accuracy_results} показано качество классификации~\eqref{ch5:eq:accuracy} для двух датасетов.
-Для данных WISDM сплайны дали самое слабое качество классификации.
-Результаты для экспертных функций, авторегрессионной модели и SSA схожи.
-Для данных USC-HAD результат более восприимчив к выбору модели классификации. 
-Для обоих датасетов логистическая регрессия продемонстрировала наименьшее качество, SVM и случайный лес показали почти одинаковое качество.
-Для датасета USC-HAD модель с использованием аппроксимации сплайнами
-показала сравнимое с другими методами качество. 
 
-В Табл.~\ref{ch5:tbl:wisdm_methods_results} и Табл.~\ref{ch5:tbl:uschad_methods_results} представлены результаты классификации~\eqref{ch5:eq:accuracy} для каждого класса в отдельности.
-Первая строка в обеих таблицах демонстрирует точность по всем классам для каждой модели и процедуры генерации признаков.
-Следующие строки соответствуют бинарным точностям по каждому из классов.
-Для данных WISDM лучшее качество имеют наименее активные классы, такие как Standing и Sitting. 
-Для USC-HAD заметного выделения качества для определенных классов не наблюдается.
-
-Также был проведён эксперимент с использованием объединённого множества всех 193 сгенерированных признаков.
-Результаты представлены на Рис.~\ref{ch5:fig:feature_union_results}. Соответствие между номера классов и видами активности приведено в Табл.~\ref{ch5:tbl:activities_distributions}. 
-Объединение признаков для обучения одной модели позволило увеличить качество. 
-Для данных WISDM все точности классификации по классам больше $97 \%$, а для USC-HAD выше $93 \%$.
+	\section{Вычислительный эксперимент}
+	Цель вычислительного эксперимента~--- проверить работоспособность предложенного подхода.
+	Предполагается, что построенный алгоритм мультиклассовой классификации способен определить тип активности человека по форме сигнала акселерометра мобильного телефона.
+	
+	Для проведения базового вычислительного эксперимента были подготовлены синтетические временные ряды, принадлежащие двум классам.
+	Первый класс~--- синусы вида $sin(x + b)$, где параметр $b$ определяет сдвиг каждого временного ряда.
+	Второй класс~--- пилообразные функции с различными сдвигами по временной шкале.
+	На каждый временной ряд был наложен нормальный шум.
+	Число временных рядов каждого класса = 60.
+	Длина каждого временного ряда $n = 50$.
+	
+	Построенные центроиды классов проиллюстрированы на рис.~\ref{centroids_synthetic}.
+	Из рисунка видно, что процедура корректно определяет сдвиги временных рядов.
+	\begin{figure}[ht]
+		\centering
+		\includegraphics[width=0.45\linewidth]{figs/ch4/centroids_synthetic_noize}
+		\caption{Центроиды синтетических временных рядов}
+		\label{centroids_synthetic}
+	\end{figure}
+	
+	Для того чтобы убедиться в целесообразности применения метрического обучения, данные
+	временные ряды классифицировались в пространстве с евклидовой метрикой и в пространстве с метрикой Махаланобиса.
+	Число ближайших соседей $k = 5$, размерность преобразованного пространства $p = 40$.
+	Полученные ошибки классификации составили:
+	
+	евклидова метрика --- $27\%$
+	
+	метрика Махаланобиса --- $6\%$.
+	
+	Реальные данные~\cite{wisdm} представляли собой временные ряды акселерометра мобильного телефона.
+	Каждый из шести классов соответствовал определенной физической активности испытуемых.
+	Для проведения вычислительного эксперимента было выбрано по $200$ объектов каждого класса.
+	Длина каждого временного ряда равнялась $n = 128$ отсчетам времени.
+	
+	Построенные центроиды классов изображены на рис.~\ref{centroids_real}.
+	Найденные центроиды обладают периодичностью, свойственной временным рядам показаний активности человека.
+	\begin{figure}[ht]
+		\centering
+		\includegraphics[width=1\linewidth]{figs/ch4/centroids_200_2}
+		\caption{Центроиды временных рядов акселерометра}
+		\label{centroids_real}
+	\end{figure}
+	На рис.~\ref{raw_ts} показаны примеры временных рядов каждого класса. Эти же временные ряды после процедуры выравнивания относительно построенных центроидов изображены на рис.~\ref{aligned_ts}.
+	\begin{figure}[!ht]
+		\centering
+		\includegraphics[width=1\linewidth]{figs/ch4/raw_ts}
+		\caption{Временные ряды акселерометра}
+		\label{raw_ts}
+	\end{figure}
+	\begin{figure}[!ht]
+		\centering
+		\includegraphics[width=1\linewidth]{figs/ch4/aligned_ts}
+		\caption{Выравненные временные ряды акселерометра}
+		\label{aligned_ts}
+	\end{figure}
+	
+	Ошибка классификации без использования метрического обучения составила~$37,5\%$.
+	Алгоритм LMNN позволяет настроить параметры: число ближайших соседей~$k$,
+	размерность преобразованного евклидова пространства~$p$.
+	Для выбора оптимальных параметров воспользуемся процедурой кросс-проверки.
+	На рис.~\ref{heat_map} цветом показана ошибка классификации алгоритма в зависимости от его параметров.
+	На данной выборке алгоритм LMNN оказывается слабо чувствителен к числу ближайших соседей,
+	и при уменьшении размерности пространства объектов ошибка классификации растет.
+	\begin{figure}[ht]
+		\centering
+		\includegraphics[width=1\linewidth]{figs/ch4/heat_map}
+		\caption{Ошибка классификации в зависимости от параметров}
+		\label{heat_map}
+	\end{figure}
+	
+	Настроим алгоритм LMNN со следующими параметрами: число ближайших соседей $k = 30$, размерность
+	выходного пространства $p = 128$.
+	Ошибка классификации составила~$17,25\%$, что вдвое меньше ошибки классификации с использованием евклидовой метрики.
+	
+	\begin{table}[!ht]
+		\centering
+		\caption{Матрицы несоответствий}
+		\subfloat[][Евклидова метрика]{\begin{tabular}{|l|l|l|l|l|l|l|}
+				\hline
+				\multirow{2}{*}{} & \multicolumn{6}{c|}{Истинные метки классов} \\ \cline{2-7}
+				& 1     & 2     & 3     & 4     & 5    & 6    \\ \hline
+				1                 & 80    & 0     & 5     & 0     & 0    & 0    \\ \hline
+				2                 & 4     & 56    & 33    & 0     & 0    & 0    \\ \hline
+				3                 & 5     & 5     & 86    & 0     & 0    & 0    \\ \hline
+				4                 & 7     & 8     & 5     & 168   & 4    & 21   \\ \hline
+				5                 & 51    & 61    & 57    & 12    & 192  & 11   \\ \hline
+				6                 & 53    & 70    & 14    & 20    & 2    & 168  \\ \hline
+		\end{tabular}}
+		\qquad
+		\subfloat[][Метрика Махаланобиса]{\begin{tabular}{|l|l|l|l|l|l|l|}
+				\hline
+				\multirow{2}{*}{} & \multicolumn{6}{c|}{Истинные метки классов} \\ \cline{2-7}
+				& 1     & 2     & 3     & 4     & 5    & 6    \\ \hline
+				1                 & 151   & 12    & 13    & 0     & 0    & 0    \\ \hline
+				2                 & 10    & 142   & 14    & 0     & 0    & 0    \\ \hline
+				3                 & 9     & 10    & 171   & 0     & 0    & 0    \\ \hline
+				4                 & 10    & 7     & 0     & 173   & 9    & 21   \\ \hline
+				5                 & 2     & 11    & 0     & 12    & 186  & 9    \\ \hline
+				6                 & 18    & 18    & 2     & 15    & 5    & 170  \\ \hline
+		\end{tabular}}
+		\label{confussion_matrix}
+	\end{table}
+	
+	В табл.~\ref{confussion_matrix} представлены матрицы несоответствий результатов классификации при использовании
+	евклидовой метрики и метрики Махаланобиса.
+	Столбцы соответствуют истинным меткам классов объектов, строки~--- предсказанным меткам.
+	Диагональное преобладание матрицы несоответствий указывает на высокую предсказательную способность алгоритма.
+	
+	В табл.~\ref{improvement} продемонстрировано увеличение точности классификации при использовании в качестве меры расстояния метрики Махаланобиса.
+	Пересечение $i$-го столбца и $j$-й строки отвечает изменению доли объектов класса $i$, отнесенных к классу $j$. Положительное суммарное значение диагональных элементов таблицы соответствует увеличению качества классификации. Значительное улучшение предсказания происходит при классификации первых трех классов.
+	Данные классы соответствуют следующим видам физической активности: ходьба, ходьба вверх, ходьба вниз.
+	
+	\begin{table}[!ht]
+		\centering
+		\caption{Увеличение точности классификации при использовании адекватной оценки матрицы трансформаций}
+		\label{improvement}
+		\begin{tabular}{|l|l|l|l|l|l|l|}
+			\hline
+			\multirow{2}{*}{} & \multicolumn{6}{c|}{Истинные метки классов}       \\ \cline{2-7}
+			& 1      & 2      & 3      & 4      & 5     & 6     \\ \hline
+			1   & \textbf{0,355}  & 0,06   & 0,04   & 0      & 0     & 0     \\ \hline
+			2   & 0,03   & \textbf{0,43}   & --0,095 & 0      & 0     & 0     \\ \hline
+			3   & 0,02   & 0,025  & \textbf{0,425}  & 0      & 0     & 0     \\ \hline
+			4   & 0,015  & --0,005 & --0,025 & \textbf{0,025}  & 0,025 & 0     \\ \hline
+			5   & --0,245 & --0,25  & --0,28  & 0      & \textbf{--0,03} & --0,01 \\ \hline
+			6   & --0,175 & --0,26  & --0,06  & --0,025 & 0,005 & \textbf{--0,01} \\ \hline
+		\end{tabular}
+	\end{table}
+	

@@ -11,4 +11,6 @@
 *.toc
 *.nav
 *.snm
+*.lot
+*.lof
 *eps-converted-to.pdf
