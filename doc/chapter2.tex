@@ -1,4 +1,215 @@
-\chapter{Постановка задачи декодирования}
+\chapter{Решение задачи декодирования в пространстве высокой размерности}
+\label{chap:ch2}
+
+\section{Формальная постановка задачи}
+
+Для постановки задачи декодирования введём предположения о структурах пространств $\bbX$ и $\bbY$.
+\begin{assumption}
+	Рассмотрим случай, когда пространства $\bbX$ и $\bbY$ избыточны. Это означает, что объекты $\bx$ и $\by$ живут на некоторых многообразиях низкой размерности. В простейшем случае такие многообразия могут являться линейными подпространствами.
+\end{assumption}
+
+\begin{definition}
+	Назовём пространство $\bbT \subset \bbR^l$ \textit{скрытым пространством} для пространства $\bbX \in \bbR^n$ ($l \leq n$), если существуют функция $\varphi_e: \bbX \to \bbT$ и функция $\varphi_d: \bbT  \to \bbX$ такие что
+	\[
+	\forall \bx \in \bbX \quad \exists \bt \in \bbT: \varphi_d (\varphi_e(\bx)) = \varphi_d(\bt) = \bx.
+	\]
+	Функцию $\varphi_e(\bx)$ будем называть \textit{функцией кодирования} объекта $\bx$, функцию $\varphi_d(\bt)$ будем называть \textit{функцией декодирования}. 
+	
+	
+	Аналогично введём определение \textit{скрытого пространства}~$\bbU \subset \bbR^s$ для целевого пространства $\bbY$, \textit{функции кодирования} $\psi_e: \bbY \to \bbU$ и \textit{декодирования} $\psi_d: \bbU  \to \bbY$
+	\[
+	\forall \by \in \bbY \quad  \exists \bu \in \bbU: \psi_d (\psi_e(\by)) = \psi_d(\bu) = \by.
+	\]
+\end{definition}
+
+\begin{definition}
+	Будем считать, что пространство $\bbT \subset \bbR^l$ задаёт \textit{внутреннюю структуру} пространства $\bbX \in \bbR^n$, если пространство $\bbT$ является скрытым для пространства $\bbX$.
+\end{definition}
+
+\begin{definition}
+	Между пространствами $\bbX$ и $\bbY$ существует \textit{согласующее отображение}, если существуют пространства $\bbT$ и $\bbU$, задающие внутренние структуры для пространств $\bbX$ и $\bbY$ соответственно, и существует \textit{функция согласования} $g: \bbT \rightarrow \bbU$, такая что
+	\[
+	\forall \bu \in \bbU \quad \exists \bt:  \bu = g(\bt).
+	\]
+\end{definition}
+
+\begin{assumption}
+	Предположим, что в задаче предсказания~\eqref{ch1:eq:loss_min} пространства $\bbT$ и $\bbU$ задают внутреннюю структуру пространств $\bbX$ и $\bbY$. 
+	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует функция согласования~$g: \bbT \rightarrow \bbU$. Тогда выполнено
+	\[
+	\forall \by \in \bbY \quad \exists \bx \in \bbX: \by = \psi_d(\bu) = \psi_d(g(\bt)) = \psi_d(g(\phi_e(\bx))). 
+	\]
+	
+	Тогда общая схема задачи декодирования принимает вид следующей коммутативной диаграммы:
+	\begin{equation}
+		\begin{tikzpicture}
+			\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
+			{
+				\bbX \subset \bbR^n & \bbY \subset \bbR^r \\
+				\bbT \subset \bbR^l & \bbU \subset \bbR^s \\};
+			\path[-stealth]
+			(m-1-1) edge node [above] {$f$} (m-1-2)
+			(m-2-1) edge [bend right=10] node [right] {$\varphi_d$} (m-1-1)
+			(m-2-2) edge [bend left=10] node [left] {$\psi_d$} (m-1-2)
+			(m-1-1) edge [bend right=10] node [left] {$\varphi_e$} (m-2-1)
+			(m-1-2) edge [bend left=10] node [right] {$\psi_e$} (m-2-2)
+			(m-2-1) edge node [above] {$h$} (m-2-2);
+		\end{tikzpicture}
+		\label{ch1:eq:decoding_scheme}
+	\end{equation}
+\end{assumption}
+
+\begin{definition}
+	Согласно схеме~\eqref{ch1:eq:decoding_scheme}, определим модель декодирования $f: \bbX \rightarrow \bbY$ как суперпозицию
+	\begin{equation}
+		f = \psi_d \circ g \circ \varphi_e.
+		\label{ch1:eq:def_decoding_function}
+	\end{equation}
+\end{definition}
+
+\section{Доказательство корректности работы алгоритмов PLS и CCA}
+
+Псевдокод метода регрессии PLS приведен в алгоритме~\ref{ch1:pls_pseudocode}.
+Алгоритм итеративно на каждом из $l$ шагов вычисляет по одному столбцу $\bt_k$, $\bu_k$, $\bp_k$, $\bq_k$ матриц $\bT$, $\bU$, $\bP$, $\bQ$ соответственно. 
+После вычисления следующего набора векторов из матриц $\bX$, $\bY$ вычитаются очередные одноранговые аппроксимации. 
+При этом предполагается, что исходные матрицы~$\bX$ и~$\bY$ нормированы (имеют нулевое среднее и единичное среднее отклонение).
+
+\begin{algorithm}[h]
+	\caption{Алгоритм PLS}
+	\label{ch1:pls_pseudocode}
+	\begin{algorithmic}[1]
+		\REQUIRE $\bX, \bY, l$;
+		\ENSURE $\bT, \bP, \bQ$;
+		\STATE нормировать матрицы $\bX$ и $\bY$ по столбцам
+		\STATE инициализировать $\bu_0$ (первый столбец матрицы $\bY$)
+		\STATE $\bX_1 = \bX; \bY_1 = \bY$
+		\FOR{$k=1,\dots, l$}
+		\REPEAT
+		\vspace{0.1cm}
+		\STATE $\bw_k := \bX_k^{\T} \bu_{k-1} / (\bu_{k-1}^{\T} \bu_{k-1}); \quad \bw_k: = \frac{\bw_k}{\| \bw_k \|}$
+		\vspace{0.1cm}
+		\STATE $\bt_k := \bX_k \bw_k$
+		\vspace{0.1cm}
+		\STATE $\bc_k := \bY_k^{\T} \bt_k / (\bt_k^{\T} \bt_k); \quad \bc_k: = \frac{\bc_k}{\| \bc_k \|}$
+		\vspace{0.1cm}
+		\STATE $\bu_k := \bY_k \bc_k$
+		\UNTIL{$\bt_k$ не стабилизируется}
+		\vspace{0.1cm}
+		\STATE $\bp_k:= \bX_k^{\T}\bt_k/(\bt_k^{\T}\bt_k),\ 
+		\bq_k := \bY_k^{\T}\bt_k/(\bt_k^{\T}\bt_k)$
+		\vspace{0.2cm}
+		\STATE $\bX_{k+1} :=  \bX_k - \bt_k \bp_k^{\T}$
+		\vspace{0.2cm}
+		\STATE $\bY_{k + 1} :=  \bY_k - \bt_k \bq_k^{\T}$ 
+		\ENDFOR
+	\end{algorithmic}
+\end{algorithm}
+
+Вектора $\bt_k$ и $\bu_k$ из внутреннего цикла алгоритма~\ref{ch1:pls_pseudocode}
+содержат информацию о матрице объектов $\bX$ и матрице ответов $\bY$ соответственно. 
+Блоки из шагов (6)-(7) и шагов (8)-(9)~--- аналоги алгоритма PCA для матриц $\bX$ и $\bY$~\cite{geladi1988pls}. 
+Последовательное выполнение блоков позволяет учесть взаимную связь между матрицами $\bX$ и $\bY$.
+
+Теоретическое обоснование алгоритма PLS следует из следующих утверждений.
+\begin{statement}
+	Максимизации ковариации между векторами $\bt_k$ и $\bu_k$ сохраняет дисперсию матриц~$\bX$ и~$\bY$ и учитывает их линейную зависимость.
+\end{statement}
+\begin{proof}
+	Утверждение следует из равенства
+	\[
+	\text{cov} (\bt_k, \bu_k) = \text{corr} (\bt_k, \bu_k) \cdot \sqrt{\text{var}(\bt_k)} \cdot \sqrt{\text{var}(\bu_k)}.
+	\]
+	Максимизация дисперсий векторов $\bt_k$ и $\bu_k$ отвечает за сохранение информации об исходных матрицах, 
+	корреляция между векторами отвечает взаимосвязи между $\bX$ и~$\bY$. 
+\end{proof}
+
+Во внутреннем цикле алгоритма вычисляются нормированные вектора весов $\bw_k$ и $\bc_k$. 
+Из данных векторов строятся матрицы весов $\bW$ и $\bC$ соответственно.
+
+\begin{statement}
+	В результате выполнения внутреннего цикла вектора $\bw_k$ и $\bc_k$ будут собственными векторами матриц $\bX_k^{\T} \bY_k \bY_k^{\T} \bX_k$ и $\bY_k^{\T} \bX_k \bX_k^{\T} \bY_k$, соответствующими максимальным собственным значениям.
+	
+	\begin{equation*}
+		\bw_k \varpropto \bX_k^{\T} \bu_{k-1} \varpropto \bX_k^{\T} \bY_k \bc_{k-1} \varpropto \bX_k^{\T} \bY_k \bY_k^{\T} \bt_{k-1} \varpropto \bX_k^{\T} \bY_k \bY_k^{\T} \bX_k \bw_{k-1},
+	\end{equation*}
+	\begin{equation*}
+		\bc_k \varpropto \bY_k^{\T} \bt_k \varpropto \bY_k^{\T} \bX_k \bw_k \varpropto \bY_k^{\T} \bX_k \bX_k^{\T} \bu_{k-1} \varpropto \bY_k^{\T} \bX_k \bX_k^{\T} \bY_k \bc_{k-1},
+	\end{equation*}
+	где символ $\varpropto$ означает равенство с точностью до мультипликативной константы. 
+	\label{st:eig}
+\end{statement}
+\begin{proof}
+	Утверждение следует из того факта, что правила обновления векторов $\bw_k$, $\bc_k$ совпадают с итерацией алгоритма поиска максимального собственного значения. 
+	Данный алгоритм основан на следующем факте.
+	
+	Если матрица $\mathbf{A}$ диагонализуема, $\bx$~--- некоторый вектор, то
+	
+	\[
+	\lim_{k \rightarrow \infty} \mathbf{A}^k \bx = \lambda_{\max}(\mathbf{A}) \cdot \mathbf{v}_{\max},
+	\]
+	где $ \lambda_{\max} (\mathbf{A})$~--- максимальное собственное значение матрицы $\mathbf{A}$, $\mathbf{v}_{\max}$~---собственный вектор матрицы $\mathbf{A}$, соответствующий~$\lambda_{\max} (\mathbf{A})$.
+	
+\end{proof}
+
+\begin{statement}
+	Обновление векторов по шагам (6)--(9) алгоритма~\ref{ch1:pls_pseudocode} соответствует максимизации ковариации между векторами~$\bt_k$ и~$\bu_k$.
+\end{statement}
+\begin{proof}
+	Максимальная ковариация между векторами~$\bt_k$ и~$\bu_k$ равна максимальному собственному значению матрицы~$\bX_k^{\T} \bY_k \bY_k^{\T} \bX_k$:
+	\begin{align*}
+		\max_{\bt_k, \bu_k}  \text{cov} (\bt_k, \bu_k)^2 &= \max_{\substack{\|\bw_k\|=1 \\ \|\bc_k\| = 1}} \text{cov} \left( \bX_k \bw_k, \bY_k \bc_k \right)^2 = \max_{\substack{\|\bw_k\|=1 \\ \|\bc_k\| = 1}} \text{cov} \left(\bc_k^{\T}  \bY_k^{\T} \bX_k \bw_k \right)^2 = \\
+		&= \max_{\|\bw_k\| = 1} \text{cov} \left\|\bY_k^{\T} \bX_k \bw_k \right\|^2 = \max_{\|\bw_k\| = 1} \bw_k^{\T} \bX_k^{\T} \bY_k \bY_k^{\T} \bX_k \bw_k = \\
+		& = \lambda_{\max} \left( \bX_k^{\T} \bY_k \bY_k^{\T} \bX_k \right),
+	\end{align*}
+	где~$\lambda_{\max} (\mathbf{A})$~--- максимальное собственное значение матрицы $\mathbf{A}$.
+	Применяя утверждение~\ref{st:eig}, получаем требуемое.
+\end{proof}
+
+После завершения внутреннего цикла на шаге (11) вычисляются вектора $\bp_k$, $\bq_k$ проецированием столбцов матриц $\bX_k$ и $\bY_k$ на вектор $\bt_k$. 
+Для перехода на следующий шаг необходимо вычесть из матриц $\bX_k$ и $\bY_k$ одноранговые аппроксимации $\bt_k \bp_k^{\T}$ и $\bt_k \bq_k^{\T}$
+\begin{equation*}
+	\bX_{k + 1} = \bX_{k} - \bt_k \bp_k^{\T} = \bX - \sum_k \bt_k \bp_k^{\T},
+\end{equation*}
+\begin{equation*}
+	\bY_{k + 1} = \bY_{k} - \bt_k \bq_k^{\T} = \bY - \sum_k \bt_k \bq_k^{\T}.
+\end{equation*}
+При этом каждый следующий вектор~$\bt_k$ оказывается ортогонален всем векторам~$\bt_i$, $i=1, \dots, k$.
+
+Для получения прогнозов модели и нахождения параметров модели 
+домножим справа формулу~\eqref{ch1:eq:PLS_X} на матрицу $\bW$. Строки матрицы невязок $\bE$ ортогональны столбцам матрицы $\bW$, поэтому 
+\[
+\bX \bW = \bT \bP^{\T} \bW.
+\] 
+
+Линейное преобразование между объектами в исходном и латентном пространстве имеет вид
+\begin{equation}
+	\bT = \bX \bW^*,
+	\label{ch1:eq:W*}
+\end{equation}
+где $\bW^* = \bW (\bP^{\T} \bW)^{-1}$. 
+
+Матрица параметров модели~\ref{ch1:eq:lin_reg_model} находится из уравнений~\eqref{ch1:eq:PLS_Y},~\eqref{ch1:eq:W*}
+\begin{equation*}
+	\bY = \bT \bQ^{\T} + \bE = \bX \bW^* \bQ^{\T} + \bE = \bX \bTheta + \bE.
+	\label{ch1:eq:pls_model}
+\end{equation*}
+Таким образом, параметры модели~\eqref{ch1:eq:lin_reg_model} равны
+\begin{equation}
+	\bTheta = \bW (\bP^{\T} \bW)^{-1} \bQ^{\T}.
+	\label{ch1:eq:linear_regression_model_parameters}
+\end{equation}
+
+Финальная модель~\eqref{ch1:eq:pls_model} является линейной, низкоразмерной в скрытом пространстве. 
+Это снижает избыточность данных и повышает стабильность модели.
+
+\hrulefill
+
+{\color{red} Разгрести}
+
+Задача~\eqref{ch1:eq:cca_max_corr} может быть также решена с помощью алгоритма~\ref{ch1:pls_pseudocode} с модификацией в шаге (11): $\bq_k := \bY_k^{\T}\bu_k/(\bu_k^{\T}\bu_k)$.
+
+
+\hrulefill
 
 Преобразование PCA задается ортогональной матрицей $\bP$. Функция кодирования объектов имеет вид $\varphi_e(\bx) = \bP^{\T}\bx$. Функция декодирования объектов имеет вид $\varphi_d(\bt) = \bP\bt$. 
 
@@ -45,70 +256,6 @@
  
 \hrulefill
  
-Для постановки задачи декодирования введём предположения о структурах пространств $\bbX$ и $\bbY$.
-\begin{assumption}
-	Рассмотрим случай, когда пространства $\bbX$ и $\bbY$ избыточны. Это означает, что объекты $\bx$ и $\by$ живут на некоторых многообразиях низкой размерности. В простейшем случае такие многообразия могут являться линейными подпространствами.
-\end{assumption}
-
-\begin{definition}
-	Назовём пространство $\bbT \subset \bbR^l$ \textit{скрытым пространством} для пространства $\bbX \in \bbR^n$ ($l \leq n$), если существуют функция $\varphi_e: \bbX \to \bbT$ и функция $\varphi_d: \bbT  \to \bbX$ такие что
-	\[
-		\forall \bx \in \bbX \quad \exists \bt \in \bbT: \varphi_d (\varphi_e(\bx)) = \varphi_d(\bt) = \bx.
-	\]
-	Функцию $\varphi_e(\bx)$ будем называть \textit{функцией кодирования} объекта $\bx$, функцию $\varphi_d(\bt)$ будем называть \textit{функцией декодирования}. 
-	
-	
-	Аналогично введём определение \textit{скрытого пространства}~$\bbU \subset \bbR^s$ для целевого пространства $\bbY$, \textit{функции кодирования} $\psi_e: \bbY \to \bbU$ и \textit{декодирования} $\psi_d: \bbU  \to \bbY$
-	\[
-	\forall \by \in \bbY \quad  \exists \bu \in \bbU: \psi_d (\psi_e(\by)) = \psi_d(\bu) = \by.
-	\]
-\end{definition}
-
-\begin{definition}
-	Будем считать, что пространство $\bbT \subset \bbR^l$ задаёт \textit{внутреннюю структуру} пространства $\bbX \in \bbR^n$, если пространство $\bbT$ является скрытым для пространства $\bbX$.
-\end{definition}
-
-\begin{definition}
-	Между пространствами $\bbX$ и $\bbY$ существует \textit{согласующее отображение}, если существуют пространства $\bbT$ и $\bbU$, задающие внутренние структуры для пространств $\bbX$ и $\bbY$ соответственно, и существует \textit{функция согласования} $g: \bbT \rightarrow \bbU$, такая что
-	\[
-	 \forall \bu \in \bbU \quad \exists \bt:  \bu = g(\bt).
-	\]
-\end{definition}
-
-\begin{assumption}
-	Предположим, что в задаче предсказания~\eqref{ch1:eq:loss_min} пространства $\bbT$ и $\bbU$ задают внутреннюю структуру пространств $\bbX$ и $\bbY$. 
-	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует функция согласования~$g: \bbT \rightarrow \bbU$. Тогда выполнено
-	\[
-	\forall \by \in \bbY \quad \exists \bx \in \bbX: \by = \psi_d(\bu) = \psi_d(g(\bt)) = \psi_d(g(\phi_e(\bx))). 
-	\]
-	
-	Тогда общая схема задачи декодирования принимает вид следующей коммутативной диаграммы:
-	\begin{equation}
-	\begin{tikzpicture}
-	\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
-	{
-		\bbX \subset \bbR^n & \bbY \subset \bbR^r \\
-		\bbT \subset \bbR^l & \bbU \subset \bbR^s \\};
-	\path[-stealth]
-	(m-1-1) edge node [above] {$f$} (m-1-2)
-	(m-2-1) edge [bend right=10] node [right] {$\varphi_d$} (m-1-1)
-	(m-2-2) edge [bend left=10] node [left] {$\psi_d$} (m-1-2)
-	(m-1-1) edge [bend right=10] node [left] {$\varphi_e$} (m-2-1)
-	(m-1-2) edge [bend left=10] node [right] {$\psi_e$} (m-2-2)
-	(m-2-1) edge node [above] {$h$} (m-2-2);
-	\end{tikzpicture}
-	\label{ch1:eq:decoding_scheme}
-	\end{equation}
-\end{assumption}
-
-\begin{definition}
-	Согласно схеме~\eqref{ch1:eq:decoding_scheme}, определим модель декодирования $f: \bbX \rightarrow \bbY$ как суперпозицию
-	 \begin{equation}
-	 	f = \psi_d \circ g \circ \varphi_e.
-	 	\label{ch1:eq:def_decoding_function}
-	 \end{equation}
-\end{definition}
-
 Рассмотрим случай квадратичной функции потерь:
 \[
 \cL(f, \bX, \bY) = \sum_{i=1}^m \| \by_i - f(\bx_i) \|^2.
