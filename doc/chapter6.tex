@@ -1,7 +1,7 @@
 \chapter{Порождение признаков с помощью метамоделей}
 
 
-\section{Постановка задачи}
+\section{Постановка задачи порождения признакового пространства}
 Временные ряды акселерометра образуют множество~$\mathcal{S}$ сегментов~$s$ фиксированной длины~$T$:
 \begin{equation}
 s = [x_1, \dots, x_T]^{T} \in \bbR^T.
@@ -38,7 +38,7 @@ s = [x_1, \dots, x_T]^{T} \in \bbR^T.
 	\label{ch5:eq:accuracy}
 \end{equation}
 
-\section{Порождение признаков}
+\section{Модели порождение признакового пространства для временных рядов}
 
 Цель данной работы~--- провести сравнение различных подходов к генерации признаков.
 В этом разделе проводится анализ рассматриваемых методов.
@@ -56,7 +56,7 @@ s = [x_1, \dots, x_T]^{T} \in \bbR^T.
 
 \begin{table}[ht]
 	\centering
-	\caption{Expert functions}
+	\caption{Примеры экспертных порождающих функций}
 	\begin{tabular}{|l|c|}
 		\hline
 		\textbf{Function description}    & \textbf{Formula} \\ \hline
@@ -90,7 +90,7 @@ x_t = w_0 + \sum_{j=1}^{n-1} w_j x_{t-j} + \epsilon_t,
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=1\linewidth]{figs/ch5/ar_example.png}
-	\caption{Time series approximation using autoregressive model with order $n = 20$}
+	\caption{Пример аппроксимации временного ряда авторегрессионной моделью с $n = 20$}
 	\label{ch5:fig:ar_example}
 \end{figure}
 
@@ -123,7 +123,7 @@ x_{T-n+1} & x_{T-n+2} & \dots & x_T
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=1\linewidth]{figs/ch5/spline_example.png}
-	\caption{Time series approximation using three order splines}
+	\caption{Пример аппроксимации временного ряда с помощью сплайнов третьего порядка}
 	\label{ch5:fig:spline_example}
 \end{figure}
 Оптимальные параметры сплайна являются решением системы с дополнительными условиями равенства производных до второго порядка включительно на концах отрезков.
@@ -150,7 +150,7 @@ p_i(\xi_{i-1}) &= x_{i-1},\: p_i(\xi_i) = x_i, \quad i = 1, \dots, M.
 Рис.~\ref{ch5:fig:spline_example} показывает аппроксимацию временного ряда с использованием модели сплайнов.
 По сравнению с авторегрессионной моделью сплайны строят более гладкую аппроксимацию, используя такое же количество параметров.
 
-\section{Классификация временных рядов}
+\section{Классификация временных рядов в порожденном признаковом пространстеа}
 Для классификации временных рядов будем использовать подход один против всех. 
 Для каждого класса обучается бинарный классификатор, и на стадии предсказания объект классифицируется согласно наиболее уверенному классификатору.
 Использовались три модели классификации: логистическая регрессия, SVM и случайный лес.
@@ -196,7 +196,7 @@ L(\mathbf{\theta}, \mathcal{D}_G, \mu) = \sum_{i=1}^{m} \log\bigl(1 + \exp(-y_i 
 где $B$~--- количество деревьев в композиции.
 
 
-\section{Вычислительный эксперимент}
+\section{Анализ порожденных признаковых пространств}
 В данной работе эксперименты проводились на двух датасетах временных рядов акселерометра мобильного телефона: WISDM~\cite{wisdm} и USC-HAD~\cite{usc}. 
 Акселерометр мобильного телефона проводит измерение ускорения по трём осям с частотой 100 Hz.
 Данные WISDM содержат 4321 временной ряд.
@@ -208,7 +208,7 @@ L(\mathbf{\theta}, \mathcal{D}_G, \mu) = \sum_{i=1}^{m} \log\bigl(1 + \exp(-y_i 
 
 \begin{table}[!ht]
 	\centering
-	\caption{Distributions of the classes}
+	\caption{Распределение объектов по классам для временных рядов аксселерометра}
 	\subfloat[WISDM]{
 		\begin{tabular}{r|l|rr}
 			\hline
@@ -251,7 +251,7 @@ L(\mathbf{\theta}, \mathcal{D}_G, \mu) = \sum_{i=1}^{m} \log\bigl(1 + \exp(-y_i 
 \begin{figure}[!ht]
 	\centering
 	\includegraphics[width=1\linewidth]{figs/ch5/ts_example.png}
-	\caption{Time series example}
+	\caption{Примеры временных рядов акселлерометра для каждой оси}
 	\label{ch5:fig:ts_example}
 \end{figure}
 
@@ -261,7 +261,7 @@ L(\mathbf{\theta}, \mathcal{D}_G, \mu) = \sum_{i=1}^{m} \log\bigl(1 + \exp(-y_i 
 		\includegraphics[width=0.49\linewidth]{figs/ch5/wisdm_methods.png}}
 	\subfloat{
 		\includegraphics[width=0.49\linewidth]{figs/ch5/uschad_methods.png}}
-	\caption{Multiclass accuracy score}
+	\caption{Мультиклассовая точность классификации для различных порожденных признаковых пространств}
 	\label{ch5:fig:accuracy_results}
 \end{figure}
 
@@ -296,7 +296,7 @@ CV(K) = \frac{1}{K}\sum_{k=1}^{K} L(f_k, \mathcal{D}\setminus \mathcal{C}_k),
 		\includegraphics[width=0.33\linewidth]{figs/ch5/hist_wisdm_svm_all.png}}
 	\subfloat[USC-HAD dataset]{
 		\includegraphics[width=0.66\linewidth]{figs/ch5/hist_uschad_svm_all.png}}\\
-	\caption{Accuracy scores of classification of each class using all features}
+	\caption{Поклассовая точность классификации временных рядов акселерометра}
 	\label{ch5:fig:feature_union_results}
 \end{figure}
 
@@ -308,7 +308,7 @@ CV(K) = \frac{1}{K}\sum_{k=1}^{K} L(f_k, \mathcal{D}\setminus \mathcal{C}_k),
 
 \begin{table}[!ht]
 	\centering
-	\caption{Binary accuracy scores for WISDM using different feature generation methods: EX~--- Expert, AR~--- Auto-Reg, SSA and  SPL for Splines}
+	\caption{Бинарная точность классификации для данных WISDM с использованием рассматриваемых алгоритмов: EX~--- Expert, AR~--- Auto-Reg, SSA and  SPL for Splines}
 	\footnotesize
 	\begin{tabular}{r|rrrr|rrrr|rrrr|}
 		& \multicolumn{4}{c|}{\textbf{Logistic Regression}} & \multicolumn{4}{c|}{\textbf{Random Forest}} & \multicolumn{4}{c|}{\textbf{SVM}}          \\ \cline{2-13} 
@@ -327,7 +327,7 @@ CV(K) = \frac{1}{K}\sum_{k=1}^{K} L(f_k, \mathcal{D}\setminus \mathcal{C}_k),
 \begin{table}[!ht]
 	\centering
 	\footnotesize
-	\caption{Binary accuracy scores for USC-HAD using different feature generation methods: EX~--- Expert, AR~--- Auto-Reg, SSA and  SPL for Splines}
+	\caption{Бинарная точность классификации для данных USC-HAD с использованием рассматриваемых алгоритмов: EX~--- Expert, AR~--- Auto-Reg, SSA and  SPL for Splines}
 	\label{my-label}
 	\begin{tabular}{r|rrrr|rrrr|rrrr|}
 		& \multicolumn{4}{c|}{\textbf{Logistic Regression}} & \multicolumn{4}{c|}{\textbf{Random Forest}} & \multicolumn{4}{c|}{\textbf{SVM}}          \\ \cline{2-13} 

@@ -1,7 +1,7 @@
-\chapter{Выбор параметров нелинейных моделей}
+\chapter{Выбор параметров нелинейных моделей с помощью квадратичного отбора признаков}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Выбор параметров для обучения моделей}
+\section{Задача выбора параметров для обучения моделей}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Модель $f( \bx, \btheta)$ с параметрами $\btheta \in \mathbb{R}^p$ предсказывает целевую переменную~$y \in \bbY$ по объекту~$\bx \in \bbR^{n}$. Пространство~$\bbY$ представляет собой бинарные метки классов~$\{0, 1\}$ для задачи двухклассовой классификации и~$\bbR$ для задачи регрессии.
@@ -59,7 +59,7 @@ QPFS выбирает подмножество параметров~$\ba$ для
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Метод Ньютона решения задачи настройки параметров}
+\section{Метод Ньютона решения задачи обучения параметров}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Метод Ньютона использует условие оптимизации первого порядка для задачи~\eqref{ch3:eq:error_function} и линеаризует градиент $S (\btheta)$
@@ -208,7 +208,7 @@ QPFS матрица~$\bQ$ и вектор~$\bb$ имеют вид
 	\end{algorithmic}
 \end{algorithm}
 
-  \section{Вычислительный эксперимент}
+  \section{Анализ значимостей параметров нелинейных моделей}
 Целью вычислительного эксперимента является исследование свойств предложенного алгоритма и сравнение его с другими методами. 
 
 Исследована зависимость параметров алгоритма QPFS для задач~\eqref{ch3:eq:lin_reg_nonlin_reg},~\eqref{ch3:eq:lin_reg_log_reg}. 
@@ -228,13 +228,13 @@ QPFS матрица~$\bQ$ и вектор~$\bb$ имеют вид
 	\begin{minipage}{.47\textwidth}
 		\centering
 		\includegraphics[width=\linewidth]{figs/ch3/log_reg_error}
-		\caption{Ландшафт функции ошибки для логистической регрессии}
+		\caption{Поверхность функции ошибки для логистической регрессии}
 		\label{ch3:fig:log_reg_error}
 	\end{minipage}%
 	\begin{minipage}{.47\textwidth}
 		\centering
 		\includegraphics[width=\linewidth]{figs/ch3/log_reg_b_wrt_beta}
-		\caption{Релевантности параметров для логистической регрессии}
+		\caption{Релевантность параметров для логистической регрессии}
 		\label{ch3:fig:log_reg_b_wrt_beta}
 	\end{minipage}
 \end{figure}
@@ -254,13 +254,13 @@ QPFS матрица~$\bQ$ и вектор~$\bb$ имеют вид
 	\begin{minipage}{.5\textwidth}
 		\centering
 		\includegraphics[width=\linewidth]{figs/ch3/neural_error}
-		\caption{Ландшафт функции ошибки для нейронной сети}
+		\caption{Поверхность функции ошибки для нейронной сети}
 		\label{ch3:fig:neural_error}
 	\end{minipage}%
 	\begin{minipage}{.5\textwidth}
 		\centering
 		\includegraphics[width=\linewidth]{figs/ch3/neural_b_wrt_beta}
-		\caption{Релевантности параметров первого слоя для модели нейронной сети}
+		\caption{Релевантность параметров первого слоя для модели нейронной сети}
 		\label{ch3:fig:neural_b_wrt_beta}
 	\end{minipage}
 \end{figure}
@@ -284,7 +284,7 @@ QPFS матрица~$\bQ$ и вектор~$\bb$ имеют вид
 \begin{figure}[!ht]
 	\centering
 	\includegraphics[width=\linewidth]{figs/ch3/active_params_wrt_iters}	
-	\caption{Множества активных параметров на протяжении оптимизационного процесса}
+	\caption{Множество активных параметров на протяжении оптимизационного процесса}
 	\label{ch3:fig:active_params_wrt_iters}
 \end{figure}
 
