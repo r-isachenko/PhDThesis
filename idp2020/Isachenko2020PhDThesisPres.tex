@@ -144,10 +144,11 @@
 	\vspace{-0.3cm}
 
 	\begin{minipage}{.5\linewidth}
-		\begin{block}{Авторегрессионная модель в задаче декодирования}
+		\begin{block}{Авторегрессионная модель}
 		\begin{figure}
 			\includegraphics[width=0.8\linewidth]{figs/slide3_3}
 		\end{figure}
+	\vspace{-0.2cm}
 		\[
 		\left[\begin{array}{c|c c} 
 			\underset{1 \times m}{\bx^{\T}} & \underset{1 \times r}{\by^{\T}} \\ 
@@ -164,13 +165,17 @@
 			\begin{align*}
 				\bX &= \bT \bP^{\T} + \bF \\
 				\bY &= \bU \bQ^{\T} + \bE \\
-				\hat{\bY} &= \bX \bW
+				\hat{\bY} &= \bX \bW 
 			\end{align*}
+		\begin{equation*}
+			\text{cov} (\bT, \bU) \rightarrow \max_{\bP, \bQ}
+		\end{equation*}
 		\vspace{-0.4cm}
 			\begin{figure}
-				\includegraphics[width=0.65\linewidth]{figs/slide3_2}
+				\includegraphics[width=0.75\linewidth]{figs/slide3_2}
 			\end{figure}
 		\end{block}
+	\vspace{0.3cm}
 	\end{minipage}
 
 \end{frame}
@@ -191,7 +196,7 @@
 	\end{block}
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Многомерная регрессия}
+\begin{frame}{Авторегрессионная модель прогнозирования}
 \begin{block}{Дано}
 	$\left( \bX, \bY \right)$~-- выборка, $\bX \in \bbR^{m \times n}$~-- матрица объектов, $\bY \in \bbR^{m \times r}$~-- матрица ответов,
 	\[
@@ -240,6 +245,9 @@
 	\end{align*}
 	\begin{equation*}
 		\bU \approx \bT \bB, \quad \bB = \text{diag}(\beta_k), \quad \beta_k = \bu_k^{\T}\bt_k / (\bt_k^{\T}\bt_k).
+	\end{equation*}
+	\begin{equation*}
+		\hat{\bY} = f(\bX) = \bX \bTheta
 	\end{equation*}
 \end{block}
 
