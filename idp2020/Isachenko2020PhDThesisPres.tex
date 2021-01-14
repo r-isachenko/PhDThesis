@@ -197,44 +197,20 @@
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Авторегрессионная модель прогнозирования}
-\begin{block}{Дано}
-	$\left( \bX, \bY \right)$~-- выборка, $\bX \in \bbR^{m \times n}$~-- матрица объектов, $\bY \in \bbR^{m \times r}$~-- матрица ответов,
-	\[
-	\bX = [\bchi_1, \dots, \bchi_n]; \quad \bY =  [\bnu_1, \dots, \bnu_r].
-	\]
-	\vspace{-0.7cm}
-\end{block}
-
-\begin{block}{Модель}
-	\vspace{-0.3cm}
-	\[
-	\by = \bTheta \bx+ \boldsymbol{\varepsilon}, \quad \bTheta \in \bbR^{r \times n}.
-	\]
-	\vspace{-0.5cm}
-\end{block}
+	$\left( \bX, \bY \right)$~-- выборка; \\
+	$\bX = [\bchi_1, \dots, \bchi_n] \in \bbR^{m \times n}$~-- матрица объектов; \\
+	$\bY = [\bnu_1, \dots, \bnu_r] \in \bbR^{m \times r}$~-- матрица ответов; \\
+	$\by = \bTheta \bx+ \boldsymbol{\varepsilon}, \quad \bTheta \in \bbR^{r \times n}$~-- модель.
 \begin{block}{Функция потерь}
+	\vspace{-0.4cm}
 	\[
-	\mathcal{L}(\bTheta | \bX, \bY) = {\left\| \underset{m \times r}{\mathbf{Y}}  - \underset{m \times n}{\bX} \cdot \underset{r \times n}{\bTheta}^{\T} \right\| }_2^2 \rightarrow\min_{\bTheta}.
-	\label{eq:error_function}
-	\]
-	\[
+	\mathcal{L}(\bTheta | \bX, \bY) = {\left\| \underset{m \times r}{\mathbf{Y}}  - \underset{m \times n}{\bX} \cdot \underset{r \times n}{\bTheta}^{\T} \right\| }_2^2 \rightarrow\min_{\bTheta} \quad \Rightarrow \quad 
 	\bTheta^{\T} = (\bX^{\T} \bX)^{-1} \bX^{\T} \bY.
 	\]
 \end{block}
-Линейная зависимость столбцов матрицы~$\bX$ приводит к неустойчивому решению. \\
-Для устранения сильной линейной зависимости предлагается использовать методы выбора признаков и снижения размерности пространства. 
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Снижение размерности пространства}
-\begin{block}{Цель}
-	\begin{itemize}
-		\item спроецировать исходные матрицы $\bX$ и $\bY$ в общее латентное пространство;
-		\item максимизировать ковариацию между образами;
-		\item сохранить информацию об исходных матрицах.
-	\end{itemize}
-\end{block}
+Для устранения сильной линейной зависимости столбцов матрицы~$\bX$ предлагается использовать методы снижения размерности пространства. 
 \begin{block}{Метод частных наименьших квадратов (PLS)}
-	\vspace{-0.5cm}
+	\vspace{-0.7cm}
 	\begin{align*}
 		\underset{m \times n}{\vphantom{\bQ}\bX} 
 		&= \underset{m \times l}{\vphantom{\bQ}\bT} \cdot \underset{l \times n}{\vphantom{\bQ}\bP^{\T}} + \underset{m \times n}{\vphantom{\bQ}\bF} 
@@ -243,14 +219,40 @@
 		&= \underset{m \times l}{\vphantom{\bQ}\bU} \cdot \underset{l \times r}{\bQ^{\T}} + \underset{m \times r}{\vphantom{\bQ}\bE}
 		=  \sum_{k=1}^l  \underset{m \times 1}{\vphantom{\bq_k^{\T}}\bu_k} \cdot \underset{1 \times r}{\bq_k^{\T}} +  \underset{m \times r}{\vphantom{\bq_k^{\T}}\bE}.
 	\end{align*}
+	\vspace{-0.2cm}
 	\begin{equation*}
 		\bU \approx \bT \bB, \quad \bB = \text{diag}(\beta_k), \quad \beta_k = \bu_k^{\T}\bt_k / (\bt_k^{\T}\bt_k).
 	\end{equation*}
+	\vspace{-0.2cm}
 	\begin{equation*}
 		\hat{\bY} = f(\bX) = \bX \bTheta
 	\end{equation*}
 \end{block}
 
+\end{frame}
+%--------------------------------------------------------------------------------
+\begin{frame}{Метод частных наименьших квадратов (PLS)}
+
+\begin{statement}[Исаченко, 2017]
+	Максимизация ковариации между векторами~$\bt_k$ и $\bu_k$ приводит к наилучшему описанию матриц $\bX$ и $\bY$ с учётом их взаимосвязи.
+\end{statement}
+\begin{statement}[Исаченко, 2017]
+	Вектора $\bw_k$ и $\bc_k$~-- собственные вектора матриц~$\bX_k^{\T} \bY_k \bY_k^{\T} \bX_k$ и $\bY_k^{\T} \bX_k \bX_k^{\T} \bY_k$, соответствуюшие максимальным собственным значениям.
+\end{statement}
+\begin{statement}[Исаченко, 2017]
+	Правила обновления векторов (6)--(9) максимизируют ковариацию между векторами~$\bt_k$ и $\bu_k$.
+\end{statement}
+
+\begin{block}{Модель PLS регрессии}
+	
+	\[
+	\bY = \bU \bQ^{\T} + \bE \approx \bT \bB \bQ^{\T}+ \bE = \bX \bW^* \bB \bQ^{\T} + \bE = \bX \bTheta + \bE.
+	\]
+	\vspace{0.1cm}
+	\[
+	\bTheta = \bW (\bP^{\T} \bW)^{-1} \bB \bQ^{\T}, \quad \bT = \bX \bW^*, \quad \text{where } \bW^* = \bW (\bP^{\T} \bW)^{-1}.
+	\]
+\end{block}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Скрытое пространство в задаче декодирования}
@@ -272,30 +274,6 @@
 	 \]
 	Для согласованных скрытых пространств модель декодирования учитывает зависимости в пространствах независимой и целевой переменных.
 	
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Метод частных наименьших квадратов (PLS)}
-
-\begin{statement}[Исаченко, 2017]
-Максимизация ковариации между векторами~$\bt_k$ и $\bu_k$ приводит к наилучшему описанию матриц $\bX$ и $\bY$ с учётом их взаимосвязи.
-\end{statement}
-\begin{statement}[Исаченко, 2017]
-Вектора $\bw_k$ и $\bc_k$~-- собственные вектора матриц~$\bX_k^{\T} \bY_k \bY_k^{\T} \bX_k$ и $\bY_k^{\T} \bX_k \bX_k^{\T} \bY_k$, соответствуюшие максимальным собственным значениям.
-\end{statement}
-\begin{statement}[Исаченко, 2017]
-Правила обновления векторов (6)--(9) максимизируют ковариацию между векторами~$\bt_k$ и $\bu_k$.
-\end{statement}
-
-\begin{block}{Модель PLS регрессии}
-
-\[
-\bY = \bU \bQ^{\T} + \bE \approx \bT \bB \bQ^{\T}+ \bE = \bX \bW^* \bB \bQ^{\T} + \bE = \bX \bTheta + \bE.
-\]
-\vspace{0.1cm}
-\[
-\bTheta = \bW (\bP^{\T} \bW)^{-1} \bB \bQ^{\T}, \quad \bT = \bX \bW^*, \quad \text{where } \bW^* = \bW (\bP^{\T} \bW)^{-1}.
-\]
-\end{block}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Пример PLS регрессии в двумерном случае}
