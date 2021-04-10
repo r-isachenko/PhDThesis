@@ -55,9 +55,103 @@
 	\label{ch2:time_series_decoding}
 \end{figure}
 
+Рассмотрим модель~\eqref{ch1:eq:reg_model} вида
+\begin{equation}
+	\by = f(\bx, \bTheta) + \bepsilon = \bTheta_1 \bx_1 + \bTheta_2 \bx_2 + \bepsilon,
+	\label{ch2:eq:two_modal_reg_model}
+\end{equation}
+где объект $\bx = [\bx_1, \bx_2] \in \bbR^n$ состоит из двух подвекторов $\bx_1 \in \bbR^k$, $\bx_2 \in \bbR^{n - k}$, тем самым  Матрица параметров $\bTheta \in \bbR^{n \times r}$ состоит из двух подматриц $\bTheta_1 \in \bbR^{k \times r}$, $\bTheta_2 \in \bbR^{n - k \times r}$. 
+
+\begin{statement}
+	\label{stat:two_modal_params}
+	Оптимальная ({\color{red} четкие предпосылки написать}) матрица параметров $\bTheta$ для модели~\eqref{ch2:eq:two_modal_reg_model} имеет следующий вид:
+	\begin{align*}
+		\bTheta_1 &= (\bX_1^{\T} \bM_{\bX_2} \bX_1)^{-1} \bX_1^{\T} \bM_{\bX_2} \bY \\
+		\bTheta_2 &= (\bX_2^{\T} \bM_{\bX_1} \bX_2)^{-1} \bX_2^{\T} \bM_{\bX_1} \bY,
+	\end{align*}
+	где $\bM_{\bX_1} = (\bI - \bP_{\bX_1})$, $\bM_{\bX_2} = (\bI - \bP_{\bX_2})$, $\bP_{\bX_1} = \bX_1 (\bX_1^{\T} \bX_1)^{-1} \bX_1^{\T}$, $\bP_{\bX_2} = \bX_2 (\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T}$.
+\end{statement}
+
+\begin{proof}
+	\[
+		\bX^{\T} \bX = \bX^{\T} \bY; \quad \Rightarrow \quad
+		\begin{cases*}
+			\bX_1^{\T} \bX_1 \bTheta_1 + \bX_1^{\T} \bX_2 \bTheta_2 = \bX_1^{\T} \bY \\
+			\bX_2^{\T} \bX_1 \bTheta_1 + \bX_2^{\T} \bX_2 \bTheta_2 = \bX_2^{\T} \bY 
+		\end{cases*}
+	\]
+	Выразим из этой системы параметры:
+	\[
+		\begin{cases}
+			\bTheta_1 = (\bX_1^{\T} \bX_1)^{-1} \bX_1^{\T} (\bY - \bX_2 \bTheta_2) \\
+			\bTheta_2 = (\bX_2^{\T} \bX_2 )^{-1}  \bX_2^{\T} (\bY - \bX_1 \bTheta_1)
+		\end{cases}
+	\]
+	Подставим полученные выражения для $\bTheta_1$ и $\bTheta_2$ в исходную систему:
+	\[
+				\begin{cases*}
+					\bX_1^{\T} \bP_{\bX_1} (\bY - \bX_2 \bTheta_2) + \bX_1^{\T} \bX_2 \bTheta_2 = \bX_1^{\T} \bY \\
+					\bX_2^{\T} \bX_1 \bTheta_1 + \bX_2^{\T}\bP_{\bX_2} (\bY - \bX_1 \bTheta_1) = \bX_2^{\T} \bY 
+				\end{cases*}
+	\]
+	Выразив матрицы параметров, получим требуемые выражения.
+\end{proof}
+
+\begin{statement}
+	\label{stat:two_modal_theta2}
+	Оптимальная подматрица $\bTheta_2$ в модели~\eqref{ch2:eq:two_modal_reg_model} является решением задачи регрессии
+	\begin{equation}
+		\| \bY_1 -  \bX_{21} \bTheta_2 \| \rightarrow \min_{\bTheta_2},
+		\label{eq:two_modal_fwl}
+	\end{equation}
+	где $\bY_1 = \bM_{\bX_1} \bY$, $\bX_{21} = \bM_{\bX_1} \bX_2$.
+\end{statement}
+
+\begin{proof}
+	Матрица $M_{\bX_1}$ является матрицей проекции на подпространство ортогональное подпространство, построенное на оболочке столбцов матрицы $\bX_1$. Таким образом, матрица $M_{\bX_1}$ является идемпотентной ($M_{\bX_1}{\T} M_{\bX_1} = M_{\bX_1}$). 
+	Таким образом, используя утверждение~\autoref{stat:two_modal_params},
+	\begin{multline*}
+		\bTheta_2 = (\bX_2^{\T} \bM_{\bX_1} \bX_2)^{-1} \bX_2^{\T} \bM_{\bX_1} \bY = (\bX_2^{\T} \bM_{\bX_1}^{\T} \bM_{\bX_1} \bX_2)^{-1} \bX_2^{\T} \bM_{\bX_1}^{\T} \bM_{\bX_1} \bY = \\
+		= ((\bM_{\bX_1} \bX_2)^{\T} (\bM_{\bX_1} \bX_2)^{\T})^{-1} (\bM_{\bX_1} \bX_2)^{\T} (\bM_{\bX_1} \bY) = (\bX_{21}^{\T} \bX_{21})^{-1} \bX_{21}^{\T} \bY_1.
+	\end{multline*}
+	Согласно теореме Гаусса-Маркова $\bTheta_2$ является решением задачи регрессии~\eqref{eq:two_modal_fwl}.
+\end{proof}
+
+Похожие результаты были доказаны в эконометрике в работах~\cite{frisch1933partial,lovell1963seasonal,cinelli2020making}. Аналогичное утверждение верно и для матрицы~$\bTheta_1$. 
+
+\begin{statement}
+	Если столбцы матрицы $\bX_1$ ортогональны столбцам матрицы $\bX_2$ в задаче~\eqref{ch2:eq:two_modal_reg_model}, то $\bTheta_2$ является решением задачи регрессии
+	\[
+			\| \bY -  \bX_{2} \bTheta_2 \| \rightarrow \min_{\bTheta_2}.
+	\]
+\end{statement}
+
+\begin{proof}
+	Используя факт, что $\bI = \bP_{\bX_1} + \bM_{\bX_1}$ и $\bX_2 \bX_1 = 0$, получаем
+	\begin{multline*}
+		(\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T} \bY = (\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T} (\bP_{\bX_1} + \bM_{\bX_1}) \bY = \\ = (\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T} \bM_{\bX_1} \bY  = (\bX_{21}^{\T} \bX_{21})^{-1} \bX_{21}^{\T} \bY_1
+	\end{multline*}
+	Используя утверждение~\autoref{stat:two_modal_theta2}, получаем требуемое утверждение.
+\end{proof}
+Данное утверждение показывает, что в случае независимых столбцов матриц $\bX_1$ и $\bX_2$ задача регрессии для модели~\eqref{ch2:eq:two_modal_reg_model} распадается на две независимые подзадачи.
+
+\begin{statement}
+	
+\end{statement}
+
+\begin{proof}
+
+\end{proof}
+
+Рассмотрим случай линейной авторегрессионной модели $f_{\text{AR}}^y$ и линейной регрессионной модели $f_{\text{R}}^{xy}$. Пусть предсказательная модель $f^{xy}: \bbR^{h_x \times m} \times \bbR^{h_y \times r} \rightarrow \bbR^{p \times r}$ является суммой авторегрессионной и регрессионной компоненты.
+
 \begin{theorem}
 	При определенных условиях (???) - [линейность моделей, уровень корреляции сигнала, обусловленность матрицы] предсказательная модель $f^{xy}: \bbR^{h_x \times m} \times \bbR^{h_y \times r} \rightarrow \bbR^{p \times r}$ лучше (???) - [меньше ошибка на трейн/вал, устойчивее решение, меньше размерность (простота)], чем авторегрессионная модель $f_{\text{AR}}^y$ и регрессионная модель $f_{\text{R}}^{xy}$.
 \end{theorem}
+
+\begin{proof}
+	 Доказательство следует из утверждений ???.
+\end{proof}
 
 \hrulefill
 
