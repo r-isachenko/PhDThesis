@@ -1,4 +1,4 @@
-\documentclass[9pt]{beamer}
+\documentclass[10pt]{beamer}
 \usepackage[utf8]{inputenc}
 \usepackage[russian]{babel}
 \usepackage{graphicx, epsfig}
@@ -19,6 +19,10 @@
 \usetheme{Singapore}%{Singapore}%{Warsaw}%{Warsaw}%{Darmstadt}
 \usecolortheme{default}
 \setbeamertemplate{footline}[page number]{}
+\setbeamerfont{title}{size=\Large}
+\beamertemplatenavigationsymbolsempty
+
+\setbeamersize{text margin left=3mm,text margin right=3mm} 
 
 \usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools} % AMS
 
@@ -104,16 +108,18 @@
 \title[\hbox to 56mm{  \hfill\insertframenumber\,/\,\inserttotalframenumber}]
 {\\ \vspace{1.5cm} Снижение размерности пространства \\ в задачах анализа временных рядов}
 \author[Роман Исаченко]{\\ 
-	\vspace{.4cm}
-	Роман Исаченко \\
+	Исаченко Роман Владимирович \\
 	\vspace{3mm}
-	{\footnotesize Научный руководитель: \\
-	д.ф.-м.н. В. В. Стрижов}}
-\institute[МФТИ(ГУ)]{
-Московский физико-технический институт\\
-Факультет управления и прикладной математики\\
-Кафедра <<Интеллектуальные системы>>}
-\date{2020 г.}
+	{\footnotesize 
+	Диссертация на соискание ученой степени \\
+	кандидата физико-математических наук
+	} \\
+	\vspace{0.2cm}
+	{\footnotesize05.13.17 -- Теоретические основы информатики} \\
+	\vspace{0.2cm}
+	{\footnotesize Научный руководитель: д.ф.-м.н. В. В. Стрижов}
+	}
+\date{Москва, 2021 г.}
 %--------------------------------------------------------------------------------
 \begin{document}
 %--------------------------------------------------------------------------------
@@ -131,172 +137,74 @@
 		Требуется построить модель, адекватно описывающую как пространство объектов так и пространство ответов при наблюдаемой мультикорреляции в обоих пространствах высокой размерности. 
 	\end{block}
 	\begin{block}{Решение}
-		Для учёта зависимостей в пространствах объектов и ответов предлагается снизить размерность с использованием скрытого пространства. 
+		Для учёта зависимостей в пространствах объектов и ответов предлагается снизить размерность с использованием скрытого пространства. Предлагаются линейные и нейросетевые методы согласования связанных моделей в пространствах высокой размерности.
 	\end{block}
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Снижение размерности пространства в задачах анализа временных рядов}
-	\begin{block}{Цель}
-		Исследуется фундаментальная проблема восстановления зависимостей не только в пространстве исходных описаний, но и в пространстве целевых переменных.
-	\end{block}
-	\begin{block}{Задача}
-		Предложить методы поиска скрытых закономерностей в связанных пространствах и алгоритмы снижения размерности, снижения сложности связанных моделей.
-	\end{block}
-	\begin{block}{Решение}
-		Линейные и нейросетевые модели, методы согласования связанных моделей в пространствах высокой размерности.
-	\end{block}
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Картинка про работу}
-    
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Литература}
-	\begin{itemize}
-		\item Katrutsa A., Strijov V. Comprehensive study of feature selection methods to solve multicollinearity problem according to evaluation criteria // \textit{Expert Systems with Applications} 76, 2017.
-		\vfill
-		\item Li J. et al. Feature selection: A data perspective //\textit{ACM Computing Surveys (CSUR)} 50(6), 2017.
-		\vfill
-		\item Eliseyev A. et al. Iterative N-way partial least squares for a binary self-paced brain–computer interface in freely moving animals //\textit{Journal of neural engineering} 4(8), 2011.
-		\vfill
-		\item Rodriguez-Lujan I. et al. Quadratic programming feature selection // \textit{Journal of Machine Learning Research} 11(Apr), 2010.
-		\vfill
-		\item Motrenko A., Strijov V. Multi-way Feature Selection for ECoG-based Brain-Computer Interface // \textit{Expert Systems with Applications} Submitted to the journal.
-	\end{itemize}
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Задача декодирования временного ряда}
-	\begin{block}{Модель}
-		Назовём \textit{моделью} параметрическую функцию $f: \bbX \times \mathbb{W} \rightarrow \bbY$
-	\end{block}
-	\begin{itemize}
-		\item $\bbX \in \bbR^n$~-- пространство независимой переменной;
-		\item $\bbY \in \bbR^r$~-- пространство целевой переменной;
-		\item $\bx \in \bbX$~-- реализация независимой переменной;
-		\item $\by \in \bbY$~-- реализация целевой переменной;
-		\item $\mathbb{W}$~-- пространство параметров модели
-	\end{itemize}
-	\textbf{Особенностью задачи} является наличие избыточности описания как независимой переменной $\bx$, так и целевой переменной $\by$.
-	
-	То есть объекты $\bx$ и $\by$ живут на некоторых многообразиях низкой размерности. 
-	
-	Примером таких многообразий могут являться линейными подпространствами.
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Скрытое пространство в задаче декодирования}
-		
-		\begin{itemize} 
-			\item
-			Назовём пространство $\bbT \subset \bbR^l$ \textit{скрытым пространством} для пространства $\bbX \in \bbR^n$ ($l \leq n$), если существуют \textit{функция кодирования} $\varphi_e: \bbX \to \bbT$ и \textit{функция декодирования} $\varphi_d: \bbT  \to \bbX$ такие что
-			\[
-			\forall \bx \in \bbX \quad \exists \bt \in \bbT: \varphi_d (\varphi_e(\bx)) = \varphi_d(\bt) = \bx.
-			\]
-			\item
-			Аналогично введём определение \textit{скрытого пространства}~$\bbU \subset \bbR^s$ для целевого пространства $\bbY$, \textit{функции кодирования} $\psi_e: \bbY \to \bbU$ и \textit{декодирования} $\psi_d: \bbU  \to \bbY$
-			\[
-			\forall \by \in \bbY \quad  \exists \bu \in \bbU: \psi_d (\psi_e(\by)) = \psi_d(\bu) = \by.
-			\]
-			\item 
-			Назовём два скрытых пространства $\bbT$ и $\bbU$ \textit{согласованными}, если существует \textit{функция согласования} $h: \bbT \rightarrow \bbU$, такая что
-			\[
-				\by = f(\bx) = \psi_d(h(\phi_e(x))).
-			 \]
-		\end{itemize}
-	При нахождении согласованных скрытых пространств модель декодирования учитывает зависимости в пространствах независимой и целевой переменных.
-	
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Схема задачи декодирования}
-	\begin{figure}
-		\includegraphics[width=0.5\linewidth]{figs/decoding_scheme}
-	\end{figure}
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Многомерная регрессия}
-	\begin{block}{Дано}
-	$\left( \bX, \bY \right)$~-- выборка, $\bX \in \bbR^{m \times n}$~-- матрица объектов, $\bY \in \bbR^{m \times r}$~-- матрица ответов,
-	\[
-	\bX = [\bchi_1, \dots, \bchi_n]; \quad \bY =  [\bnu_1, \dots, \bnu_r].
-	\]
-	\vspace{-0.7cm}
-	\end{block}
+\begin{frame}{Задача декодирования сигналов}
+    \begin{figure}
+    	\includegraphics[width=0.85\linewidth]{figs/slide3_1}
+    \end{figure}
 
-\begin{block}{Модель}
-	\vspace{-0.3cm}
+	\begin{minipage}{.45\linewidth}
+		\vspace{-1.0cm}
+		\begin{block}{Авторегрессионная модель}
+		\begin{figure}
+			\includegraphics[width=0.8\linewidth]{figs/slide3_3}
+		\end{figure}
+		\end{block}
+		
+	\end{minipage}%
+	\begin{minipage}{.55\linewidth}
+		\begin{block}{Проекция в скрытое пространство}
+			\vspace{-0.6cm}
+			\begin{align*}
+				\bX &= \bT \bP^{\T} + \bF \\
+				\bY &= \bU \bQ^{\T} + \bE \\
+			\end{align*}
+		\vspace{-1.0cm}
+		\[
+			\text{cov} (\bT, \bU) \rightarrow \max_{\bP, \bQ}
+		\]
+		\vspace{-0.4cm}
+			\begin{figure}
+				\includegraphics[width=0.75\linewidth]{figs/slide3_2}
+			\end{figure}
+		\end{block}
+	\vspace{0.3cm}
+	\end{minipage}
+
+\end{frame}
+%--------------------------------------------------------------------------------
+\begin{frame}{Задача авторегрессионного прогнозирования}
+	$\bX = [\bchi_1, \dots, \bchi_n] \in \bbR^{m \times n}$~-- матрица объектов; \\
+	$\bY = [\bnu_1, \dots, \bnu_r] \in \bbR^{m \times r}$~-- матрица ответов; \\
+	$\by = \bTheta \bx+ \boldsymbol{\varepsilon}, \quad \bTheta \in \bbR^{r \times n}$~-- модель.
+\begin{block}{Функция потерь линейной регрессии}
+	\vspace{-0.4cm}
 	\[
-		\by = \bTheta \bx+ \boldsymbol{\varepsilon}, \quad \bTheta \in \bbR^{r \times n}.
-	\]
-	\vspace{-0.5cm}
-\end{block}
-	\begin{block}{Функция потерь}
-	\[
-	\mathcal{L}(\bTheta | \bX, \bY) = {\left\| \underset{m \times r}{\mathbf{Y}}  - \underset{m \times n}{\bX} \cdot \underset{r \times n}{\bTheta}^{\T} \right\| }_2^2 \rightarrow\min_{\bTheta}.
-	\label{eq:error_function}
-	\]
-	\[
+	\mathcal{L}(\bTheta | \bX, \bY) = {\left\| \underset{m \times r}{\mathbf{Y}}  - \underset{m \times n}{\bX} \cdot \underset{r \times n}{\bTheta}^{\T} \right\| }_2^2 \rightarrow\min_{\bTheta} \quad \Rightarrow \quad 
 	\bTheta^{\T} = (\bX^{\T} \bX)^{-1} \bX^{\T} \bY.
 	\]
-	\end{block}
-	Линейная зависимость столбцов матрицы~$\bX$ приводит к неустойчивому решению. \\
-	Для устранения сильной линейной зависимости предлагается использовать методы выбора признаков и снижения размерности пространства. 
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Снижение размерности пространства}
-\begin{block}{Цель}
-	\begin{itemize}
-		\item спроецировать исходные матрицы $\bX$ и $\bY$ в общее латентное пространство;
-		\item максимизировать ковариацию между образами;
-		\item сохранить информацию об исходных матрицах.
-	\end{itemize}
 \end{block}
-\begin{block}{Метод частных наименьших квадратов (PLS)}
-	\vspace{-0.5cm}
-\begin{align*}
-\underset{m \times n}{\vphantom{\bQ}\bX} 
-&= \underset{m \times l}{\vphantom{\bQ}\bT} \cdot \underset{l \times n}{\vphantom{\bQ}\bP^{\T}} + \underset{m \times n}{\vphantom{\bQ}\bF} 
-= \sum_{k=1}^l \underset{m \times 1}{\vphantom{\bp_k^{\T}}\bt_k} \cdot \underset{1 \times n}{\bp_k^{\T}} + \underset{m \times n}{\vphantom{\bp_k^{\T}}\bF},\\
-\underset{m \times r}{\vphantom{\bQ}\bY} 
-&= \underset{m \times l}{\vphantom{\bQ}\bU} \cdot \underset{l \times r}{\bQ^{\T}} + \underset{m \times r}{\vphantom{\bQ}\bE}
-=  \sum_{k=1}^l  \underset{m \times 1}{\vphantom{\bq_k^{\T}}\bu_k} \cdot \underset{1 \times r}{\bq_k^{\T}} +  \underset{m \times r}{\vphantom{\bq_k^{\T}}\bE}.
-\end{align*}
-\begin{equation*}
-\bU \approx \bT \bB, \quad \bB = \text{diag}(\beta_k), \quad \beta_k = \bu_k^{\T}\bt_k / (\bt_k^{\T}\bt_k).
-\end{equation*}
+Для устранения сильной линейной зависимости столбцов матрицы~$\bX$ предлагается использовать методы снижения размерности пространства. 
+\begin{block}{Метод проекции в скрытое пространство (PLS)}
+	\vspace{-0.7cm}
+	\begin{align*}
+		\underset{m \times n}{\vphantom{\bQ}\bX} 
+		&= \underset{m \times l}{\vphantom{\bQ}\bT} \cdot \underset{l \times n}{\vphantom{\bQ}\bP^{\T}} + \underset{m \times n}{\vphantom{\bQ}\bF} 
+		= \sum_{k=1}^l \underset{m \times 1}{\vphantom{\bp_k^{\T}}\bt_k} \cdot \underset{1 \times n}{\bp_k^{\T}} + \underset{m \times n}{\vphantom{\bp_k^{\T}}\bF},\\
+		\underset{m \times r}{\vphantom{\bQ}\bY} 
+		&= \underset{m \times l}{\vphantom{\bQ}\bU} \cdot \underset{l \times r}{\bQ^{\T}} + \underset{m \times r}{\vphantom{\bQ}\bE}
+		=  \sum_{k=1}^l  \underset{m \times 1}{\vphantom{\bq_k^{\T}}\bu_k} \cdot \underset{1 \times r}{\bq_k^{\T}} +  \underset{m \times r}{\vphantom{\bq_k^{\T}}\bE}.
+	\end{align*}
+	\vspace{-0.2cm}
+	\begin{equation*}
+		\hat{\bY} = f(\bX) = \bX \bTheta; \quad \bU \approx \bT \bB, \quad \bB = \text{diag}(\beta_k), \quad \beta_k = \bu_k^{\T}\bt_k / (\bt_k^{\T}\bt_k).
+	\end{equation*}
+	\vspace{-0.2cm}
 \end{block}
 
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Псевдокод метода частных наименьших квадратов (PLS)}
-
-\begin{figure}
-\begin{flushleft}
-	\includegraphics[width=0.6\linewidth]{figs/pls_pseudocode}
-\end{flushleft}
-\end{figure}
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Метод частных наименьших квадратов (PLS)}
-
-\begin{statement}[Исаченко, 2017]
-Максимизация ковариации между векторами~$\bt_k$ и $\bu_k$ приводит к наилучшему описанию матриц $\bX$ и $\bY$ с учётом их взаимосвязи.
-\end{statement}
-\begin{statement}[Исаченко, 2017]
-Вектора $\bw_k$ и $\bc_k$~-- собственные вектора матриц~$\bX_k^{\T} \bY_k \bY_k^{\T} \bX_k$ и $\bY_k^{\T} \bX_k \bX_k^{\T} \bY_k$, соответствуюшие максимальным собственным значениям.
-\end{statement}
-\begin{statement}[Исаченко, 2017]
-Правила обновления векторов (6)--(9) максимизируют ковариацию между векторами~$\bt_k$ и $\bu_k$.
-\end{statement}
-
-\begin{block}{Модель PLS регрессии}
-
-\[
-\bY = \bU \bQ^{\T} + \bE \approx \bT \bB \bQ^{\T}+ \bE = \bX \bW^* \bB \bQ^{\T} + \bE = \bX \bTheta + \bE.
-\]
-\vspace{0.1cm}
-\[
-\bTheta = \bW (\bP^{\T} \bW)^{-1} \bB \bQ^{\T}, \quad \bT = \bX \bW^*, \quad \text{where } \bW^* = \bW (\bP^{\T} \bW)^{-1}.
-\]
-\end{block}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Пример PLS регрессии в двумерном случае}
@@ -311,7 +219,50 @@
 	Учёт взаимной связи между матрицами~$\bX$ и~$\bY$ отклоняет вектора~$\bw_k$ и~$\bc_k$ от направления главных компонент. 
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Задача выбора признаков}
+\begin{frame}{Метод частных наименьших квадратов (PLS)}
+
+\begin{statement}[Исаченко, 2017]
+	Максимизация ковариации между векторами~$\bt_k$ и $\bu_k$ приводит к наилучшему описанию матриц $\bX$ и $\bY$ с учётом их взаимосвязи.
+\end{statement}
+\begin{statement}[Исаченко, 2017]
+	Вектора $\bw_k$ и $\bc_k$~-- собственные вектора матриц~$\bX_k^{\T} \bY_k \bY_k^{\T} \bX_k$ и $\bY_k^{\T} \bX_k \bX_k^{\T} \bY_k$, соответствуюшие максимальным собственным значениям.
+\end{statement}
+\begin{statement}[Исаченко, 2017]
+	Правила обновления векторов (6)--(9) максимизируют ковариацию между векторами~$\bt_k$ и $\bu_k$.
+\end{statement}
+
+\begin{block}{Модель PLS регрессии}
+	
+	\[
+	\bY = \bU \bQ^{\T} + \bE \approx \bT \bB \bQ^{\T}+ \bE = \bX \bW^* \bB \bQ^{\T} + \bE = \bX \bTheta + \bE.
+	\]
+	\[
+	\bTheta = \bW (\bP^{\T} \bW)^{-1} \bB \bQ^{\T}, \quad \bT = \bX \bW^*, \quad \text{where } \bW^* = \bW (\bP^{\T} \bW)^{-1}.
+	\]
+\end{block}
+\end{frame}
+%--------------------------------------------------------------------------------
+\begin{frame}{Скрытое пространство в задаче декодирования}
+	
+	\textbf{Особенностью задачи} является избыточность описания независимой переменной $\bx$ и целевой переменной $\by$.
+	Объекты $\bx$ и $\by$ живут на некоторых многообразиях низкой размерности. 
+	\begin{figure}
+		\includegraphics[width=0.32\linewidth]{figs/decoding_scheme}
+	\end{figure}
+		
+	Пространства $\bbT \subset \bbR^l$ и $\bbU \subset \bbR^s$ \textit{скрытые пространства} для $\bbX \in \bbR^n$ ($l \leq n$) и $\bbY \in \bbR^r (s \leq r)$, если существуют \textit{функции кодировании} $\varphi_e: \bbX \to \bbT$, $\psi_e: \bbY \to \bbU$ и \textit{функции декодирования} $\varphi_d: \bbT  \to \bbX$, $\psi_d: \bbU  \to \bbY$:
+	\begin{align*}
+	\forall \bx \in \bbX &\quad \exists \bt \in \bbT: \varphi_d (\varphi_e(\bx)) = \varphi_d(\bt) = \bx; \\
+	\forall \by \in \bbY &\quad  \exists \bu \in \bbU: \psi_d (\psi_e(\by)) = \psi_d(\bu) = \by.
+	\end{align*}
+	Cкрытыe пространства $\bbT$ и $\bbU$ являются \textit{согласованными}, если существует \textit{функция согласования} $h: \bbT \rightarrow \bbU$:
+	\[
+		\by = f(\bx) = \psi_d(h(\phi_e(x))).
+	 \]
+	
+\end{frame}
+%--------------------------------------------------------------------------------
+\begin{frame}{Выбор признаков в задаче декодирования}
 \begin{block}{Требуется}
 Найти бинарный вектор~$\ba = \{0, 1\}^n$, компоненты~-- индикаторы выбранных признаков. 
 \end{block}
@@ -336,7 +287,7 @@
 где индекс~$\ba$ обозначает подматрицу с номерами столбцов, для которых~$a_j = 1$.
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Quadratic Programming Feature Selection}
+\begin{frame}{Выбор признаков с помощью квадратичного программирования}
 	\[
 	\| \bnu - \bX \btheta\|_2^2 \rightarrow\min_{\btheta \in \bbR^{n}}.
 	\]
@@ -346,12 +297,11 @@
 	\[
 	S(\bz | \bX, \bnu)	= (1 - \alpha) \cdot \underbrace{\bz^{\T} \bQ \bz}_{\text{Sim}(\bX)} - \alpha \cdot \underbrace{\vphantom{()} \mathbf{b}^{\T} \bz}_{\text{Rel}(\bX, \bnu)} \rightarrow \min_{\substack{\bz \geq \bZero_n \\ \bOne_n^{\T} \bz=1}}.
 	\]
+	\vspace{-0.3cm}
 	\end{block}
-		\begin{itemize}
-			\item $\bz \in [0, 1]^n$ -- значимость признаков;
-			\item $\bQ \in \bbR^{n \times n}$ -- матрица парных взаимодействий признаков;
-			\item $\mathbf{b} \in \bbR^n$ -- вектор релевантностей признаков к целевой переменной.
-		\end{itemize}
+		$\bz \in [0, 1]^n$ -- значимость признаков; \\
+		$\bQ \in \bbR^{n \times n}$ -- матрица парных взаимодействий признаков; \\
+		$\mathbf{b} \in \bbR^n$ -- вектор релевантностей признаков к целевой переменной.
 		\[
 		\bQ = \left[\left|\text{corr}(\bchi_i, \bchi_j)\right|\right]_{i,j=1}^n, \quad
 		\bb = \left[\left|\text{corr}(\bchi_i, \bnu)\right|\right]_{i=1}^n.
@@ -361,12 +311,13 @@
 	В случае полуопределенной матрицы~$\bQ$ задача QPFS является выпуклой. 
 	Полуопределенная релаксация~-- сдвиг спектра:
 \end{statement}
+\vspace{-0.3cm}
 \begin{equation*}
 \bQ \rightarrow \bQ - \lambda_{\min} \mathbf{I}.
 \end{equation*}
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Многомерный QPFS}
+\begin{frame}{Многомерный выбор признаков в задаче декодирования}
 \begin{block}{Агрегирование релевантностей по целевым векторам (RelAgg)}
 \[
 \bb = \left[\left|\text{corr}(\bchi_i, \bnu)\right|\right]_{i=1}^n \rightarrow \bb = \left[\sum_{k=1}^r\left|\text{corr}(\bchi_i, \bnu_k)\right|\right]_{i=1}^n.
@@ -390,7 +341,7 @@
 \end{block}
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Многомерный QPFS}
+\begin{frame}{Многомерный выбор признаков в задаче декодирования}
 	SymImp штрафует коррелированные целевые вектора, которые в меньшей мере объясняются признаками. 
 	\[
 	\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{\vphantom{()} \bz_x^{\T}\mathbf{B} \bz_y}_{\text{Rel}(\bX, \bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}}; \quad
@@ -400,7 +351,7 @@
 	\begin{block}{Минимаксный подход (MinMax / MaxMin)}
 	\vspace{-0.5cm}
 	\[
-	\min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}} 	\max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \left(\text {or} \, \max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}}\right) \left[\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{\bz_x^{\T} \bB \bz_y}_{\text{Rel}(\bX, \bY)} - \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)}\right].
+	\min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}} 	\max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \Bigl(\text {or} \, \max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}}\Bigr) \Bigl[\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{\bz_x^{\T} \bB \bz_y}_{\text{Rel}(\bX, \bY)} - \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)}\Bigr].
 	\]
 	\end{block}
 	\vspace{-0.4cm}
@@ -415,19 +366,23 @@
 
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Многомерный QPFS}
+\begin{frame}{Многомерный выбор признаков в задаче декодирования}
 	\begin{block}{Максимизация релевантностей (MaxRel)}
+	\vspace{-0.2cm}
 	\[
 		\min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}} 	\max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \left[ (1 - \alpha) \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha \cdot \bz_x^{\T} \bB \bz_y \right].
 	\]
+	\vspace{-0.2cm}
 	\end{block}
 	\begin{rustheorem}[Исаченко, 2018]
 		Для положительно определенной матрицы $\bQ_x$ minmax и maxmin задачи достигают одинакового значения функционала.
 	\end{rustheorem}
 	\begin{block}{Асимметричный учёт значимостей (AsymImp)}
+	\vspace{-0.2cm}
 	\begin{equation*}
 	\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot  \underbrace{\left(\bz_x^{\T} \bB \bz_y - \bb^{\T} \bz_y \right) }_{\text{Rel}(\bX, \bY)} + \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1 \\ \bz_y \geq \bZero_r, \, \bOne_r^{\T}\bz_y=1}}.
 	\end{equation*}
+	\vspace{-0.4cm} \\
 	При $b_j = \max\limits_{i=1, \dots n} [\bB]_{i, j}$ коэффициенты при~$\bz_y$ в~$\text{Rel}(\bX, \bY)$ неотрицательны.
 	
 	\begin{statement}[Исаченко, 2017]
@@ -458,9 +413,11 @@
 
 \begin{block}{Нормированное RMSE}
 	Качество предсказания:
+	\vspace{-0.2cm}
 	\[
-	\text{sRMSE}(\bY, \widehat{\bY}_{\ba}) = \sqrt{\frac{\text{MSE} (\bY, \widehat{\bY}_{\ba})}{\text{MSE} (\bY, \overline{\bY})}} =  \frac{\| \bY - \widehat{\bY}_{\ba} \|_2}{\| \bY - \overline{\bY} \|_2}, \quad \text{где} \quad \widehat{\bY}_{\ba} = \bX_{\ba} \bTheta_{\ba}^{\T}.
+		\text{sRMSE}(\bY, \widehat{\bY}_{\ba}) = \sqrt{\frac{\text{MSE} (\bY, \widehat{\bY}_{\ba})}{\text{MSE} (\bY, \overline{\bY})}} =  \frac{\| \bY - \widehat{\bY}_{\ba} \|_2}{\| \bY - \overline{\bY} \|_2}, \quad \text{где} \quad \widehat{\bY}_{\ba} = \bX_{\ba} \bTheta_{\ba}^{\T}.
 	\]
+	\vspace{-0.2cm}
 	$\overline{\bY}$~--- константный прогноз.
 \end{block}
 
@@ -470,6 +427,7 @@
 	R^2 = \frac{1}{r} \text{tr} \left( \bC^{\T} \mathbf{R}^{-1} \bC \right); \quad \bC = [ \text{corr}(\bchi_i, \bnu_j)]_{\substack{i=1, \dots, n \\ j=1, \dots, r}}, \, \mathbf{R} = [ \text{corr}(\bchi_i, \bchi_j)]_{i, j = 1}^n.
 	\]
 \end{block}
+\vspace{-0.4cm}
 \begin{block}{BIC}
 	Компромисс между качеством предсказания и количеством выбранных признаков~$\|\ba\|_0$:
 	\[
@@ -480,7 +438,7 @@
 %--------------------------------------------------------------------------------
 \begin{frame}{Данные ECoG}
 \begin{figure}
-	\includegraphics[width=\linewidth]{figs/ecog_data}
+	\includegraphics[width=0.85\linewidth]{figs/ecog_data}
 \end{figure}
 \begin{minipage}{.55\linewidth}
 \begin{itemize}
@@ -499,7 +457,7 @@
 \]
 \end{minipage}%
 \begin{minipage}{.43\linewidth}
-	\includegraphics[width=\linewidth]{figs/Y_corr_matrix.eps}
+	\includegraphics[width=0.9\linewidth]{figs/Y_corr_matrix.eps}
 	\begin{center}
 		\vspace{-0.4cm}
 		Матрица корреляций $\bY$
@@ -514,7 +472,7 @@
 %--------------------------------------------------------------------------------
 \begin{frame}{Анализ предложенных методов выбора признаков}
 	\begin{figure}
-		\includegraphics[width=\linewidth]{figs/ecog_3_30_metrics.pdf}
+		\includegraphics[width=0.85\linewidth]{figs/ecog_3_30_metrics.pdf}
 	\end{figure}
 	Предложенные методы выбирают модель с меньшей ошибкой по отношению к базовому алгоритму.
 \end{frame}
@@ -555,11 +513,7 @@
 \end{table}
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Сравнение метода проекции в скрытое пространство с методом выбора признаков}
-
-\begin{block}{Постановка эксперимента}
-	 	Сравнить отбор признаков и снижение размерности пространства с помощью моделей линейной регрессии и PLS регрессии.
-\end{block}
+\begin{frame}{Сравнение метода проекции в скрытое пространство с методами выбора признаков}
 
 \begin{figure}[h]
 	\begin{minipage}{.43\linewidth}
@@ -579,40 +533,78 @@
 
 \end{frame}
 %--------------------------------------------------------------------------------
+\begin{frame}{Нелинейные методы согласования скрытого пространства}
+	
+	\begin{minipage}{.65\linewidth}
+		\begin{block}{Нелинейная проекция в скрытое пространство}
+			\vspace{-0.3cm}
+			\begin{align*}
+				\bT &= \varphi_e(\bX) =  \bW_x^L \sigma(\dots \sigma(\bW_x^2 \sigma(\bX \bW_x^1)) \dots ) \\
+				\bU &= \psi_e(\bY) =  \bW_y^L \sigma(\dots \sigma(\bW_y^2 \sigma(\bY \bW_y^1)) \dots ) \\
+				\bX &= \varphi_d(\bX) =  \bW_t^L \sigma(\dots \sigma(\bW_x^2 \sigma(\bT \bW_t^1)) \dots ) \\
+				\bY &= \psi_d(\bY) =  \bW_u^L \sigma(\dots \sigma(\bW_y^2 \sigma(\bU \bW_u^1)) \dots )
+			\end{align*}
+			\vspace{-0.3cm}
+		\end{block}
+		\begin{block}{Согласование проекций}
+		\[
+		g(\bT, \bU) \rightarrow \max_{\bW},
+		\]
+		где $\bW = \{\{\bW_x^i\}_{i=1}^L, \{\bW_y^i\}_{i=1}^L, \{\bW_t^i\}_{i=1}^L, \{\bW_u^i\}_{i=1}^L\}$.
+		\end{block}	
+	\end{minipage}%
+	\begin{minipage}{.35\linewidth}
+		\begin{figure}
+			\includegraphics[width=1.0\linewidth]{figs/decoding_scheme}
+		\end{figure}
+	\begin{block}{Данные рукописных цифр}
+		\begin{figure}
+			\includegraphics[width=1.0\linewidth]{figs/left_right_mnist}
+		\end{figure}
+	\end{block}
+	
+	\end{minipage}
+
+\end{frame}
+%--------------------------------------------------------------------------------
 \begin{frame}{Результаты, выносимые на защиту}
-\begin{itemize}
-	\item Исследована задача декодирования сигналов в пространствах высокой размерности.
-	\vfill
-	\item Исследованы методы снижения размерности с анализом структуры пространства.
+\begin{enumerate}
+	\item Исследована задача декодирования сигналов в пространствах высокой размерности. Исследованы методы снижения размерности с анализом структуры пространства.
 	\vfill
 	\item Предложены методы для выбора признаков, учитывающие зависимости как в пространстве объектов, так и в пространстве ответов.
 	\vfill
-	\item Предложена комбинация методов выбора признаков и снижения размерности пространства.
+	\item Предложена комбинация методов выбора признаков и снижения размерности пространства. Предложенные алгоритмы выбора признаков доставляют устойчивые и адекватные решения в коррелированных пространствах высокой размерности.
+	\vfill
+	\item Преложены нелинейные методы согласования скрытых пространств для данных со сложно организованной целевой переменной.
 	\vfill
 	\item Создан макет системы, пригнозирующей сигналы в пространстве большой размерности.
-	\vfill
-	\item Предложенные алгоритмы выбора признаков доставляют устойчивые и адекватные решения в коррелированных пространствах высокой размерности.
-\end{itemize}
+\end{enumerate}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Заключение}
 	\begin{block}{Публикации ВАК}
-		\vspace{-0.2cm}
-		\begin{itemize}
+		{\scriptsize
+		\begin{enumerate}
 			\item Исаченко Р.В., Стрижов В. В. Метрическое обучение в задачах мультиклассовой классификации временных рядов \emph{Информатика и её применения}, 10(2), 2016.
-			\item Isachenko~R. et al. Feature Generation for Physical Activity Classification. \emph{Artificial Intellegence and Decision Making}, 2018, подана в журнал.
-			\item Isachenko~R., Strijov~V. Quadratic programming optimization for Newton method. \emph{Lobachevskii Journal of Mathematics}, 2018, принята к публикации.
-			\item Isachenko~R., Vladimirova~M., Strijov~V. Dimensionality reduction for multivariate ECoG-based data. \emph{Chemometrics}, 2018, готова к подаче.
-		\end{itemize}
+			\item Isachenko~R. et al. Feature Generation for Physical Activity Classification. \emph{Artificial Intellegence and Decision Making}, 3, 2018.
+			\item Isachenko~R., Strijov~V. Quadratic programming optimization for Newton method. \emph{Lobachevskii Journal of Mathematics}, 39(9), 2018.
+			\item Isachenko~R., Vladimirova~M., Strijov~V. Dimensionality Reduction for Time Series Decoding and Forecasting Problems. \emph{DEStech Transactions on Computer Science and Engineering}, optim, 2018.
+			\item Исаченко Р.В., Яушев Ф.Р., Стрижов В.В. Модели согласования скрытого пространства в задаче прогнозирования // Системы и средства информатики, 31(1), 2021.
+		\end{enumerate}
+	}
 	\end{block}
 \vspace{-0.2cm}
 \begin{block}{Выступления с докладом}
-	\vspace{-0.2cm}
-	\begin{itemize}
-		\item Ломоносов, 2016, Москва. Метрическое обучение в задачах мультиклассовой классификации временных рядов.
-		\item Intelligent Data Processing Conference, 2016, Барселона. Multimodel forecasting multiscale time series in internet of things.
-		\item Математические методы распознавания образов ММРО, 2017, Таганрог. Локальные модели для классификации объектов сложной структуры.
-	\end{itemize}
+	{\scriptsize
+	\begin{enumerate}
+		\item Ломоносов, 2016. Метрическое обучение в задачах мультиклассовой классификации временных рядов.
+		\item Intelligent Data Processing Conference, 2016. Multimodel forecasting multiscale time series in internet of things.
+		\item Математические методы распознавания образов, 2017. Локальные модели для классификации объектов сложной структуры.
+		\item  Intelligent Data Processing Conference, 2018, Dimensionality reduction for
+		multicorrelated signal decoding with projections to latent space. 
+		\item  Intelligent Data Processing Conference, 2020, Снижение размерности в задаче декодирования временных рядов.
+	\end{enumerate}
+	}
 \end{block}
 \end{frame}
 \end{document} 
