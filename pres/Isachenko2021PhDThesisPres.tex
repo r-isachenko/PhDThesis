@@ -54,7 +54,9 @@
 \newcommand{\bE}{\mathbf{E}}
 \newcommand{\bF}{\mathbf{F}}
 \newcommand{\bH}{\mathbf{H}}
+\newcommand{\bI}{\mathbf{I}}
 \newcommand{\bJ}{\mathbf{J}}
+\newcommand{\bM}{\mathbf{M}}
 \newcommand{\bP}{\mathbf{P}}
 \newcommand{\bQ}{\mathbf{Q}}
 \newcommand{\bR}{\mathbf{R}}
@@ -89,7 +91,7 @@
 \newcommand{\argmin}{\mathop{\arg \min}\limits}
 \newcommand{\argmax}{\mathop{\arg \max}\limits}
 
-\newcommand\undermat[2]{%
+\newcommand\undermat[2]{%f
 	\makebox[0pt][l]{$\smash{\underbrace{\phantom{%
 					\begin{matrix}#2\end{matrix}}}_{\text{$#1$}}}$}#2}
 
@@ -146,21 +148,21 @@
     	\includegraphics[width=0.85\linewidth]{figs/slide3_1}
     \end{figure}
 
-	\begin{minipage}{.45\linewidth}
+	\begin{minipage}{.48\linewidth}
 		\vspace{-0.2cm}
-		\begin{block}{Авторегрессионная модель}
+		\begin{block}{Регрессионная модель декодирования}
 		\begin{figure}
-			\includegraphics[width=\linewidth]{figs/slide3_3}
+			\includegraphics[width=0.85\linewidth]{figs/slide3_3}
 		\end{figure}
 		\end{block}
 		
 	\end{minipage}%
-	\begin{minipage}{.55\linewidth}
+	\begin{minipage}{.53\linewidth}
 		\begin{block}{Проекция в скрытое пространство}
 			\begin{figure}
 				\includegraphics[width=0.75\linewidth]{figs/slide3_2}
 			\end{figure}
-			\vspace{-0.4cm}
+			\vspace{-0.5cm}
 			\begin{align*}
 				\bX &= \bT \bP^{\T} + \bE_{\bx} \\
 				\bY &= \bU \bQ^{\T} + \bE_{\by} \\
@@ -175,14 +177,12 @@
 
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Задача авторегрессионного прогнозирования}
-	$\bX = [\bchi_1, \dots, \bchi_n] \in \bbR^{m \times n}$~-- матрица объектов; \\
-	$\bY = [\bnu_1, \dots, \bnu_r] \in \bbR^{m \times r}$~-- матрица ответов; \\
-	$\by = \bTheta \bx+ \boldsymbol{\varepsilon}, \quad \bTheta \in \bbR^{r \times n}$~-- модель.
+\begin{frame}{Задача регрессионного декодирования}
+	$\by = f(\bx, \bTheta) + \boldsymbol{\varepsilon} = \bTheta \bx+ \boldsymbol{\varepsilon}$ --  модель,  $\bTheta \in \bbR^{r \times n}$~-- параметры модели.
 \begin{block}{Функция потерь линейной модели декодирования}
 	\vspace{-0.4cm}
 	\[
-	\mathcal{L}(\bTheta | \bX, \bY) = {\left\| \underset{m \times r}{\mathbf{Y}}  - \underset{m \times n}{\bX} \cdot \underset{r \times n}{\bTheta}^{\T} \right\| }_2^2 \rightarrow\min_{\bTheta}; \quad 
+	\mathcal{L}(f, \bX, \bY) = {\left\| \underset{m \times r}{\mathbf{Y}}  - \underset{m \times n}{\bX} \cdot \underset{r \times n}{\bTheta}^{\T} \right\| }_2^2 \rightarrow\min_{\bTheta}; \quad 
 	\bTheta^{\T} = (\bX^{\T} \bX)^{-1} \bX^{\T} \bY.
 	\]
 \end{block}
@@ -190,32 +190,17 @@
 \begin{block}{Метод проекции в скрытое пространство}
 	\vspace{-0.7cm}
 	\begin{align*}
-		\underset{m \times n}{\vphantom{\bQ}\bX} 
-		&= \underset{m \times l}{\vphantom{\bQ}\bT} \cdot \underset{l \times n}{\vphantom{\bQ}\bP^{\T}} + \underset{m \times n}{\vphantom{\bQ}\bE_{\bx}} 
-		= \sum_{k=1}^l \underset{m \times 1}{\vphantom{\bp_k^{\T}}\bt_k} \cdot \underset{1 \times n}{\bp_k^{\T}} + \underset{m \times n}{\vphantom{\bp_k^{\T}}\bE_{\bx}},\\
-		\underset{m \times r}{\vphantom{\bQ}\bY} 
-		&= \underset{m \times l}{\vphantom{\bQ}\bU} \cdot \underset{l \times r}{\bQ^{\T}} + \underset{m \times r}{\vphantom{\bQ}\bE_{\by}}
-		=  \sum_{k=1}^l  \underset{m \times 1}{\vphantom{\bq_k^{\T}}\bu_k} \cdot \underset{1 \times r}{\bq_k^{\T}} +  \underset{m \times r}{\vphantom{\bq_k^{\T}}\bE_{\by}}.
+		\bX	&= \bT \cdot \bP^{\T} + \bE_{\bx} 
+		= \sum_{k=1}^\ell \bt_k \cdot \bp_k^{\T} + \bE_{\bx},\\
+		\bY &= \bU \cdot \bQ^{\T} + \bE_{\by} = \sum_{k=1}^\ell  \bu_k \cdot \bq_k^{\T} + \bE_{\by}.
 	\end{align*}
 	\vspace{-0.2cm}
 	\begin{equation*}
-		\hat{\bY} = f(\bX) = \bX \bTheta; \quad \bU \approx \bT \bB, \quad \bB = \text{diag}(\beta_k), \quad \beta_k = \bu_k^{\T}\bt_k / (\bt_k^{\T}\bt_k).
+		\hat{\bY} = f(\bX, \bTheta) = \bX \bTheta; \quad \bU \approx \bT \bB, \quad \bB = \text{diag}(\beta_k), \quad \beta_k = \bu_k^{\T}\bt_k / (\bt_k^{\T}\bt_k).
 	\end{equation*}
 	\vspace{-0.2cm}
 \end{block}
 
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Пример проекции в скрытое пространство в двумерном случае}
-	\begin{itemize}
-		\item $\bx_i \sim \mathcal{N}(0, \mathbf{\Sigma})$;
-		\item $\by_i$ линейно зависят от $pc_2$ и не зависят от $pc_1$.
-	\end{itemize}	
-	\begin{figure}[h]
-	\centering
-	\includegraphics[width=0.95\linewidth]{figs/pls_toy_example}
-	\end{figure}
-	Учёт взаимной корреляции между проекциями матриц~$\bX$ и~$\bY$ отклоняет вектора~$\bw_k$ и~$\bc_k$ от направления главных компонент. 
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Метод проекции в скрытое пространство}
@@ -229,15 +214,51 @@
 	обладают максимальной ковариацией.
 \end{statement}
 
-\begin{block}{Модель проекции в скрытое пространство}
-	
+
+\begin{rustheorem}[Исаченко, 2017]
+	Оптимальные параметры для линейной модели проекции в скрытое пространство имеют вид
+\end{rustheorem}
+	\[
+	\bTheta = \bW (\bP^{\T} \bW)^{-1} \bB \bQ^{\T}, \quad \bT = \bX \bW^*, \quad \text{где } \bW^* = \bW (\bP^{\T} \bW)^{-1}.
+	\]
 	\[
 	\bY = \bU \bQ^{\T} + \bE_{\by} \approx \bT \bB \bQ^{\T}+ \bE_{\by} = \bX \bW^* \bB \bQ^{\T} + \bE = \bX \bTheta + \bE_{\by}.
 	\]
-	\[
-	\bTheta = \bW (\bP^{\T} \bW)^{-1} \bB \bQ^{\T}, \quad \bT = \bX \bW^*, \quad \text{where } \bW^* = \bW (\bP^{\T} \bW)^{-1}.
-	\]
-\end{block}
+\end{frame}
+%--------------------------------------------------------------------------------
+\begin{frame}{Модель декодирования сигналов}
+	Пусть $f_1(\bx_1, \bTheta_1)$, $f_2(\bx_2, \bTheta_2)$ -- линейные регрессионные модели декодирования сигналов. 
+	\begin{statement}[Исаченко, 2021]
+		Пусть модель декодирования является аддитивной суперпозицией линейных моделей:
+		\[
+			\by = f_1(\bx_1, \bTheta_1) + f_2(\bx_2, \bTheta_2) + \boldsymbol{\varepsilon} = \bTheta_1 \bx_1 + \bTheta_2 \bx_2 + \boldsymbol{\varepsilon}.
+		\]
+		Тогда оптимальные параметры имеют вид
+		\vspace{-0.2cm}
+		\begin{align*}
+			\bTheta_1 &= (\bX_1^{\T} \bM_{\bX_2} \bX_1)^{-1} \bX_1^{\T} \bM_{\bX_2} \bY \\
+			\bTheta_2 &= (\bX_2^{\T} \bM_{\bX_1} \bX_2)^{-1} \bX_2^{\T} \bM_{\bX_1} \bY,
+		\end{align*}
+		где $\bM_{\bX_1} = \bI - \bX_1 (\bX_1^{\T} \bX_1)^{-1} \bX_1^{\T}$, $\bM_{\bX_2} = \bI -\bX_2 (\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T}$.
+	\end{statement}
+	\begin{rustheorem}[Исаченко, 2021]
+		Если $\text{span}(\bX_1) \neq \text{span}(\bX_2)$, то ошибка аддитивной суперпозиции линейных моделей декодирования не превышает ошибки отдельной модели:
+		\[
+			\cL(\bTheta_1^*, \bTheta_2^*, \bX_1, \bX_2, \bY) \leq \cL(f_i, \bX_i, \bY), \quad i = 1, 2.
+		\]
+	\end{rustheorem}
+\end{frame}
+%--------------------------------------------------------------------------------
+\begin{frame}{Пример проекции в скрытое пространство в двумерном случае}
+	\begin{itemize}
+		\item $\bx_i \sim \mathcal{N}(0, \mathbf{\Sigma})$;
+		\item $\by_i$ линейно зависят от $pc_2$ и не зависят от $pc_1$.
+	\end{itemize}	
+	\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.95\linewidth]{figs/pls_toy_example}
+	\end{figure}
+	Учёт взаимной корреляции между проекциями матриц~$\bX$ и~$\bY$ отклоняет вектора~$\bw_k$ и~$\bc_k$ от направления главных компонент. 
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Скрытое пространство в задаче декодирования}
@@ -263,35 +284,26 @@
 \begin{frame}{Нелинейные методы согласования скрытого пространства}
 	
 	\begin{minipage}{.65\linewidth}
-		\begin{block}{Нелинейная проекция в скрытое пространство}
-			\vspace{-0.3cm}
-			\begin{align*}
-				\bT &= \varphi_e(\bX) =  \bW_x^L \sigma(\dots \sigma(\bW_x^2 \sigma(\bX \bW_x^1)) \dots ) \\
-				\bU &= \psi_e(\bY) =  \bW_y^L \sigma(\dots \sigma(\bW_y^2 \sigma(\bY \bW_y^1)) \dots ) \\
-				\bX &= \varphi_d(\bX) =  \bW_t^L \sigma(\dots \sigma(\bW_x^2 \sigma(\bT \bW_t^1)) \dots ) \\
-				\bY &= \psi_d(\bY) =  \bW_u^L \sigma(\dots \sigma(\bW_y^2 \sigma(\bU \bW_u^1)) \dots )
-			\end{align*}
-			\vspace{-0.3cm}
-		\end{block}
-		\begin{block}{Согласование проекций}
-		\[
-		g(\bT, \bU) \rightarrow \max_{\bW},
-		\]
-		где $\bW = \{\{\bW_x^i\}_{i=1}^L, \{\bW_y^i\}_{i=1}^L, \{\bW_t^i\}_{i=1}^L, \{\bW_u^i\}_{i=1}^L\}$.
-		\end{block}	
+	Функции кодирования и декодирования являются глубокими нейросетями вида:
+	\begin{align*}
+		\bT &= \varphi_e(\bX) =  \bW_x^L \sigma(\dots \sigma(\bW_x^2 \sigma(\bX \bW_x^1)) \dots ) \\
+		\bU &= \psi_e(\bY) =  \bW_y^L \sigma(\dots \sigma(\bW_y^2 \sigma(\bY \bW_y^1)) \dots ) \\
+		\bX &= \varphi_d(\bX) =  \bW_t^L \sigma(\dots \sigma(\bW_x^2 \sigma(\bT \bW_t^1)) \dots ) \\
+		\bY &= \psi_d(\bY) =  \bW_u^L \sigma(\dots \sigma(\bW_y^2 \sigma(\bU \bW_u^1)) \dots )
+	\end{align*}
+	\vspace{-0.3cm}
 	\end{minipage}%
 	\begin{minipage}{.35\linewidth}
 		\begin{figure}
 			\includegraphics[width=1.0\linewidth]{figs/decoding_scheme}
 		\end{figure}
-	\begin{block}{Данные рукописных цифр}
-		\begin{figure}
-			\includegraphics[width=1.0\linewidth]{figs/left_right_mnist}
-		\end{figure}
-	\end{block}
-	
 	\end{minipage}
-
+	\begin{block}{Согласование проекций}
+		Для нахождения оптимальной модели декодирования предложен метод согласования нелинейных проекций
+		\[
+			g(\bT, \bU) \rightarrow \max_{\bW}, \quad \bW = \{\{\bW_x^i\}_{i=1}^L, \{\bW_y^i\}_{i=1}^L, \{\bW_t^i\}_{i=1}^L, \{\bW_u^i\}_{i=1}^L\}.
+		\]
+	\end{block}	
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Выбор признаков в задаче декодирования}
@@ -320,6 +332,7 @@
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Выбор признаков с помощью квадратичного программирования}
+	$\bX = [\bchi_1, \dots, \bchi_n] \in \bbR^{m \times n}$~-- матрица объектов; $\bY = [\bnu_1, \dots, \bnu_r] \in \bbR^{m \times r}$~-- матрица ответов.
 	\[
 	\| \bnu - \bX \btheta\|_2^2 \rightarrow\min_{\btheta \in \bbR^{n}}.
 	\]
@@ -327,50 +340,44 @@
 	\begin{block}{Задача квадратичного программирования}
 	\vspace{-0.3cm}
 	\[
-	S(\bz | \bX, \bnu)	= (1 - \alpha) \cdot \underbrace{\bz^{\T} \bQ \bz}_{\text{Sim}(\bX)} - \alpha \cdot \underbrace{\vphantom{()} \mathbf{b}^{\T} \bz}_{\text{Rel}(\bX, \bnu)} \rightarrow \min_{\substack{\bz \geq \bZero_n \\ \bOne_n^{\T} \bz=1}}.
+	S(\bz, \bQ, \mathbf{b}) = (1 - \alpha) \cdot \underbrace{\bz^{\T} \bQ \bz}_{\text{Sim}(\bX)} - \alpha \cdot \underbrace{\vphantom{()} \mathbf{b}^{\T} \bz}_{\text{Rel}(\bX, \bnu)} \rightarrow \min_{\substack{\bz \geq \bZero_n \\ \bOne_n^{\T} \bz=1}}.
 	\]
-	\vspace{-0.3cm}
+	\vspace{-0.5cm}
 	\end{block}
 		$\bz \in [0, 1]^n$ -- значимость признаков; \\
-		$\bQ \in \bbR^{n \times n}$ -- матрица парных взаимодействий признаков; \\
-		$\mathbf{b} \in \bbR^n$ -- вектор релевантностей признаков к целевой переменной.
-		\[
-		\bQ = \bigl[\left|\text{corr}(\bchi_i, \bchi_j)\right|\bigr]_{i,j=1}^n, \quad
-		\bb = \bigl[\left|\text{corr}(\bchi_i, \bnu)\right|\bigr]_{i=1}^n.
-		\]
-\vspace{-0.2cm}
+		$\bQ = \bigl[\left|\text{corr}(\bchi_i, \bchi_j)\right|\bigr]_{i,j=1}^n \in \bbR^{n \times n}$ -- матрица парных взаимодействий признаков; \\
+		$\mathbf{b} = \bigl[\left|\text{corr}(\bchi_i, \bnu)\right|\bigr]_{i=1}^n \in \bbR^n$ -- вектор релевантностей признаков к целевой переменной. 
 \begin{statement}[Исаченко, 2018]
-	В случае полуопределенной матрицы~$\bQ$ задача QPFS является выпуклой. 
-	Полуопределенная релаксация~-- сдвиг спектра:
+	Задача $S(\bz,  \hat{\bQ}, \mathbf{b})$ имеет единственный глобальный минимум, где матрица $\hat{\bQ}$ получена полуопределенной релаксацией исходной матрицы $\bQ$:
+	\begin{equation*}
+		\hat{\bQ} = \bQ - \lambda_{\min}(\bQ) \bI.
+	\end{equation*}
 \end{statement}
-\vspace{-0.3cm}
-\begin{equation*}
-\bQ \rightarrow \bQ - \lambda_{\min} \mathbf{I}.
-\end{equation*}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Многомерный выбор признаков в задаче декодирования}
-\begin{block}{Агрегирование релевантностей по целевым векторам (RelAgg)}
-\[
-\bb = \left[\left|\text{corr}(\bchi_i, \bnu)\right|\right]_{i=1}^n \rightarrow \bb = \left[\sum_{k=1}^r\left|\text{corr}(\bchi_i, \bnu_k)\right|\right]_{i=1}^n.
-\]
-\end{block}
-{\bf Недостаток:} нет учёта зависимостей в матрице~$\bY$. 
-
-\begin{block}{Симметричный учёт значимостей (SymImp)}
-Штрафуем коррелированные целевые вектора с помощью~$\text{Sim} (\bY)$
-\[
-\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{\bz_x^{\T} \bB \bz_y}_{\text{Rel}(\bX, \bY)} + \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1 \\ \bz_y \geq \bZero_r, \, \bOne_r^{\T}\bz_y=1}}.
-\]
-\[
-\bQ_x = \left[ \left| \text{corr}(\bchi_i, \bchi_j) \right| \right]_{i,j=1}^n, \,
-\bQ_y = \left[ \left| \text{corr}(\bnu_i, \bnu_j) \right| \right]_{i,j=1}^r, \,
-\bB =  \left[ \left| \text{corr}(\bchi_i, \bnu_j) \right| \right]_{\substack{i=1, \dots, n \\ j=1, \dots, r}}.
-\]
-\[
-\alpha_1 + \alpha_2 + \alpha_3 = 1, \quad \alpha_i \geq 0.
-\] 
-\end{block}
+	\begin{block}{Агрегирование релевантностей по целевым векторам (RelAgg)}
+	\vspace{-0.2cm}
+	\[
+		\bb = \left[\left|\text{corr}(\bchi_i, \bnu)\right|\right]_{i=1}^n \rightarrow \bb = \left[\sum_{k=1}^r\left|\text{corr}(\bchi_i, \bnu_k)\right|\right]_{i=1}^n.
+	\]
+	\end{block}
+	{\bf Недостаток:} нет учёта зависимостей в матрице~$\bY$. 
+	
+	\begin{block}{Симметричный учёт значимостей (SymImp)}
+	Штрафуем коррелированные целевые вектора с помощью~$\text{Sim} (\bY)$
+	\[
+	\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{\bz_x^{\T} \bB \bz_y}_{\text{Rel}(\bX, \bY)} + \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1 \\ \bz_y \geq \bZero_r, \, \bOne_r^{\T}\bz_y=1}}.
+	\]
+	\[
+	\bQ_x = \bigl[ \left| \text{corr}(\bchi_i, \bchi_j) \right| \bigr]_{i,j=1}^n, \,
+	\bQ_y = \bigl[ \left| \text{corr}(\bnu_i, \bnu_j) \right| \bigr]_{i,j=1}^r, \,
+	\bB =  \bigl[ \left| \text{corr}(\bchi_i, \bnu_j) \right| \bigr]_{\substack{i=1, \dots, n \\ j=1, \dots, r}}.
+	\]
+	\[
+	\alpha_1 + \alpha_2 + \alpha_3 = 1, \quad \alpha_i \geq 0.
+	\] 
+	\end{block}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Многомерный выбор признаков в задаче декодирования}
@@ -394,7 +401,7 @@
 	\begin{rustheorem}[Исаченко, 2018]
 		Минимаксная задача эквивалентна задаче квадратичного программирования с $n + r + 1$ переменными.
 	\end{rustheorem}
-	Для получения выпуклой задачи применяется сдвиг спектра.
+	Для получения выпуклой задачи применяется полуопределенная рекласация сдвига спектра.
 
 \end{frame}
 %--------------------------------------------------------------------------------
@@ -416,20 +423,17 @@
 	\end{equation*}
 	\vspace{-0.4cm} \\
 	При $b_j = \max\limits_{i=1, \dots n} [\bB]_{i, j}$ коэффициенты при~$\bz_y$ в~$\text{Rel}(\bX, \bY)$ неотрицательны.
-	
-	\begin{statement}[Исаченко, 2017]
-		В одномерном случае $r=1$ предлагаемые стратегии SymImp, MinMax, MaxMin, MaxRel, AsymImp совпадают с исходным алгоритмом QPFS.
-	\end{statement}
 \end{block}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Обобщение предложенных методов выбора признаков}
+\vspace{-0.3cm}
 \begin{table}
 	\centering
 	\footnotesize{
 		\begin{tabular}{c|c|c}
 			\hline
-			Алгоритм & Критерий & Функция ошибки $S(\bz | \bX, \bY)$ \\
+			Алгоритм & Критерий & Функция ошибки $S(\bz, \bX, \bY)$ \\
 			\hline && \\ 
 			RelAgg & $\min \bigl[ \text{Sim}(\bX) - \text{Rel}(\bX, \bY) \bigr] $ & $\min\limits_{\bz_x} \bigl[ (1 - \alpha) \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha \cdot \bz_x^{\T} \bB \bOne_r \bigr] $ \\ &&\\
 			SymImp & $\begin{aligned} \min \, \bigl[ \text{Sim}(\bX) & - \text{Rel}(\bX, \bY) \\ & + \text{Sim}(\bY) \bigr] \end{aligned}$ & $ \min\limits_{\bz_x, \, \bz_y} \left[ \alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y + \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \right] $\\ &&\\ 
@@ -439,6 +443,10 @@
 			\hline
 	\end{tabular}}
 \end{table}
+	\vspace{-0.2cm}
+	\begin{rustheorem}[Исаченко, 2018]
+		В одномерном случае $r=1$ предлагаемые методы выбора признаков SymImp, MinMax, MaxMin, MaxRel, AsymImp совпадают с исходной задачей минимизации функции ошибок $S(\bz, \bQ, \mathbf{b})$.
+	\end{rustheorem}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Внешние критерии качества решения задачи декодирования}
@@ -580,7 +588,9 @@
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Заключение}
+	\vspace{-0.1cm}
 	\begin{block}{Публикации ВАК}
+		\vspace{-0.1cm}
 		{\scriptsize
 		\begin{enumerate}
 			\item Isachenko R., Strijov V. Quadratic Programming Feature Selection for Multicorrelated Signal Decoding with Partial Least Squares \emph{Expert Systems with Applications}, 2021, на рецензировании.
@@ -592,8 +602,9 @@
 		\end{enumerate}
 	}
 	\end{block}
-\vspace{-0.2cm}
+\vspace{-0.3cm}
 \begin{block}{Выступления с докладом}
+	\vspace{-0.1cm}
 	{\scriptsize
 	\begin{enumerate}
 		\item  Intelligent Data Processing Conference, 2020, Снижение размерности в задаче декодирования временных рядов.
