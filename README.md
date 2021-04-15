@@ -11,11 +11,12 @@
 #### Papers
 | Description | Link |  
 |---------|------| 
-| MSThesis, chemometrics paper | [github](https://github.com/Intelligent-Systems-Phystech/MSThesis/tree/master/Isachenko2018MSThesis) | 
-| Isachenko R. et al. Feature Generation for Physical Activity Classification // Artificial Intelligence and Decision Making, 2018. № 3. С. 20--27 | [github](https://github.com/Intelligent-Systems-Phystech/2017-Isachenko-MetaModels) | 
-| Isachenko R. V., Vladimirova M. R., Strijov V. V. Dimensionality Reduction for Time Series Decoding and Forecasting Problems //DEStech Transactions on Computer Science and Engineering, 2018. №. optim. | [github](https://github.com/Intelligent-Systems-Phystech/2017-Isachenko-PLS) | 
-| Isachenko R. V., Strijov V. V. Quadratic programming optimization with feature selection for nonlinear models // Lobachevskii Journal of Mathematics, 2018. Т. 39. № 9. С. 1179--1187 | [github](https://github.com/Intelligent-Systems-Phystech/2018-Isachenko-QPFSNewton) | 
+| Expert Systems | [github](https://github.com/Intelligent-Systems-Phystech/MSThesis/tree/master/Isachenko2018MSThesis/expert_systems) | 
 | Исаченко Р.В., Яушев Ф.Ю., Стрижов В.В. Модели согласования скрытого пространства в задаче прогнозирования // Системы и средства информатики, 2021. Т. 31 № 1. | [github](https://github.com/Intelligent-Systems-Phystech/2020-Project-71) | 
+| Isachenko R. V., Strijov V. V. Quadratic programming optimization with feature selection for nonlinear models // Lobachevskii Journal of Mathematics, 2018. Т. 39. № 9. С. 1179--1187 | [github](https://github.com/Intelligent-Systems-Phystech/2018-Isachenko-QPFSNewton) | 
+| Isachenko R. V., Vladimirova M. R., Strijov V. V. Dimensionality Reduction for Time Series Decoding and Forecasting Problems //DEStech Transactions on Computer Science and Engineering, 2018. №. optim. | [github](https://github.com/Intelligent-Systems-Phystech/2017-Isachenko-PLS) | 
+| MSThesis | [github](https://github.com/Intelligent-Systems-Phystech/MSThesis/tree/master/Isachenko2018MSThesis) | 
+| Isachenko R. et al. Feature Generation for Physical Activity Classification // Artificial Intelligence and Decision Making, 2018. № 3. С. 20--27 | [github](https://github.com/Intelligent-Systems-Phystech/2017-Isachenko-MetaModels) | 
 
 #### Projects
 | Description | Link |  
