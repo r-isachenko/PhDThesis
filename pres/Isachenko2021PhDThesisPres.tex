@@ -123,14 +123,21 @@
 				g (\bt, \bu) \rightarrow \max_{\bphi_e, \bpsi_e, \bh},
 			\]
 			\[
-				\bphi_e \circ \bphi_d = \bOne_n, \quad \bpsi_e \circ \bpsi_d = \bOne_r.
+				\bphi_e \circ \bphi_d (\bx) = \bx, \quad \bpsi_e \circ \bpsi_d (\by) = \by.
 			\]
 		\end{block}
 	\end{minipage}
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Согласование зависимостей в задаче декодирования}
-	
+\begin{frame}{Задача декодирования сигналов}
+	$\bY = \bF(\bX, \bTheta) + \bE_{\by}$ --  модель с параметрами $\bTheta$.
+	\begin{block}{Функция потерь модели декодирования}
+		\vspace{-0.3cm}
+		\[
+			\mathcal{L}(f, \bX, \bY) = {\left\| \bY  - \bF(\bX, \bTheta) \right\| }_2^2 =  \rightarrow\min_{\bTheta}.
+		\]
+		\vspace{-0.3cm}
+	\end{block}
 	\textbf{Особенностью задачи} является избыточность размерности пространств переменных $\bx$ и $\by$.
 	Требуется найти многообразия низкой размерности:
 	\vspace{-0.2cm}
@@ -155,6 +162,11 @@
 	\text{для любого } \bx \in \bbX &\quad \text{существует } \bt \in \bbT: \bphi_d \bigl(\bphi_e(\bx)\bigr) = \bphi_d(\bt) = \bx, \\
 	\text{для любого } \by \in \bbY &\quad  \text{существует } \bu \in \bbU: \bpsi_d \bigl(\bpsi_e(\by)\bigr) = \bpsi_d(\bu) = \by.
 	\end{align*}
+	 
+\end{frame}
+%--------------------------------------------------------------------------------
+\begin{frame}{Согласование зависимостей в задаче декодирования}
+
 	Cкрытыe пространства $\bbT$ и $\bbU$ называются \textbf{согласованными}, если существует \textit{функция связи} $\mathbf{h}: \bbT \rightarrow \bbU$:
 	\vspace{-0.3cm}
 	\[
@@ -166,62 +178,87 @@
 	 	\[
 	 		g: \bbT \times \bbU \rightarrow \bbR, \quad g(\bt, \bu) = g(\bphi_e(\bx), \bpsi_e(\by)) \rightarrow \max_{\bphi_e, \bpsi_e, \bh}
 	 	\]
+	 	\vspace{-0.3cm}
 	 \end{block}
-	 
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Задача декодирования сигналов}
-	$\bY = \bF(\bX, \bTheta) + \bE_{\by} = \bX \cdot \bTheta^{\T}  + \bE_{\by}$ --  модель с параметрами $\bTheta \in \bbR^{r \times n}$.
-\begin{block}{Функция потерь модели декодирования}
-	\vspace{-0.4cm}
+	Рассмотрим $\bY = \bF(\bX, \bTheta) + \bE_{\by} = \bX \bTheta^{\T}  + \bE_{\by}$ --  модель с параметрами $\bTheta \in \bbR^{r \times n}$.
+	\vspace{-0.1cm}
 	\[
-	\mathcal{L}(f, \bX, \bY) = {\left\| \underset{m \times r}{\mathbf{Y}}  - \underset{m \times n}{\bX} \cdot \underset{r \times n}{\bTheta}^{\T} \right\| }_2^2 \rightarrow\min_{\bTheta}; \quad 
-	\bTheta^{\T} = (\bX^{\T} \bX)^{-1} \bX^{\T} \bY.
+		\mathcal{L}(f, \bX, \bY) = {\left\| \bY  - \bX \bTheta^{\T} \right\| }_2^2 \rightarrow\min_{\bTheta}.
 	\]
 	\vspace{-0.3cm}
-\end{block}
-Для устранения мультикорреляции столбцов матриц~$\bX$ и $\bY$ предлагается использовать методы снижения размерности пространства. 
-\begin{block}{Метод проекции в скрытое пространство}
-	\vspace{-0.7cm}
-	\begin{align*}
-		\bX	&= \bT \cdot \bP^{\T} + \bE_{\bx} 
-		= \sum_{k=1}^\ell \bt_k \cdot \bp_k^{\T} + \bE_{\bx},\\
-		\bY &= \bU \cdot \bQ^{\T} + \bE_{\by} = \sum_{k=1}^\ell  \bu_k \cdot \bq_k^{\T} + \bE_{\by}.
-	\end{align*}
+	\begin{minipage}{0.65\linewidth}
+		\begin{block}{Метод проекции в скрытое пространство}
+		\vspace{-0.7cm}
+		\begin{align*}
+			\bX	&= \bT \bP^{\T} + \bE_{\bx},\\
+			\bY &= \bU \bQ^{\T} + \bE_{\by}.
+		\end{align*}
+			\end{block}
+	\end{minipage}%
+	\begin{minipage}{0.35\linewidth}
+			\vspace{-0.1cm}
+			\begin{equation*}
+				\begin{tikzpicture}
+					\matrix (m) [matrix of math nodes,row sep=2em,column sep=4em,minimum width=2em,ampersand replacement=\&]
+					{
+						\bbX \subset \bbR^n \& \bbY \subset \bbR^r \\
+						\bbT \subset \bbR^\ell \& \bbU \subset \bbR^s \\};
+					\path[-stealth]
+					(m-1-1) edge [red] node [black, above] {$\mathbf{f}$} (m-1-2)
+					(m-1-1) edge [blue, bend right=10] node [black, left] {$\bW$} (m-2-1)
+					(m-2-1) edge [red, bend right=10] node [black, right] {$\bP$} (m-1-1)
+					(m-1-2) edge [red, bend left=10] node [black, right] {$\bC$} (m-2-2)
+					(m-2-2) edge [blue, bend left=10] node [black, left] {$\bQ$} (m-1-2)
+					(m-2-1) edge [blue] node [black, above] {$\bB$} (m-2-2);
+				\end{tikzpicture}
+			\end{equation*}
+	\end{minipage}
 	\vspace{-0.2cm}
-	\begin{equation*}
-		\hat{\bY} = f(\bX, \bTheta) = \bX \bTheta, \quad \bU \approx \bT \bB, \quad \bB = \text{diag}(\beta_k), \quad \beta_k = \bu_k^{\T}\bt_k / (\bt_k^{\T}\bt_k).
-	\end{equation*}
-	\vspace{-0.2cm}
-\end{block}
+	\[
+		\bU = \bh(\bT) = \bT \bB, \quad \bB = \text{diag}(\beta_k), \quad \beta_k = \bu_k^{\T}\bt_k / (\bt_k^{\T}\bt_k).
+	\]
+	\vspace{-0.3cm}
+	\[
+		\bY = \bU \bQ^{\T} + \bE_{\by} \approx \bT \bB \bQ^{\T}+ \bE_{\by} = \bX \bW^* \bB \bQ^{\T} + \bE = \bX \bTheta^{\T} + \bE_{\by},
+	\]
+	\[
+		\bT = \bX \bW^*, \quad \text{где \,} \bW^* = \bW (\bP^{\T} \bW)^{-1}.
+	\]
 
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Метод проекции в скрытое пространство}
-
-\begin{statement}[Исаченко, 2017]
-	Вычисленные вектора $\bt_k$ и $\bu_k$ с помощью итеративной процедуры обновления:
+\begin{frame}{Согласованная модель проекции в скрытое пространство}
+	\begin{statement}[Исаченко, 2017]
+		Вычисленные вектора $\bt_k$ и $\bu_k$ с помощью итеративной процедуры обновления:
+		\vspace{-0.2cm}
 		\begin{align*}
-			\bt_k &:= \frac{\bX_k \bw_k}{\|\bw_k\|}, \quad  \bw_k := \bX_k^{\T} \bu_{k-1} / (\bu_{k-1}^{\T} \bu_{k-1}); \\
+			\bt_k &:= \frac{\bX_k \bw_k}{\|\bw_k\|}, \quad  \bw_k := \bX_k^{\T} \bu_{k-1} / (\bu_{k-1}^{\T} \bu_{k-1}); \\ 
 			\bu_k &:= \frac{\bY_k \bc_k}{\| \bc_k \|}, \quad \bc_k := \bY_k^{\T} \bt_k / (\bt_k^{\T} \bt_k).
 		\end{align*}
-	обладают максимальной ковариацией $\textnormal{cov}(\bt, \bu)$.
-\end{statement}
+		\vspace{-0.5cm} \\
+		обладают максимальной ковариацией $\textnormal{cov}(\bt, \bu)$.
+	\end{statement}
 
-
-\begin{rustheorem}[Исаченко, 2017]
-	Параметры линейной модели проекции в скрытое пространство
-	\[
-	\bTheta = \bW (\bP^{\T} \bW)^{-1} \bB \bQ^{\T}, \quad \bT = \bX \bW^*, \quad \text{где \,} \bW^* = \bW (\bP^{\T} \bW)^{-1},
-	\]
-	\[
-	\bY = \bU \bQ^{\T} + \bE_{\by} \approx \bT \bB \bQ^{\T}+ \bE_{\by} = \bX \bW^* \bB \bQ^{\T} + \bE = \bX \bTheta + \bE_{\by},
-	\]
-	доставляют максимум ковариации проекций $\textnormal{cov}(\bt, \bu)$.
+	\begin{rustheorem}[Исаченко, 2017]
+		В случае линейных функций декодирования $\bphi_e (\bT) = \bT \bP^{\T}$, $\bpsi_e (\bU) = \bU \bQ^{\T}$ и функции согласования $g(\bt, \bu) = \textnormal{cov}(\bt, \bu)$ параметры
+		\[
+		\bTheta = \bW (\bP^{\T} \bW)^{-1} \bB \bQ^{\T}
+		\]
+		являются оптимальными для модели $\bF(\bX, \bTheta)$.
 	\end{rustheorem}
+\end{frame}		
+%--------------------------------------------------------------------------------
+\begin{frame}{Пример согласованной проекции в скрытое пространство}
+	Исходные переменные $\bx_i \sim \mathcal{N}(0, \mathbf{\Sigma})$. \\ 
+	Целевые переменные $\by_i$ линейно зависят от $pc_2$ и не зависят от $pc_1$.
+	\begin{figure}[h]
+	\centering
+	\includegraphics[width=\linewidth]{figs/pls_toy_example}
+	\end{figure}
+	Согласование проекций матриц~$\bX$ и~$\bY$ позволяет найти оптимальное скрытое представление, отклоняя вектора~$\bw_k$ и~$\bc_k$ от направления главных компонент. 
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Модель декодирования сигналов}
+\begin{frame}{Суперпозиция моделей декодирования сигналов}
 	Пусть $\mathbf{f}_1(\bx_1, \bTheta_1)$, $\mathbf{f}_2(\bx_2, \bTheta_2)$ -- линейные модели декодирования сигналов. 
 	\begin{statement}[Исаченко, 2021]
 		Пусть модель декодирования является аддитивной суперпозицией линейных моделей:
@@ -239,19 +276,9 @@
 	\begin{rustheorem}[Исаченко, 2021]
 		Если $\text{span}(\bX_1) \neq \text{span}(\bX_2)$, то ошибка аддитивной суперпозиции линейных моделей декодирования не превышает ошибки отдельной модели:
 		\[
-			\mathcal{L}_{\textnormal{dep}}(\bTheta_1^*, \bTheta_2^*, \bX_1, \bX_2, \bY) \leq \mathcal{L}(f_i, \bX_i, \bY), \quad i = 1, 2.
+			\mathcal{L}_{\textnormal{dep}}(\bTheta_1^*, \bTheta_2^*, \bX_1, \bX_2, \bY) \leq \mathcal{L}(\bTheta_i, \bX_i, \bY), \quad i = 1, 2.
 		\]
 	\end{rustheorem}
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Пример согласованной проекции в скрытое пространство}
-	Исходные переменные $\bx_i \sim \mathcal{N}(0, \mathbf{\Sigma})$. \\ 
-	Целевые переменные $\by_i$ линейно зависят от $pc_2$ и не зависят от $pc_1$.
-	\begin{figure}[h]
-	\centering
-	\includegraphics[width=\linewidth]{figs/pls_toy_example}
-	\end{figure}
-	Согласование проекций матриц~$\bX$ и~$\bY$ позволяет найти оптимальное скрытое представление, отклоняя вектора~$\bw_k$ и~$\bc_k$ от направления главных компонент. 
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Нелинейные методы согласования скрытого пространства}
@@ -292,28 +319,28 @@
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Выбор признаков в задаче декодирования}
-\begin{block}{Требуется}
-Найти бинарный вектор~$\ba = \{0, 1\}^n$, компоненты~-- индикаторы выбранных признаков. 
-\end{block}
-\begin{block}{Функция ошибки отбора признаков}
-	\vspace{-0.2cm}
-\[
-\ba = \argmin_{\ba' \in \{0, 1\}^n} S(\ba', \bX, \bY).
-\]
-\vspace{-0.5cm}
-\end{block}
-\begin{block}{Релаксация}
-	Замена дикретной области определения $\{0, 1\}^n$ на непрерывную релаксацию $[0, 1]^n$:
+	\begin{block}{Требуется}
+	Найти бинарный вектор~$\ba = \{0, 1\}^n$, компоненты~-- индикаторы выбранных признаков. 
+	\end{block}
+	\begin{block}{Функция ошибки отбора признаков}
+		\vspace{-0.2cm}
 	\[
-	\bz = \argmin_{\bz' \in [0, 1]^n} S(\bz', \bX, \bY), \quad 
-	a_j = [z_j > \tau].
-\]
-\end{block}
-Получив~$\ba$, решаем задачу регрессии:
-\[
-\mathcal{L}(\bTheta_{\ba}, \bX_{\ba}, \bY) = {\left\| \mathbf{Y} - \bX_{\ba}\bTheta^{\T}_{\ba} \right\| }_2^2 \rightarrow\min_{\bTheta_{\ba}},
-\]
-где индекс~$\ba$ обозначает подматрицу с номерами столбцов, для которых~$a_j = 1$.
+	\ba = \argmin_{\ba' \in \{0, 1\}^n} S(\ba', \bX, \bY).
+	\]
+	\vspace{-0.5cm}
+	\end{block}
+	\begin{block}{Релаксация}
+		Замена дикретной области определения $\{0, 1\}^n$ на непрерывную релаксацию $[0, 1]^n$:
+		\[
+		\bz = \argmin_{\bz' \in [0, 1]^n} S(\bz', \bX, \bY), \quad 
+		a_j = [z_j > \tau].
+	\]
+	\end{block}
+	Получив~$\ba$, решаем задачу регрессии:
+	\[
+	\mathcal{L}(\bTheta_{\ba}, \bX_{\ba}, \bY) = {\left\| \mathbf{Y} - \bX_{\ba}\bTheta^{\T}_{\ba} \right\| }_2^2 \rightarrow\min_{\bTheta_{\ba}},
+	\]
+	где индекс~$\ba$ обозначает подматрицу с номерами столбцов, для которых~$a_j = 1$.
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Выбор признаков с помощью квадратичного программирования}
