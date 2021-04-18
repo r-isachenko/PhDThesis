@@ -256,7 +256,7 @@
 	\centering
 	\includegraphics[width=\linewidth]{figs/pls_toy_example}
 	\end{figure}
-	Согласование проекций матриц~$\bX$ и~$\bY$ позволяет найти оптимальное скрытое представление, отклоняя вектора~$\bw_k$ и~$\bc_k$ от направления главных компонент. 
+	Согласование проекций матриц~$\bX$ и~$\bY$ находит оптимальное скрытое представление, отклоняя вектора~$\bw_k$ и~$\bc_k$ от направления главных компонент. 
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Суперпозиция моделей декодирования сигналов}
@@ -283,40 +283,29 @@
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Нелинейные методы согласования скрытого пространства}
-	
-	\begin{minipage}{.65\linewidth}
-	Функции кодирования и декодирования являются глубокими нейросетями вида:
+	Функции кодирования и декодирования являются глубокими нейросетями:
+	\vspace{-0.1cm}
 	\begin{align*}
 		\bT &= \bphi_e(\bX) =  \bW_x^L \sigma(\dots \sigma(\bW_x^2 \sigma(\bX \bW_x^1)) \dots ) \\
 		\bU &= \bpsi_e(\bY) =  \bW_y^L \sigma(\dots \sigma(\bW_y^2 \sigma(\bY \bW_y^1)) \dots ) \\
 		\bX &= \bphi_d(\bT) =  \bW_t^L \sigma(\dots \sigma(\bW_x^2 \sigma(\bT \bW_t^1)) \dots ) \\
 		\bY &= \bpsi_d(\bU) =  \bW_u^L \sigma(\dots \sigma(\bW_y^2 \sigma(\bU \bW_u^1)) \dots )
 	\end{align*}
-	\vspace{-0.3cm}
-	\end{minipage}%
-	\begin{minipage}{.35\linewidth}
-		\begin{equation*}
-			\begin{tikzpicture}
-				\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em,ampersand replacement=\&]
-				{
-					\bbX \subset \bbR^n \& \bbY \subset \bbR^r \\
-					\bbT \subset \bbR^\ell \& \bbU \subset \bbR^s \\};
-				\path[-stealth]
-				(m-1-1) edge [black] node [black, above] {$\mathbf{f}$} (m-1-2)
-				(m-2-1) edge [black, bend right=10] node [black, right] {$\bphi_d$} (m-1-1)
-				(m-2-2) edge [black, bend left=10] node [black, left] {$\bpsi_d$} (m-1-2)
-				(m-1-1) edge [black, bend right=10] node [black, left] {$\bphi_e$} (m-2-1)
-				(m-1-2) edge [black, bend left=10] node [black, right] {$\bpsi_e$} (m-2-2)
-				(m-2-1) edge [black] node [black, above] {$\mathbf{h}$} (m-2-2);
-			\end{tikzpicture}
-		\end{equation*}
-	\end{minipage}
+	\vspace{-0.4cm}
 	\begin{block}{Согласование проекций}
-		Для нахождения оптимальной модели декодирования предложен метод согласования нелинейных проекций
+		\vspace{-0.3cm}
 		\[
 			g(\bT, \bU) \rightarrow \max_{\bW}, \quad \bW = \{\bW_x^i, \bW_y^i, \bW_t^i, \bW_u^i\}_{i=1}^L.
 		\]
 	\end{block}	
+	\vspace{-0.3cm}
+	\begin{rustheorem}[Исаченко, 2021]
+		Градиент функции согласования $g(\bt, \bu) = \textnormal{corr}(\bt, \bu)$ имеет вид
+		\[
+			\frac{\partial g(\bt, \bu)}{\partial \bt} = \frac{1}{\ell - 1} \left(\bSigma_1^{-1/2} \bU \bV^{\T} \bSigma_2^{-1/2} \bU - \bSigma_1^{-1/2} \bU \bD \bV^{\T} \bSigma_1^{-1/2} \right),
+		\]
+		где $\bU, \bD, \bV = \textnormal{SVD}(\bSigma)$, \, $\bSigma = \bSigma_1^{-1/2} \bSigma_{12} \bSigma_2^{-1/2} $, \, $\bSigma_1 = \frac{1}{\ell - 1} \bT \bT^{\T}$, \, $\bSigma_2 = \frac{1}{\ell - 1} \bU \bU^{\T}$, \, $\bSigma_{12} = \frac{1}{\ell - 1} \bT \bU^{\T}$.
+	\end{rustheorem}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Выбор признаков в задаче декодирования}
@@ -331,7 +320,7 @@
 	\vspace{-0.5cm}
 	\end{block}
 	\begin{block}{Релаксация}
-		Замена дикретной области определения $\{0, 1\}^n$ на непрерывную релаксацию $[0, 1]^n$:
+		Замена дискретной области определения $\{0, 1\}^n$ на непрерывную релаксацию $[0, 1]^n$:
 		\[
 		\bz = \argmin_{\bz' \in [0, 1]^n} S(\bz', \bX, \bY), \quad 
 		a_j = [z_j > \tau].
@@ -452,7 +441,7 @@
 		\footnotesize{
 			\begin{tabular}{c|c|c}
 				\hline
-				Алгоритм & Критерий & Функция ошибки $S(\bz, \bX, \bY)$ \\
+				Метод & Критерий & Функция ошибки $S(\bz, \bX, \bY)$ \\
 				\hline && \\ 
 				RelAgg & $\min \bigl[ \text{Sim}(\bX) - \text{Rel}(\bX, \bY) \bigr] $ & $\min\limits_{\bz_x} \bigl[ (1 - \alpha) \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha \cdot \bz_x^{\T} \bB \bOne_r \bigr] $ \\ &&\\
 				SymImp & $\begin{aligned} \min \, \bigl[ \text{Sim}(\bX) & - \text{Rel}(\bX, \bY) \\ & + \text{Sim}(\bY) \bigr] \end{aligned}$ & $ \min\limits_{\bz_x, \, \bz_y} \left[ \alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y + \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \right] $\\ &&\\ 
@@ -549,12 +538,12 @@
 %--------------------------------------------------------------------------------
 \begin{frame}{Результаты, выносимые на защиту}
 \begin{enumerate}
-	\item Исследована проблема снижения размерности сигналов в пространствах высокой размерности. 
+	\item Исследована проблема снижения размерности сигналов в коррелированных пространствах высокой размерности. 
 	Предложены методы декодирования сигналов, учитывающие зависимости как в исходном, так и в целевом пространстве сигналов.
 	\vfill
-	\item Доказаны теоремы об оптимальности предлагаемых методов декодирования сигналов. Предлагаемые методы позволяют осуществлять выбор согласованных моделей в случае избыточной размерности описания данных.
+	\item Доказаны теоремы об оптимальности предлагаемых методов декодирования сигналов. Предлагаемые методы выбирают согласованные модели в случае избыточной размерности описания данных.
 	\vfill 
-	\item Предложены методы выбора признаков, учитывающие зависимости как в исходном, так и в целевом пространстве. Предложенные алгоритмы доставляют устойчивые и адекватные решения в коррелированных пространствах высокой размерности.
+	\item Предложены методы выбора признаков, учитывающие зависимости как в исходном, так и в целевом пространстве. Предложенные методы доставляют устойчивые и адекватные решения в пространствах высокой размерности.
 	\vfill
 	\item Предложены нелинейные методы согласования скрытых пространств для данных со сложноорганизованной целевой переменной.
 	\vfill
