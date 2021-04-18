@@ -94,98 +94,51 @@
     \end{figure}
     \vspace{-0.15cm}
 	\begin{minipage}{.48\linewidth}
-		\vspace{-0.1cm}
+		\vspace{-0.3cm}
 		\begin{block}{Прогностическая модель декодирования}
 			\includegraphics[width=\linewidth]{figs/slide3_3}
 		\end{block}
 	\end{minipage}%
 	\begin{minipage}{.53\linewidth}
-		\vspace{-0.2cm}
 		\begin{block}{Согласование зависимостей в скрытом пространстве}
-			\vspace{-0.3cm}
-			\begin{equation*}
-				\begin{tikzpicture}
-					\matrix (m) [matrix of math nodes,row sep=2em,column sep=4em,minimum width=2em,ampersand replacement=\&]
-					{
-						\bx \in \bbR^n \& \by \in \bbR^r \\
-						\bt \in \bbR^\ell \& \bu \in \bbR^s \\};
-					\path[-stealth]
-					(m-1-1) edge [red] node [black, above] {$\mathbf{f}$} (m-1-2)
-					(m-2-1) edge [red, bend right=10] node [black, right] {$\bphi_d$} (m-1-1)
-					(m-2-2) edge [blue, bend left=10] node [black, left] {$\bpsi_d$} (m-1-2)
-					(m-1-1) edge [blue, bend right=10] node [black, left] {$\bphi_e$} (m-2-1)
-					(m-1-2) edge [red, bend left=10] node [black, right] {$\bpsi_e$} (m-2-2)
-					(m-2-1) edge [blue] node [black, above] {$\mathbf{h}$} (m-2-2);
-				\end{tikzpicture}
-			\end{equation*}
 			\vspace{-0.7cm}
+			\begin{equation*}
+					\begin{tikzpicture}
+						\matrix (m) [matrix of math nodes,row sep=2em,column sep=2em,minimum width=2em,ampersand replacement=\&]
+						{
+							\bx \in \bbR^n \& \& \by \in \bbR^r \\
+							\& \bt, \bu \in \bbR^\ell \& \\};
+						\path[-stealth]
+						(m-1-1) edge node [above] {$\mathbf{f}$} (m-1-3)
+						(m-1-1) edge [bend right=10] node [below, pos=0.3] {$\bW$} (m-2-2)
+						(m-2-2) edge [bend right=10] node [above, pos=0.3] {$\bP$} (m-1-1)
+						(m-1-3) edge [bend left=10] node [below, pos=0.3] {$\bC$} (m-2-2)
+						(m-2-2) edge [bend left=10] node [above, pos=0.3] {$\bQ$} (m-1-3);
+					\end{tikzpicture}
+			\end{equation*}
+			\vspace{-1.3cm}
+			\begin{align*}
+				\bx &= \bP \bt + \be_{\bx} \\
+				\by &= \bQ \bu + \be_{\by} \\
+			\end{align*}
+			\vspace{-1.2cm}
 			\[
-				g (\bt, \bu) \rightarrow \max_{\bphi_e, \bpsi_e, \bh},
-			\]
-			\[
-				\bphi_e \circ \bphi_d (\bx) = \bx, \quad \bpsi_e \circ \bpsi_d (\by) = \by.
+				\text{cov} (\bt, \bu) \rightarrow \max_{\bP, \bQ}
 			\]
 		\end{block}
 	\end{minipage}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Задача декодирования сигналов}
-	$\bY = \bF(\bX, \bTheta) + \bE_{\by}$ --  модель с параметрами $\bTheta$.
+	$\bY = \bF(\bX, \bTheta) + \bE_{\by} = \bX \cdot \bTheta^{\T}  + \bE_{\by}$ --  модель с параметрами $\bTheta \in \bbR^{r \times n}$.
 	\begin{block}{Функция потерь модели декодирования}
 		\vspace{-0.3cm}
 		\[
-			\mathcal{L}(f, \bX, \bY) = {\left\| \bY  - \bF(\bX, \bTheta) \right\| }_2^2 =  \rightarrow\min_{\bTheta}.
+			\mathcal{L}(f, \bX, \bY) = {\left\| \bY  - \bF(\bX, \bTheta) \right\| }_2^2 =  {\left\| \underset{m \times r}{\mathbf{Y}}  - \underset{m \times n}{\bX} \cdot \underset{r \times n}{\bTheta}^{\T} \right\| }_2^2 \rightarrow\min_{\bTheta}.
 		\]
 		\vspace{-0.3cm}
 	\end{block}
-	\textbf{Особенностью задачи} является избыточность размерности пространств переменных $\bx$ и $\by$.
-	Требуется найти многообразия низкой размерности:
-	\vspace{-0.2cm}
-	\begin{equation*}
-		\begin{tikzpicture}
-			\matrix (m) [matrix of math nodes,row sep=2em,column sep=4em,minimum width=2em,ampersand replacement=\&]
-			{
-				\bbX \subset \bbR^n \& \bbY \subset \bbR^r \\
-				\bbT \subset \bbR^\ell \& \bbU \subset \bbR^s \\};
-			\path[-stealth]
-			(m-1-1) edge [red] node [black, above] {$\mathbf{f}$} (m-1-2)
-			(m-2-1) edge [red, bend right=10] node [black, right] {$\bphi_d$} (m-1-1)
-			(m-2-2) edge [blue, bend left=10] node [black, left] {$\bpsi_d$} (m-1-2)
-			(m-1-1) edge [blue, bend right=10] node [black, left] {$\bphi_e$} (m-2-1)
-			(m-1-2) edge [red, bend left=10] node [black, right] {$\bpsi_e$} (m-2-2)
-			(m-2-1) edge [blue] node [black, above] {$\mathbf{h}$} (m-2-2);
-		\end{tikzpicture}
-	\end{equation*}
-	\vspace{-0.6cm} \\
-	$\bbT \subset \bbR^\ell$ и $\bbU \subset \bbR^s$ \textbf{скрытые пространства} для $\bbX \in \bbR^n$ ($\ell \leq n$) и $\bbY \in \bbR^r (s \leq r)$, если существуют \textit{функции кодирования} $\bphi_e: \bbX \to \bbT$, $\bpsi_e: \bbY \to \bbU$ и \textit{декодирования} $\bphi_d: \bbT  \to \bbX$, $\bpsi_d: \bbU  \to \bbY$:
-	\begin{align*}
-	\text{для любого } \bx \in \bbX &\quad \text{существует } \bt \in \bbT: \bphi_d \bigl(\bphi_e(\bx)\bigr) = \bphi_d(\bt) = \bx, \\
-	\text{для любого } \by \in \bbY &\quad  \text{существует } \bu \in \bbU: \bpsi_d \bigl(\bpsi_e(\by)\bigr) = \bpsi_d(\bu) = \by.
-	\end{align*}
-	 
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Согласование зависимостей в задаче декодирования}
-
-	Cкрытыe пространства $\bbT$ и $\bbU$ называются \textbf{согласованными}, если существует \textit{функция связи} $\mathbf{h}: \bbT \rightarrow \bbU$:
-	\vspace{-0.3cm}
-	\[
-		\by = \mathbf{f}(\bx) = \bpsi_d\Bigl(\mathbf{h}\bigl(\bphi_e(\bx)\bigr)\Bigr).
-	 \]
-	 \vspace{-0.5cm}
-	 \begin{block}{Функция согласования проекций}
-	 	\vspace{-0.3cm}
-	 	\[
-	 		g: \bbT \times \bbU \rightarrow \bbR, \quad g(\bt, \bu) = g(\bphi_e(\bx), \bpsi_e(\by)) \rightarrow \max_{\bphi_e, \bpsi_e, \bh}
-	 	\]
-	 	\vspace{-0.3cm}
-	 \end{block}
-	Рассмотрим $\bY = \bF(\bX, \bTheta) + \bE_{\by} = \bX \bTheta^{\T}  + \bE_{\by}$ --  модель с параметрами $\bTheta \in \bbR^{r \times n}$.
-	\vspace{-0.1cm}
-	\[
-		\mathcal{L}(f, \bX, \bY) = {\left\| \bY  - \bX \bTheta^{\T} \right\| }_2^2 \rightarrow\min_{\bTheta}.
-	\]
-	\vspace{-0.3cm}
+	
 	\begin{minipage}{0.65\linewidth}
 		\begin{block}{Метод проекции в скрытое пространство}
 		\vspace{-0.7cm}
@@ -204,26 +157,74 @@
 						\bbX \subset \bbR^n \& \bbY \subset \bbR^r \\
 						\bbT \subset \bbR^\ell \& \bbU \subset \bbR^s \\};
 					\path[-stealth]
-					(m-1-1) edge [red] node [black, above] {$\mathbf{f}$} (m-1-2)
-					(m-1-1) edge [blue, bend right=10] node [black, left] {$\bW$} (m-2-1)
-					(m-2-1) edge [red, bend right=10] node [black, right] {$\bP$} (m-1-1)
-					(m-1-2) edge [red, bend left=10] node [black, right] {$\bC$} (m-2-2)
-					(m-2-2) edge [blue, bend left=10] node [black, left] {$\bQ$} (m-1-2)
-					(m-2-1) edge [blue] node [black, above] {$\bB$} (m-2-2);
+					(m-1-1) edge [black] node [black, above] {$\mathbf{f}$} (m-1-2)
+					(m-1-1) edge [black, bend right=10] node [black, left] {$\bW$} (m-2-1)
+					(m-2-1) edge [black, bend right=10] node [black, right] {$\bP$} (m-1-1)
+					(m-1-2) edge [black, bend left=10] node [black, right] {$\bC$} (m-2-2)
+					(m-2-2) edge [black, bend left=10] node [black, left] {$\bQ$} (m-1-2)
+					(m-2-1) edge [black] node [black, above] {$\bB$} (m-2-2);
 				\end{tikzpicture}
 			\end{equation*}
 	\end{minipage}
+	\vspace{-0.4cm}
+	\begin{block}{Согласование проекций}
+		Для получения согласованной модели в скрытом пространстве находится функция связи 
+		\vspace{-0.3cm}
+		\[
+			\bU = \bh(\bT) = \bT \bB, \quad \bB = \text{diag}(\beta_k), \quad \beta_k = \bu_k^{\T}\bt_k / (\bt_k^{\T}\bt_k).
+		\]
+		Финальная модель декодирования имеет вид
+		\vspace{-0.3cm}
+		\[
+			\bY = \bU \bQ^{\T} + \bE_{\by} \approx \bT \bB \bQ^{\T}+ \bE_{\by} = \bX \bW^* \bB \bQ^{\T} + \bE = \bX \bTheta^{\T} + \bE_{\by},
+		\]
+		\[
+			\bT = \bX \bW^*, \quad \text{где \,} \bW^* = \bW (\bP^{\T} \bW)^{-1}.
+		\]
+	\end{block}
+	 
+\end{frame}
+%--------------------------------------------------------------------------------
+\begin{frame}{Согласование зависимостей в задаче декодирования}
+
+
+	\textbf{Особенностью задачи} является избыточность размерности пространств переменных $\bx$ и $\by$.
+	Требуется найти многообразия низкой размерности:
 	\vspace{-0.2cm}
-	\[
-		\bU = \bh(\bT) = \bT \bB, \quad \bB = \text{diag}(\beta_k), \quad \beta_k = \bu_k^{\T}\bt_k / (\bt_k^{\T}\bt_k).
-	\]
+	\begin{equation*}
+		\begin{tikzpicture}
+			\matrix (m) [matrix of math nodes,row sep=2em,column sep=4em,minimum width=2em,ampersand replacement=\&]
+			{
+				\bbX \subset \bbR^n \& \bbY \subset \bbR^r \\
+				\bbT \subset \bbR^\ell \& \bbU \subset \bbR^s \\};
+			\path[-stealth]
+			(m-1-1) edge [black] node [black, above] {$\mathbf{f}$} (m-1-2)
+			(m-2-1) edge [black, bend right=10] node [black, right] {$\bphi_d$} (m-1-1)
+			(m-2-2) edge [black, bend left=10] node [black, left] {$\bpsi_d$} (m-1-2)
+			(m-1-1) edge [black, bend right=10] node [black, left] {$\bphi_e$} (m-2-1)
+			(m-1-2) edge [black, bend left=10] node [black, right] {$\bpsi_e$} (m-2-2)
+			(m-2-1) edge [black] node [black, above] {$\mathbf{h}$} (m-2-2);
+		\end{tikzpicture}
+	\end{equation*}
+	$\bbT \subset \bbR^\ell$ и $\bbU \subset \bbR^s$ \textit{скрытые пространства} для $\bbX \in \bbR^n$ ($\ell \leq n$) и $\bbY \in \bbR^r (s \leq r)$, если существуют \textit{функции кодирования} $\bphi_e: \bbX \to \bbT$, $\bpsi_e: \bbY \to \bbU$ и \textit{декодирования} $\bphi_d: \bbT  \to \bbX$, $\bpsi_d: \bbU  \to \bbY$:
+	\begin{align*}
+	\text{для любого } \bx \in \bbX &\quad \text{существует } \bt \in \bbT: \bphi_d \bigl(\bphi_e(\bx)\bigr) = \bphi_d(\bt) = \bx; \\
+	\text{для любого } \by \in \bbY &\quad  \text{существует } \bu \in \bbU: \bpsi_d \bigl(\bpsi_e(\by)\bigr) = \bpsi_d(\bu) = \by.
+	\end{align*}
+
+	Cкрытыe пространства $\bbT$ и $\bbU$ называются \textbf{согласованными}, если существует \textit{функция связи} $\mathbf{h}: \bbT \rightarrow \bbU$:
 	\vspace{-0.3cm}
 	\[
-		\bY = \bU \bQ^{\T} + \bE_{\by} \approx \bT \bB \bQ^{\T}+ \bE_{\by} = \bX \bW^* \bB \bQ^{\T} + \bE = \bX \bTheta^{\T} + \bE_{\by},
-	\]
-	\[
-		\bT = \bX \bW^*, \quad \text{где \,} \bW^* = \bW (\bP^{\T} \bW)^{-1}.
-	\]
+		\by = \mathbf{f}(\bx) = \bpsi_d\Bigl(\mathbf{h}\bigl(\bphi_e(\bx)\bigr)\Bigr).
+	 \]
+	 \vspace{-0.5cm}
+	 \begin{block}{Функция согласования проекций}
+	 	\vspace{-0.3cm}
+	 	\[
+	 		g: \bbT \times \bbU \rightarrow \bbR, \quad g(\bt, \bu) = g(\bphi_e(\bx), \bpsi_e(\by)) \rightarrow \max_{\bphi_e, \bpsi_e, \bh}
+	 	\]
+	 	\vspace{-0.3cm}
+	 \end{block}
 
 \end{frame}
 %--------------------------------------------------------------------------------
@@ -246,7 +247,7 @@
 		\]
 		являются оптимальными для модели $\bF(\bX, \bTheta)$.
 	\end{rustheorem}
-\end{frame}		
+\end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Пример согласованной проекции в скрытое пространство}
 	Исходные переменные $\bx_i \sim \mathcal{N}(0, \mathbf{\Sigma})$. \\ 
@@ -301,12 +302,12 @@
 					\bbX \subset \bbR^n \& \bbY \subset \bbR^r \\
 					\bbT \subset \bbR^\ell \& \bbU \subset \bbR^s \\};
 				\path[-stealth]
-				(m-1-1) edge [red] node [black, above] {$\mathbf{f}$} (m-1-2)
-				(m-2-1) edge [red, bend right=10] node [black, right] {$\bphi_d$} (m-1-1)
-				(m-2-2) edge [blue, bend left=10] node [black, left] {$\bpsi_d$} (m-1-2)
-				(m-1-1) edge [blue, bend right=10] node [black, left] {$\bphi_e$} (m-2-1)
-				(m-1-2) edge [red, bend left=10] node [black, right] {$\bpsi_e$} (m-2-2)
-				(m-2-1) edge [blue] node [black, above] {$\mathbf{h}$} (m-2-2);
+				(m-1-1) edge [black] node [black, above] {$\mathbf{f}$} (m-1-2)
+				(m-2-1) edge [black, bend right=10] node [black, right] {$\bphi_d$} (m-1-1)
+				(m-2-2) edge [black, bend left=10] node [black, left] {$\bpsi_d$} (m-1-2)
+				(m-1-1) edge [black, bend right=10] node [black, left] {$\bphi_e$} (m-2-1)
+				(m-1-2) edge [black, bend left=10] node [black, right] {$\bpsi_e$} (m-2-2)
+				(m-2-1) edge [black] node [black, above] {$\mathbf{h}$} (m-2-2);
 			\end{tikzpicture}
 		\end{equation*}
 	\end{minipage}
