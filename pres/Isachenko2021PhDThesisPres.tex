@@ -263,10 +263,11 @@
 	Пусть $\mathbf{f}_1(\bx_1, \bTheta_1)$, $\mathbf{f}_2(\bx_2, \bTheta_2)$ -- линейные модели декодирования сигналов. 
 	\begin{statement}[Исаченко, 2021]
 		Пусть модель декодирования является аддитивной суперпозицией линейных моделей:
+		\vspace{-0.3cm}
 		\[
 			\by = \mathbf{f}_1(\bx_1, \bTheta_1) + \mathbf{f}_2(\bx_2, \bTheta_2) + \boldsymbol{\varepsilon}_{\by} = \bTheta_1 \bx_1 + \bTheta_2 \bx_2 + \boldsymbol{\varepsilon}_{\by}.
 		\]
-		Тогда оптимальные параметры имеют вид
+		Тогда оптимальные параметры
 		\vspace{-0.2cm}
 		\begin{align*}
 			\bTheta_1 &= (\bX_1^{\T} \bM_{\bX_2} \bX_1)^{-1} \bX_1^{\T} \bM_{\bX_2} \bY, \\
@@ -276,9 +277,10 @@
 	\end{statement}
 	\begin{rustheorem}[Исаченко, 2021]
 		Если $\text{span}(\bX_1) \neq \text{span}(\bX_2)$, то ошибка аддитивной суперпозиции линейных моделей декодирования не превышает ошибки отдельной модели:
-		\[
-			\mathcal{L}_{\textnormal{dep}}(\bTheta_1^*, \bTheta_2^*, \bX_1, \bX_2, \bY) \leq \mathcal{L}(\bTheta_i, \bX_i, \bY), \quad i = 1, 2.
-		\]
+		\begin{align*}
+			\mathcal{L}_{\textnormal{sup}}(\bTheta_1^*, \bTheta_2^*, \bX_1, \bX_2, \bY) &\leq \mathcal{L}(\bTheta_1, \bX_1, \bY), \\
+			\mathcal{L}_{\textnormal{sup}}(\bTheta_1^*, \bTheta_2^*, \bX_1, \bX_2, \bY) &\leq \mathcal{L}(\bTheta_2, \bX_2, \bY).
+		\end{align*}
 	\end{rustheorem}
 \end{frame}
 %--------------------------------------------------------------------------------
@@ -299,46 +301,31 @@
 		\]
 	\end{block}	
 	\vspace{-0.3cm}
-	\begin{rustheorem}[Исаченко, 2021]
 		Градиент функции согласования $g(\bt, \bu) = \textnormal{corr}(\bt, \bu)$ имеет вид
 		\[
 			\frac{\partial g(\bt, \bu)}{\partial \bt} = \frac{1}{\ell - 1} \left(\bSigma_1^{-1/2} \bU \bV^{\T} \bSigma_2^{-1/2} \bU - \bSigma_1^{-1/2} \bU \bD \bV^{\T} \bSigma_1^{-1/2} \right),
 		\]
 		где $\bU, \bD, \bV = \textnormal{SVD}(\bSigma)$, \, $\bSigma = \bSigma_1^{-1/2} \bSigma_{12} \bSigma_2^{-1/2} $, \, $\bSigma_1 = \frac{1}{\ell - 1} \bT \bT^{\T}$, \, $\bSigma_2 = \frac{1}{\ell - 1} \bU \bU^{\T}$, \, $\bSigma_{12} = \frac{1}{\ell - 1} \bT \bU^{\T}$.
-	\end{rustheorem}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Выбор признаков в задаче декодирования}
-	\begin{block}{Требуется}
-	Найти бинарный вектор~$\ba = \{0, 1\}^n$, компоненты~-- индикаторы выбранных признаков. 
-	\end{block}
+	$\bX = [\bchi_1, \dots, \bchi_n] \in \bbR^{m \times n}$~-- матрица исходных переменных; $\bY = [\bnu_1, \dots, \bnu_r] \in \bbR^{m \times r}$~-- матрица целевых переменных. \\
+	Требуется найти бинарный вектор~$\ba = \{0, 1\}^n$, компоненты~-- индикаторы выбранных признаков. 
 	\begin{block}{Функция ошибки отбора признаков}
-		\vspace{-0.2cm}
-	\[
-	\ba = \argmin_{\ba' \in \{0, 1\}^n} S(\ba', \bX, \bY).
-	\]
-	\vspace{-0.5cm}
-	\end{block}
-	\begin{block}{Релаксация}
-		Замена дискретной области определения $\{0, 1\}^n$ на непрерывную релаксацию $[0, 1]^n$:
+		\vspace{-0.3cm}
 		\[
-		\bz = \argmin_{\bz' \in [0, 1]^n} S(\bz', \bX, \bY), \quad 
+			\bz = \argmin_{\bz' \in [0, 1]^n} S(\bz', \bX, \bY), \quad 
 		a_j = [z_j > \tau].
-	\]
+		\]
+		\vspace{-0.2cm}
 	\end{block}
-	Получив~$\ba$, решаем задачу регрессии:
-	\[
-	\mathcal{L}(\bTheta_{\ba}, \bX_{\ba}, \bY) = {\left\| \mathbf{Y} - \bX_{\ba}\bTheta^{\T}_{\ba} \right\| }_2^2 \rightarrow\min_{\bTheta_{\ba}},
-	\]
-	где индекс~$\ba$ обозначает подматрицу с номерами столбцов, для которых~$a_j = 1$.
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Выбор признаков с помощью квадратичного программирования}
-	$\bX = [\bchi_1, \dots, \bchi_n] \in \bbR^{m \times n}$~-- матрица объектов; $\bY = [\bnu_1, \dots, \bnu_r] \in \bbR^{m \times r}$~-- матрица ответов
-	\[
-	\| \bnu - \bX \btheta\|_2^2 \rightarrow\min_{\btheta \in \bbR^{n}}.
-	\]
-	\vspace{-0.3cm}
+	\begin{block}{Функция ошибки модели декодирования}
+		\vspace{-0.6cm}
+		\[
+			\mathcal{L}(\bTheta_{\ba}, \bX_{\ba}, \bY) = {\left\| \mathbf{Y} - \bX_{\ba}\bTheta^{\T}_{\ba} \right\| }_2^2 \rightarrow\min_{\bTheta_{\ba}}, \quad \bX_{\ba} = \{\bchi_j: a_j = 1, \, j = 1, \dots, n\}
+		\]
+		\vspace{-0.6cm}
+	\end{block}
 	\begin{block}{Задача квадратичного программирования}
 	\vspace{-0.3cm}
 	\[
@@ -349,26 +336,38 @@
 		$\bz \in [0, 1]^n$ -- значимость признаков; \\
 		$\bQ = \bigl[\left|\text{corr}(\bchi_i, \bchi_j)\right|\bigr]_{i,j=1}^n \in \bbR^{n \times n}$ -- матрица парных взаимодействий признаков; \\
 		$\mathbf{b} = \bigl[\left|\text{corr}(\bchi_i, \bnu)\right|\bigr]_{i=1}^n \in \bbR^n$ -- вектор релевантностей признаков к целевой переменной. 
-\begin{statement}[Исаченко, 2018]
-	Пусть матрица парных взаимодействий признаков $\hat{\bQ}$ получена полуопределенной релаксацией исходной матрицы $\bQ$:
-	\vspace{-0.2cm}
-	\begin{equation*}
-		\hat{\bQ} = \bQ - \lambda_{\min}(\bQ) \bI.
-	\end{equation*}
-	\vspace{-0.7cm} \\
-	Тогда задача выбора признаков с помощью квадратичного программирования имеет единственный глобальный минимум.
-\end{statement}
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Выбор признаков в задаче декодирования}
+\begin{frame}{Выбор признаков с помощью квадратичного программирования}
+
+	\begin{block}{Задача квадратичного программирования}
+		\vspace{-0.3cm}
+		\[
+		S(\bz, \bX, \bnu) = (1 - \alpha) \cdot \underbrace{\bz^{\T} \bQ \bz}_{\text{Sim}(\bX)} - \alpha \cdot \underbrace{\vphantom{()} \mathbf{b}^{\T} \bz}_{\text{Rel}(\bX, \bnu)} \rightarrow \min_{\substack{\bz \geq \bZero_n \\ \bOne_n^{\T} \bz=1}}.
+		\]
+		\vspace{-0.5cm}
+	\end{block}
+
+	\begin{rustheorem}[Исаченко, 2018]
+		Пусть матрица парных взаимодействий признаков $\hat{\bQ}$ получена полуопределенной релаксацией исходной матрицы $\bQ$:
+		\vspace{-0.2cm}
+		\begin{equation*}
+			\hat{\bQ} = \bQ - \lambda_{\min}(\bQ) \bI.
+		\end{equation*}
+		\vspace{-0.7cm} \\
+		Тогда задача выбора признаков с помощью квадратичного программирования имеет единственный глобальный минимум.
+	\end{rustheorem}
 	\begin{block}{Агрегирование релевантностей по целевым векторам (RelAgg)}
 	\vspace{-0.2cm}
-	\[
-		\bb = \bigl[\left|\text{corr}(\bchi_i, \bnu)\right|\bigr]_{i=1}^n \rightarrow \bb = \left[\sum_{k=1}^r\left|\text{corr}(\bchi_i, \bnu_k)\right|\right]_{i=1}^n.
-	\]
+		\[
+			\bb = \bigl[\left|\text{corr}(\bchi_i, \bnu)\right|\bigr]_{i=1}^n \rightarrow \bb = \left[\sum_{k=1}^r\left|\text{corr}(\bchi_i, \bnu_k)\right|\right]_{i=1}^n.
+		\]
 	\end{block}
 	{\bf Недостаток:} нет учёта зависимостей в целевом пространстве матрицы~$\bY$. 
 	
+\end{frame}
+%--------------------------------------------------------------------------------
+\begin{frame}{Выбор признаков в задаче декодирования}
 	\begin{block}{Симметричный учёт значимостей (SymImp)}
 	Штрафуем коррелированные целевые вектора с помощью~$\text{Sim} (\bY)$:
 	\[
@@ -383,20 +382,29 @@
 	\alpha_1 + \alpha_2 + \alpha_3 = 1, \quad \alpha_i \geq 0.
 	\] 
 	\end{block}
+	SymImp штрафует коррелированные целевые вектора, которые в меньшей мере объясняются признаками. 
+		
+	\begin{block}{Асимметричный учёт значимостей (AsymImp)}
+		\vspace{-0.2cm}
+		\begin{equation*}
+		\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot  \underbrace{\left(\bz_x^{\T} \bB \bz_y - \bb^{\T} \bz_y \right) }_{\text{Rel}(\bX, \bY)} + \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1 \\ \bz_y \geq \bZero_r, \, \bOne_r^{\T}\bz_y=1}}.
+		\end{equation*}
+		\vspace{-0.4cm} \\
+		При $b_j = \max\limits_{i=1, \dots n} [\bB]_{i, j}$ коэффициенты при~$\bz_y$ в~$\text{Rel}(\bX, \bY)$ неотрицательны.
+	\end{block}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Выбор признаков в задаче декодирования}
-	SymImp штрафует коррелированные целевые вектора, которые в меньшей мере объясняются признаками. 
 	\[
-	\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{\vphantom{()} \bz_x^{\T}\mathbf{B} \bz_y}_{\text{Rel}(\bX, \bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}}; \quad
-	\alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} + \alpha_2 \cdot \underbrace{\vphantom{()} \bz_x^{\T} \mathbf{B} \bz_y}_{\text{Rel}(\bX, \bY)} \rightarrow \min_{\substack{\bz_y \geq \bZero_r  \\ \bOne_r^{\T}\bz_y=1}}.
+		\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{\vphantom{()} \bz_x^{\T}\mathbf{B} \bz_y}_{\text{Rel}(\bX, \bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}}; \quad
+		\alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} + \alpha_2 \cdot \underbrace{\vphantom{()} \bz_x^{\T} \mathbf{B} \bz_y}_{\text{Rel}(\bX, \bY)} \rightarrow \min_{\substack{\bz_y \geq \bZero_r  \\ \bOne_r^{\T}\bz_y=1}}.
 	\]
 	\vspace{-0.3cm}
 	\begin{block}{Минимаксный подход (MinMax / MaxMin)}
-	\vspace{-0.6cm}
-	\[
-	S(\bz, \bX, \bY) = \min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}} 	\max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \Bigl(\text {or} \, \max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}}\Bigr) \Bigl[\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{\bz_x^{\T} \bB \bz_y}_{\text{Rel}(\bX, \bY)} - \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)}\Bigr].
-	\]
+		\vspace{-0.6cm}
+		\[
+		S(\bz, \bX, \bY) = \min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}} 	\max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \Bigl(\text {or} \, \max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}}\Bigr) \Bigl[\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot \underbrace{\bz_x^{\T} \bB \bz_y}_{\text{Rel}(\bX, \bY)} - \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)}\Bigr].
+		\]
 	\end{block}
 	\vspace{-0.4cm}
 	\begin{rustheorem}[Исаченко, 2018]
@@ -410,32 +418,10 @@
 
 \end{frame}
 %--------------------------------------------------------------------------------
-\begin{frame}{Выбор признаков в задаче декодирования}
-	\begin{block}{Максимизация релевантностей (MaxRel)}
-	\vspace{-0.4cm}
-	\[
-		S(\bz, \bX, \bY) = \min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}} 	\max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}}  \Bigl(\text {or} \, \max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \min_{\substack{\bz_x \geq \bZero_n \\ \bOne_n^{\T}\bz_x=1}}\Bigr)  \left[ (1 - \alpha) \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha \cdot \bz_x^{\T} \bB \bz_y \right].
-	\]
-	\vspace{-0.2cm}
-	\end{block}
-	\begin{rustheorem}[Исаченко, 2018]
-		Для положительно определенной матрицы $\bQ_x$ minmax и maxmin задачи достигают одинакового значения функционала $S(\bz, \bX, \bY)$.
-	\end{rustheorem}
-	\begin{block}{Асимметричный учёт значимостей (AsymImp)}
-	\vspace{-0.2cm}
-	\begin{equation*}
-	\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot  \underbrace{\left(\bz_x^{\T} \bB \bz_y - \bb^{\T} \bz_y \right) }_{\text{Rel}(\bX, \bY)} + \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1 \\ \bz_y \geq \bZero_r, \, \bOne_r^{\T}\bz_y=1}}.
-	\end{equation*}
-	\vspace{-0.4cm} \\
-	При $b_j = \max\limits_{i=1, \dots n} [\bB]_{i, j}$ коэффициенты при~$\bz_y$ в~$\text{Rel}(\bX, \bY)$ неотрицательны.
-\end{block}
-\end{frame}
-%--------------------------------------------------------------------------------
 \begin{frame}{Обобщение предложенных методов выбора признаков}
 	\begin{rustheorem}[Исаченко, 2018]
-		В одномерном случае $r=1$ предлагаемые методы выбора признаков SymImp, MinMax, MaxMin, MaxRel, AsymImp совпадают с исходной задачей минимизации функции ошибок $S(\bz, \bX, \bY)$.
+		В одномерном случае $r=1$ предлагаемые методы выбора признаков SymImp, MinMax, MaxMin, AsymImp совпадают с исходной задачей минимизации функции ошибок $S(\bz, \bX, \bY)$.
 	\end{rustheorem}
-	\vspace{-0.2cm}
 	\begin{table}
 		\centering
 		\footnotesize{
@@ -446,11 +432,39 @@
 				RelAgg & $\min \bigl[ \text{Sim}(\bX) - \text{Rel}(\bX, \bY) \bigr] $ & $\min\limits_{\bz_x} \bigl[ (1 - \alpha) \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha \cdot \bz_x^{\T} \bB \bOne_r \bigr] $ \\ &&\\
 				SymImp & $\begin{aligned} \min \, \bigl[ \text{Sim}(\bX) & - \text{Rel}(\bX, \bY) \\ & + \text{Sim}(\bY) \bigr] \end{aligned}$ & $ \min\limits_{\bz_x, \, \bz_y} \left[ \alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y + \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \right] $\\ &&\\ 
 				MinMax & $\begin{aligned} &\min \, \bigl[ \text{Sim}(\bX) - \text{Rel}(\bX, \bY) \bigr]  \\ & \max \bigl[\text{Rel}(\bX, \bY) + \text{Sim}(\bY) \bigr] \end{aligned}$ & $	\min\limits_{\bz_x} 	\max\limits_{\bz_y} \bigl[\alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y - \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \bigr]$ \\ &&\\ 
-				MaxRel & $\begin{aligned} &\min \, \bigl[ \text{Sim}(\bX) - \text{Rel}(\bX, \bY) \bigr]  \\ & \max \bigl[\text{Rel}(\bX, \bY) \bigr] \end{aligned}$& $\min\limits_{\bz_x} 	\max\limits_{\bz_y} \bigl[ (1 - \alpha) \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha \cdot \bz_x^{\T} \bB \bz_y \bigr]$ \\ 		&&\\
 				AsymImp & $\begin{aligned} & \min \, \bigl[ \text{Sim}(\bX) - \text{Rel}(\bX, \bY) \bigr]\\ &  \max \bigl[\text{Rel}(\bX, \bY) + \text{Sim}(\bY) \bigr] \end{aligned}$ & $\min\limits_{\bz_x, \bz_y} \bigl[ \alpha_1 \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \left(\bz_x^{\T} \bB \bz_y - \bb^{\T} \bz_y \right) + \alpha_3  \bz_y^{\T} \bQ_y \bz_y \bigr]$\\  && \\
 				\hline
 		\end{tabular}}
 	\end{table}
+\end{frame}
+%--------------------------------------------------------------------------------
+\begin{frame}{Оптимизация нелинейных моделей с помощью квадратичного программирования}
+	Параметр $\theta_j$ для модели $f(\bx, \btheta)$ является \textbf{активным}, если $\bJ^{\T} (\mathbf{f}(\bx, \btheta) - \by) \neq 0$.
+	\begin{rustheorem}[Исаченко, 2018]
+		Задача поиска активных параметров модели методом квадратичного программирования в случае использовании метода Ньютона в случае дифференцируемой по параметрам  $\mathbf{f}(\bx, \btheta)$ принимает вид:
+		
+		\begin{minipage}{0.55\linewidth}
+				\[
+				S(\bz, \bX, \bnu) = (1 - \alpha) \cdot \underbrace{\bz^{\T} \bQ \bz}_{\textnormal{Sim}(\bJ)} - \alpha \cdot \underbrace{\vphantom{()} \mathbf{b}^{\T} \bz}_{\textnormal{Rel}(\bJ,  \mathbf{f} - \by)} \rightarrow \min_{\substack{\bz \geq \bZero_n \\ \bOne_n^{\T} \bz=1}},
+				\]
+			где
+			\begin{equation*}
+				 \bJ = 
+				\begin{pmatrix}
+					\frac{\partial f(\bx_1 , \btheta)}{\partial \theta_1} & \dots & 
+					\frac{\partial f(\bx_1 , \btheta)}{\partial \theta_p} \\
+					\dots & \dots & \dots \\
+					\frac{\partial f(\bx_m , \btheta)}{\partial \theta_1} & \dots & 
+					\frac{\partial f(\bx_m , \btheta)}{\partial \theta_p}
+				\end{pmatrix}.
+			\end{equation*}
+		\end{minipage}%
+		\begin{minipage}{0.45\linewidth}
+			\begin{figure}
+				\includegraphics[width=0.9\linewidth]{figs/newton_qpfs}
+			\end{figure}
+		\end{minipage}
+	\end{rustheorem}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Внешние критерии качества решения задачи декодирования}
