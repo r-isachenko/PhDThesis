@@ -9,10 +9,12 @@
 
 \hrulefill
 
+\textbf{введение1}
+
 Пусть имеется два множества временных рядов $\mathcal{S}^x = \{\bs^x_i\}_{i=1}^m$ и $\mathcal{S}^y = \{\bs^y_i\}_{i=1}^r$, состоящие из $m$ и $r$ временных рядов соответственно. 
 Первое множество $\mathcal{S}^x$ является множеством временных рядов $m$ входных сигналов. 
 Второе множество $\mathcal{S}^y$ является множеством временных рядов $r$ целевых сигналов.
-Каждый временной ряд $\bs = (s_1, s_2, \dots, s_T)$ является последовательность измерений некоторый величины в течение времени. 
+Каждый временной ряд $\bs = (s_1, s_2, \dots, s_T)$ является последовательностью измерений некоторый величины в течение времени. 
 \begin{definition}
 	Временное представление $\bx_t = ([\bs^x_1]_t, \dots, [\bs^x_m]_t) \in \bbR^m$ состоит из измерений временных рядов входных сигналов в момент времени $t$. 
 	Аналогично временное представление $\by_t = ([\bs^y_1]_t, \dots, [\bs^y_r]_t) \in \bbR^r$ состоит из измерений временных рядов целевых сигналов в момент времени $t$.
@@ -49,10 +51,10 @@
 На Рис.~\ref{ch2:time_series_decoding} схематично продемонстрированы принципы построения введенных моделей декодирования временных рядов.
 
 \begin{figure}
-	\centering
-	\includegraphics[width=0.5\linewidth]{figs/ch2/time_series_decoding}
-	\caption{Схема построения моделей декодирования}
-	\label{ch2:time_series_decoding}
+       \centering
+       \includegraphics[width=0.5\linewidth]{figs/ch2/time_series_decoding}
+       \caption{Схема построения моделей декодирования}
+       \label{ch2:time_series_decoding}
 \end{figure}
 
 Рассмотрим модель~\eqref{ch1:eq:reg_model} вида
@@ -60,7 +62,7 @@
 	\by = f(\bx, \bTheta) + \bepsilon = \bTheta_1 \bx_1 + \bTheta_2 \bx_2 + \bepsilon,
 	\label{ch2:eq:two_modal_reg_model}
 \end{equation}
-где объект $\bx = [\bx_1, \bx_2] \in \bbR^n$ состоит из двух подвекторов $\bx_1 \in \bbR^k$, $\bx_2 \in \bbR^{n - k}$, тем самым  Матрица параметров $\bTheta \in \bbR^{n \times r}$ состоит из двух подматриц $\bTheta_1 \in \bbR^{k \times r}$, $\bTheta_2 \in \bbR^{n - k \times r}$. 
+где объект $\bx = [\bx_1, \bx_2] \in \bbR^n$ состоит из двух подвекторов $\bx_1 \in \bbR^k$, $\bx_2 \in \bbR^{n - k}$. Тем самым матрица параметров $\bTheta \in \bbR^{n \times r}$ состоит из двух подматриц $\bTheta_1 \in \bbR^{k \times r}$, $\bTheta_2 \in \bbR^{n - k \times r}$. 
 
 \begin{statement}
 	\label{stat:two_modal_params}
@@ -108,7 +110,7 @@
 \end{statement}
 
 \begin{proof}
-	Матрица $M_{\bX_1}$ является матрицей проекции на подпространство ортогональное подпространство, построенное на оболочке столбцов матрицы $\bX_1$. Таким образом, матрица $M_{\bX_1}$ является идемпотентной ($M_{\bX_1}{\T} M_{\bX_1} = M_{\bX_1}$). 
+	Матрица $M_{\bX_1}$ является матрицей проекции на ортогональное подпространство, построенное на линейной оболочке столбцов матрицы $\bX_1$. Таким образом, матрица $M_{\bX_1}$ является идемпотентной ($M_{\bX_1}{\T} M_{\bX_1} = M_{\bX_1}$). 
 	Таким образом, используя утверждение~\autoref{stat:two_modal_params},
 	\begin{multline*}
 		\bTheta_2 = (\bX_2^{\T} \bM_{\bX_1} \bX_2)^{-1} \bX_2^{\T} \bM_{\bX_1} \bY = (\bX_2^{\T} \bM_{\bX_1}^{\T} \bM_{\bX_1} \bX_2)^{-1} \bX_2^{\T} \bM_{\bX_1}^{\T} \bM_{\bX_1} \bY = \\
@@ -120,7 +122,7 @@
 Похожие результаты были доказаны в эконометрике в работах~\cite{frisch1933partial,lovell1963seasonal,cinelli2020making}. Аналогичное утверждение верно и для матрицы~$\bTheta_1$. 
 
 \begin{statement}
-	Если столбцы матрицы $\bX_1$ ортогональны столбцам матрицы $\bX_2$ в задаче~\eqref{ch2:eq:two_modal_reg_model}, то $\bTheta_2$ является решением задачи регрессии
+	Если столбцы матрицы $\bX_1$ ортогональны столбцам матрицы~$\bX_2$ в задаче~\eqref{ch2:eq:two_modal_reg_model}, то $\bTheta_2$ является решением задачи регрессии
 	\[
 			\| \bY -  \bX_{2} \bTheta_2 \| \rightarrow \min_{\bTheta_2}.
 	\]
@@ -161,8 +163,6 @@
 	Это означает, что объекты $\bx$ и $\by$ принадлежат некоторым многообразиям низкой размерности. В простейшем случае такие многообразия могут являться вложениями, линейными подпространствами.
 \end{assumption}
 
-{\color{red} подумать, жирные ли буквы}
-
 \begin{definition}
 	Назовём пространство $\bbT \subset \bbR^l$ \textit{скрытым пространством} для пространства $\bbX \subset \bbR^n$ ($l \leq n$), если существуют функция $\bphi_e: \bbX \to \bbT$ и функция $\bphi_d: \bbT  \to \bbX$ такие что
 	\[
@@ -177,21 +177,17 @@
 \end{definition}
 
 \begin{definition}
-	Пространство $\bbT \subset \bbR^l$ задаёт \textit{внутреннюю структуру} пространства $\bbX \subset \bbR^n$, если пространство~$\bbT$ является скрытым для пространства~$\bbX$.
-\end{definition}
-
-\begin{definition}
-	Между пространствами $\bbX$ и $\bbY$ существует \textit{согласующее отображение}, если существуют пространства $\bbT$ и $\bbU$, задающие внутренние структуры для пространств $\bbX$ и $\bbY$ соответственно, и существует \textit{функция согласования} $\mathbf{g}: \bbT \rightarrow \bbU$, такая что
+	Между пространствами $\bbX$ и $\bbY$ существует \textit{согласующее отображение}, если существуют пространства $\bbT$ и $\bbU$, являющиеся скрытыми для пространств $\bbX$ и $\bbY$ соответственно, и существует \textit{функция связи} $\bh: \bbT \rightarrow \bbU$, такая что
 	\[
-	\bu \in \bbU \quad \exists \bt:  \bu = \mathbf{g}(\bt).
+	\bu \in \bbU \quad \exists \bt:  \bu = \bh(\bt).
 	\]
 \end{definition}
 
 \begin{assumption}
-	Предположим, что в задаче предсказания~\eqref{ch1:eq:loss_min} пространства $\bbT$ и $\bbU$ задают внутреннюю структуру пространств $\bbX$ и $\bbY$. 
-	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует функция согласования~$\mathbf{g}: \bbT \rightarrow \bbU$. Тогда выполнено
+	Предположим, что в задаче предсказания~\eqref{ch1:eq:loss_min} пространства $\bbT$ и $\bbU$ являются скрытыми для пространств $\bbX$ и $\bbY$ соответственно. 
+	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует функция связи~$\bh: \bbT \rightarrow \bbU$. Тогда выполнено
 	\[
-	\forall \by \in \bbY \quad \exists \bx \in \bbX: \by = \bpsi_d(\bu) = \bpsi_d(\mathbf{g}(\bt)) = \bpsi_d(\mathbf{g}(\bphi_e(\bx))),
+		\forall \by \in \bbY \quad \exists \bx \in \bbX: \by = \bpsi_d(\bu) = \bpsi_d(\bh(\bt)) = \bpsi_d(\bh(\bphi_e(\bx))),
 	\]
 	и общая схема задачи декодирования принимает вид следующей коммутативной диаграммы:
 	\begin{equation}
@@ -228,7 +224,7 @@
 \begin{definition}
 	Согласно диаграмме~\eqref{ch1:eq:decoding_scheme}, определим модель декодирования $f: \bbX \rightarrow \bbY$ как суперпозицию
 	\begin{equation}
-		f = \bpsi_d \circ \mathbf{g} \circ \bphi_e.
+		f = \bpsi_d \circ \bh \circ \bphi_e.
 		\label{ch1:eq:def_decoding_function}
 	\end{equation}
 \end{definition}
@@ -371,50 +367,43 @@
 
 \textbf{Алгоритмы PCA, PLS, CCA, DeepCCA в терминах задачи декодирования (работа Фаруха)}
 
-\begin{figure}[!ht]
-	\centering
-	\includegraphics[width=\linewidth]{figs/ch1/Examples}
-	\caption{Примеры алгоритмов, работающих по схеме \ref{ch1:eq:decoding_scheme}}
-	\label{ch1:fig:PLSFigure}
-\end{figure}
-
 Так как параметры функции кодирования подбираются из условия максимизации функции согласования~\eqref{eq:argmax}, то после перехода в латентное пространство между $\mathbf{T}$ и $\mathbf{U}$ существует зависимость
 \begin{equation}
-	\bU = h(\bT) +  \boldsymbol{\eta},
+	\bU = \bh(\bT) +  \boldsymbol{\eta},
 	\label{eq:reg2}
 \end{equation}
-где $h: \mathbb{R}^{n \times p} \to \mathbb{R}^{n \times p}$~--- функция регрессионной зависимости,  $\boldsymbol{\eta}$~--- матрица регрессионных ошибок.
-Оптимальная функция $h$ выбирается минимизацией функции ошибки. Используется квадратичная функция потерь $\mathcal{L}$ на $\bT$ и $\bU$:
+где $\bh: \mathbb{R}^{n \times p} \to \mathbb{R}^{n \times p}$~--- функция регрессионной зависимости,  $\boldsymbol{\eta}$~--- матрица регрессионных ошибок.
+Оптимальная функция $h$ выбирается минимизацией функции ошибки. Используется квадратичная функция потерь $\cL$ на $\bT$ и $\bU$:
 \begin{equation}
-	\mathcal{L}(h | {\bT}, {\bU}) = {\left\| \underset{n \times p}{\bU}  - h(\underset{m \times p}{\bT}) \right\| }_2^2 \rightarrow\min_{h}.
+	\cL(\bh | {\bT}, {\bU}) = {\left\| \underset{n \times p}{\bU}  - \bh(\underset{m \times p}{\bT}) \right\| }_2^2 \rightarrow\min_{h}.
 	\label{eq:loss_function}
 \end{equation}
 
 Финальная прогностическая модель имеет вид
-$\widehat{\by} = \psi_2\bigl(h(\varphi_1(\bx))\bigr)$, то есть
+$\widehat{\by} = \bpsi_2\bigl(\bh(\bphi_1(\bx))\bigr)$, то есть
 
 \begin{equation}
-	f = \psi_2 \circ h \circ \varphi_1.
+	f = \bpsi_2 \circ \bh \circ \bphi_1.
 	\label{eq:f}
 \end{equation}
 
 Метод главных компонент (PCA) снижает размерность данных и сохраняет максимальную дисперсию. Линейная модель PCA представляет собой ортогональное линейное преобразование исходного признакового пространства в новое пространство меньшей размерности. Первый базисный вектор строится так, чтобы выборочная дисперсия столбцов проекций матрицы~$\bX$ была максимальной:
 \begin{equation}
-	\bp = \argmax_{\|\bp\|_{2} = 1} [\textbf{var}(\bX \textbf{p})],
+	\bp = \argmax_{\|\bp\|_{2} = 1} [\text{var}(\bX \textbf{p})],
 	\label{eq:PCA}
 \end{equation}
-где $\textbf{var}(\bX \textbf{p}) = \frac{1}{n} (\bX \textbf{p})^{\T}\bX \textbf{p}$ обозначает выборочную дисперсию. Последующие базисные векторы находятся итеративно после вычитания проекции на все найденные ранее.
+где $\text{var}(\bX \textbf{p}) = \frac{1}{n} (\bX \textbf{p})^{\T}\bX \textbf{p}$ обозначает выборочную дисперсию. Последующие базисные векторы находятся итеративно после вычитания проекции на все найденные ранее.
 
-Функция кодирования $\varphi_1: \mathbb{R}^{n \times m} \to \mathbb{R}^{n \times p}$ имеет вид
+Функция кодирования $\bphi_1: \mathbb{R}^{n \times m} \to \mathbb{R}^{n \times p}$ имеет вид
 \begin{equation}
-	\varphi_1(\bX) =  \underset{n \times m}\bX \cdot \underset{m \times p}\bP^{\T},
+	\bphi_1(\bX) =  \underset{n \times m}\bX \cdot \underset{m \times p}\bP^{\T},
 	\label{eq:PCA2}
 \end{equation}
-где $\textbf{P} = [\textbf{p}_1, \dots, \textbf{p}_{p}].$
+где $\bP = [\bp_1, \dots, \bp_{p}].$
 Метод PCA не согласует независимые переменные и целевые переменные. Из-за этого зависимости в обоих пространствах не учитываются.
 
 
-Метод частичных наименьших квадратов восстанавливает связь между двумя наборами данных $\bX$ и $\bY$. Алгоритм проецирует $\bX$ и $\bY$ на латентное пространство $\mathbb{R}^{p}$ меньшей размерности. PLS находит матрицы исходных данных $\bX$ и $\bY$ в латентном пространстве $\textbf{T}$ и $\textbf{U}$ соответственно. Матрица объектов $\bX$ и целевая матрица $\bY$ проецируются на латентное пространство следующим образом:
+Метод частичных наименьших квадратов восстанавливает связь между двумя наборами данных $\bX$ и $\bY$. Алгоритм проецирует $\bX$ и $\bY$ на латентное пространство $\mathbb{R}^{p}$ меньшей размерности. PLS находит матрицы исходных данных $\bX$ и $\bY$ в латентном пространстве $\textbf{T}$ и $\textbf{U}$ соответственно. Матрица объектов~$\bX$ и целевая матрица~$\bY$ проецируются на латентное пространство следующим образом:
 \begin{align}
 	\underset{n \times m}{\bX}  &= \underset{n \times p}{\textbf{T}} \cdot \underset{p \times m}{\textbf{P}}^{\T} +  \underset{n \times m}{\textbf{F}},
 	\label{eq:PLSpr1} \\
@@ -425,8 +414,8 @@ $\widehat{\by} = \psi_2\bigl(h(\varphi_1(\bx))\bigr)$, то есть
 
 В методе PLS  функции кодирования имеют вид
 \begin{equation*}
-	\varphi_1(\bX) = \bX \bW_{\bx}, \;\;
-	\psi_1(\bY) = \bY \bW_{\by},
+	\bphi_1(\bX) = \bX \bW_{\bx}, \;\;
+	\bpsi_1(\bY) = \bY \bW_{\by},
 \end{equation*}
 где матрицы весов $\bW_{\bx} \in \mathbb{R}^{m \times p}, \bW_{\by} \in \mathbb{R}^{k \times p}$ находятся путем максимизации функции согласования $g(\bX \bW_{\bx},  \bY \bW_{\by}) = \textbf{Cov} (\bX \bW_{\bx},  \bY \bW_{\by})^{2}$:
 \begin{equation}
@@ -437,20 +426,20 @@ $\widehat{\by} = \psi_2\bigl(h(\varphi_1(\bx))\bigr)$, то есть
 
 Функции восстановления принимают вид
 \begin{equation*}
-	\varphi_2(\bT) = \bT\bP^{\T}, \;\;
-	\psi_2(\bU) = \bU \bQ^{\T}.
+	\bphi_d(\bT) = \bT\bP^{\T}, \;\;
+	\bpsi_d(\bU) = \bU \bQ^{\T}.
 \end{equation*}
 
 Канонический анализ корреляций находит два набора базисных векторов $\{\bw_{\bx_i}\}_{i=1}^{p}$, $\bw_{\bx} \in \mathbb{R}^{m}$, и $\{\bw_{\by_i}\}_{i=1}^{p}, \; \bw_{\by} \in \mathbb{R}^{k}$, один для матрицы $\bX$, другой для матрицы $\bY$, так чтобы коэффициент корреляция между проекциями переменных на эти базисные векторы был максимальным. Функция согласования для CCA имеет вид
 \begin{equation*}
-	g(\bX \bW_{\bx}, \bY \bW_{\by}) = \textbf{corr}(\bX \bW_{\bx}, \bY \bW_{\by}),
+	g(\bX \bW_{\bx}, \bY \bW_{\by}) = \text{corr}(\bX \bW_{\bx}, \bY \bW_{\by}),
 \end{equation*}
 \noindentгде $\textbf{corr}(\bX \bw_{\bx}, \bY \bw_{\by})$~-- коэффициент корреляции между векторами.
 
 Таким образом, функции кодирования имеют вид
 \begin{equation*}
-	\varphi_1(\bX) = \bX \bW_{\bx} , \;\;
-	\psi_1(\bY) = \bY \bW_{\by},
+	\bphi_1(\bX) = \bX \bW_{\bx} , \;\;
+	\bpsi_1(\bY) = \bY \bW_{\by},
 \end{equation*}
 где первые столбцы матриц весов находятся как векторы, максимизирующие функцию согласования $g$. Далее ищутся векторы, максимизирующие $g$, но с ограничением, что они не коррелируют с первой парой векторов. Процедура продолжается до тех пор, пока число векторов не станет равным $p$.
 
@@ -459,10 +448,10 @@ $\widehat{\by} = \psi_2\bigl(h(\varphi_1(\bx))\bigr)$, то есть
 Нелинейный канонический анализ корреляций~--- нелинейная модификация CCA. Метод Deep CCA преобразует исходные данные с помощью нейронной сети таким образом, что результирующее представление становится согласованным. В данной работе рассматриваются следующие нелинейные функции кодирования и восстановления:
 
 \begin{align*}
-	\bT &= \varphi_1(\bX) =  \bW_\bx^L \sigma(\dots \sigma(\bW_\bx^2 \sigma(\bX \bW_\bx^1)) \dots ), \\
-	\bU &= \psi_1(\bY) =  \bW_\by^L \sigma(\dots \sigma(\bW_\by^2 \sigma(\bY \bW_\by^1)) \dots ), \\
-	\bX &= \varphi_2(\bX) =  \bW_\bt^L \sigma(\dots \sigma(\bW_\bt^2 \sigma(\bT \bW_\bt^1)) \dots ), \\
-	\bY &= \psi_2(\bY) =  \bW_\bu^L \sigma(\dots \sigma(\bW_\bu^2 \sigma(\bU \bW_\bu^1)) \dots ).
+	\bT &= \bphi_e(\bX) =  \bW_\bx^L \sigma(\dots \sigma(\bW_\bx^2 \sigma(\bX \bW_\bx^1)) \dots ), \\
+	\bU &= \bpsi_e(\bY) =  \bW_\by^L \sigma(\dots \sigma(\bW_\by^2 \sigma(\bY \bW_\by^1)) \dots ), \\
+	\bX &= \bphi_d(\bX) =  \bW_\bt^L \sigma(\dots \sigma(\bW_\bt^2 \sigma(\bT \bW_\bt^1)) \dots ), \\
+	\bY &= \bpsi_d(\bY) =  \bW_\bu^L \sigma(\dots \sigma(\bW_\bu^2 \sigma(\bU \bW_\bu^1)) \dots ).
 \end{align*}
 Каждая функция представляет нейронную сеть с $L$ скрытыми слоями.
 
@@ -498,7 +487,7 @@ $\widehat{\by} = \psi_2\bigl(h(\varphi_1(\bx))\bigr)$, то есть
 	\centering
 	\includegraphics[width=\linewidth]{figs/ch2/ecog_data}
 	\caption{Сигналы мозга (левый график) и 3D координаты руки (правый график)}
-	\label{ch1:fig:ecog_data}
+	\label{ch2:fig:ecog_data}
 \end{figure}
 
 Введём среднеквадратичную ошибку для некоторых матриц $\mathbf{A} = [a_{ij}]$ и $\mathbf{B} = [b_{ij}]$
