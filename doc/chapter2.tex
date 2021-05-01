@@ -164,34 +164,34 @@
 {\color{red} подумать, жирные ли буквы}
 
 \begin{definition}
-	Назовём пространство $\bbT \subset \bbR^l$ \textit{скрытым пространством} для пространства $\bbX \in \bbR^n$ ($l \leq n$), если существуют функция $\varphi_e: \bbX \to \bbT$ и функция $\varphi_d: \bbT  \to \bbX$ такие что
+	Назовём пространство $\bbT \subset \bbR^l$ \textit{скрытым пространством} для пространства $\bbX \subset \bbR^n$ ($l \leq n$), если существуют функция $\bphi_e: \bbX \to \bbT$ и функция $\bphi_d: \bbT  \to \bbX$ такие что
 	\[
-	\bx \in \bbX \quad \exists \bt \in \bbT: \varphi_d (\varphi_e(\bx)) = \varphi_d(\bt) = \bx.
+	\bx \in \bbX \quad \exists \bt \in \bbT: \bphi_d (\bphi_e(\bx)) = \bphi_d(\bt) = \bx.
 	\]
-	Функция $\varphi_e(\bx)$ называется \textit{функцией кодирования} объекта $\bx$, функция $\varphi_d(\bt)$  называется \textit{функцией декодирования}. 
+	Функция $\bphi_e(\bx)$ называется \textit{функцией кодирования} объекта $\bx$, функция $\bphi_d(\bt)$  называется \textit{функцией декодирования}. 
 	
-	Аналогично введём определение \textit{скрытого пространства}~$\bbU \subset \bbR^s$ для целевого пространства $\bbY$, \textit{функции кодирования} $\psi_e: \bbY \to \bbU$ и \textit{декодирования} $\psi_d: \bbU  \to \bbY$
+	Аналогично введём определение \textit{скрытого пространства}~$\bbU \subset \bbR^s$ для целевого пространства $\bbY$, \textit{функции кодирования} $\bpsi_e: \bbY \to \bbU$ и \textit{декодирования} $\bpsi_d: \bbU  \to \bbY$
 	\[
-	 \by \in \bbY \quad  \exists \bu \in \bbU: \psi_d (\psi_e(\by)) = \psi_d(\bu) = \by.
+	 \by \in \bbY \quad  \exists \bu \in \bbU: \bpsi_d (\bpsi_e(\by)) = \bpsi_d(\bu) = \by.
 	\]
 \end{definition}
 
 \begin{definition}
-	Пространство $\bbT \subset \bbR^l$ задаёт \textit{внутреннюю структуру} пространства $\bbX \in \bbR^n$, если пространство $\bbT$ является скрытым для пространства $\bbX$.
+	Пространство $\bbT \subset \bbR^l$ задаёт \textit{внутреннюю структуру} пространства $\bbX \subset \bbR^n$, если пространство~$\bbT$ является скрытым для пространства~$\bbX$.
 \end{definition}
 
 \begin{definition}
-	Между пространствами $\bbX$ и $\bbY$ существует \textit{согласующее отображение}, если существуют пространства $\bbT$ и $\bbU$, задающие внутренние структуры для пространств $\bbX$ и $\bbY$ соответственно, и существует \textit{функция согласования} $g: \bbT \rightarrow \bbU$, такая что
+	Между пространствами $\bbX$ и $\bbY$ существует \textit{согласующее отображение}, если существуют пространства $\bbT$ и $\bbU$, задающие внутренние структуры для пространств $\bbX$ и $\bbY$ соответственно, и существует \textit{функция согласования} $\mathbf{g}: \bbT \rightarrow \bbU$, такая что
 	\[
-	\bu \in \bbU \quad \exists \bt:  \bu = g(\bt).
+	\bu \in \bbU \quad \exists \bt:  \bu = \mathbf{g}(\bt).
 	\]
 \end{definition}
 
 \begin{assumption}
 	Предположим, что в задаче предсказания~\eqref{ch1:eq:loss_min} пространства $\bbT$ и $\bbU$ задают внутреннюю структуру пространств $\bbX$ и $\bbY$. 
-	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует функция согласования~$g: \bbT \rightarrow \bbU$. Тогда выполнено
+	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует функция согласования~$\mathbf{g}: \bbT \rightarrow \bbU$. Тогда выполнено
 	\[
-	\forall \by \in \bbY \quad \exists \bx \in \bbX: \by = \psi_d(\bu) = \psi_d(g(\bt)) = \psi_d(g(\phi_e(\bx))),
+	\forall \by \in \bbY \quad \exists \bx \in \bbX: \by = \bpsi_d(\bu) = \bpsi_d(\mathbf{g}(\bt)) = \bpsi_d(\mathbf{g}(\bphi_e(\bx))),
 	\]
 	и общая схема задачи декодирования принимает вид следующей коммутативной диаграммы:
 	\begin{equation}
@@ -199,18 +199,17 @@
 			\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
 			{
 				\bbX \subset \bbR^n & \bbY \subset \bbR^r \\
-				\bbT \subset \bbR^l & \bbU \subset \bbR^s \\};
+				\bbT \subset \bbR^\ell & \bbU \subset \bbR^s \\};
 			\path[-stealth]
-			(m-1-1) edge node [above] {$f$} (m-1-2)
-			(m-2-1) edge [bend right=10] node [right] {$\varphi_d$} (m-1-1)
-			(m-2-2) edge [bend left=10] node [left] {$\psi_d$} (m-1-2)
-			(m-1-1) edge [bend right=10] node [left] {$\varphi_e$} (m-2-1)
-			(m-1-2) edge [bend left=10] node [right] {$\psi_e$} (m-2-2)
-			(m-2-1) edge node [above] {$h$} (m-2-2);
+			(m-1-1) edge [black] node [black, above] {$\mathbf{f}$} (m-1-2)
+			(m-2-1) edge [black, bend right=10] node [black, right] {$\bphi_d$} (m-1-1)
+			(m-2-2) edge [black, bend left=10] node [black, left] {$\bpsi_d$} (m-1-2)
+			(m-1-1) edge [black, bend right=10] node [black, left] {$\bphi_e$} (m-2-1)
+			(m-1-2) edge [black, bend left=10] node [black, right] {$\bpsi_e$} (m-2-2)
+			(m-2-1) edge [black] node [black, above] {$\mathbf{h}$} (m-2-2);
 		\end{tikzpicture}
 		\label{ch1:eq:decoding_scheme}
 	\end{equation}
-
 
 \begin{equation}
 	\begin{tikzpicture}
@@ -229,7 +228,7 @@
 \begin{definition}
 	Согласно диаграмме~\eqref{ch1:eq:decoding_scheme}, определим модель декодирования $f: \bbX \rightarrow \bbY$ как суперпозицию
 	\begin{equation}
-		f = \psi_d \circ g \circ \varphi_e.
+		f = \bpsi_d \circ \mathbf{g} \circ \bphi_e.
 		\label{ch1:eq:def_decoding_function}
 	\end{equation}
 \end{definition}
@@ -379,52 +378,6 @@
 	\label{ch1:fig:PLSFigure}
 \end{figure}
 
-\begin{definition}
-Параметрическая функция $\varphi_1: \mathbb{R}^{n \times m} \to \mathbb{R}^{n \times p}$, переводящая исходные данные в латентное пространство, называется \textbf{функцией кодирования}.
-\end{definition}
-
-\begin{definition}
-	Функция $\varphi_2: \mathbb{R}^{n \times p} \to \mathbb{R}^{n \times m}$, переводящая данные из латентного пространства в исходное, называется \textbf{функцией восстановления}.
-\end{definition}
-
-\begin{definition}
-	Функция $g: \mathbb{R}^{n \times p}\times \mathbb{R}^{n \times p} \to \mathbb{R}$, связывающая закономерности в низкоразмерных латентных представлениях, называется \textbf{функцией согласования}.
-\end{definition}
-
-\begin{definition}
-	Согласование~--- алгоритмическая процедура максимизации функции согласования.
-\end{definition}
-
-Коммутативная диаграмма процедуры выбора прогностической модели имеет вид
-\begin{equation}
-\begin{tikzpicture}
-	\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
-{
-	\underset{n \times m}{\bX} & \underset{n \times k}{\bY} \\
-	\underset{n \times p}{\mathbf{T}} &  \underset{n \times p}{\mathbf{U}} \\};
-	\path[-stealth]
-	(m-2-1) edge node [right] {$\varphi_2$} (m-1-1)
-	(m-2-2) edge node [left] {$\psi_2$} (m-1-2)
-	(m-1-1) edge [bend right] node [left] {$\varphi_1$} (m-2-1)
-	(m-1-2) edge [bend left] node [right] {$\psi_1$} (m-2-2)
-	(m-2-1) edge [<->] node [above] {$g$} (m-2-2)
-	(m-1-1) edge [->] node [above] {$f$} (m-1-2);
-\end{tikzpicture}
-\label{eq:scheme}
-\end{equation}
-где $\varphi_1: \mathbb{R}^{n \times m} \to \mathbb{R}^{n \times p}$~---  функция кодирования независимых переменных; $\psi_1: \mathbb{R}^{n \times k} \to \mathbb{R}^{n \times p}$~---  функция кодирования целевых переменных; $\varphi_2: \mathbb{R}^{n \times p} \to \mathbb{R}^{n \times m}$~---  функция восстановления независимых переменных; $\psi_2: \mathbb{R}^{n \times p} \to \mathbb{R}^{n \times k}$~--  функция восстановления целевых переменных; $g: \mathbb{R}^{n \times p} \times \mathbb{R}^{n \times p} \to \mathbb{R}$~--- функция согласования.
-Матрицы
-\[
-	\bT = \varphi_1(\bX)  \in \mathbb{R}^{n\times p}; \quad \bU =\psi_1(\bY) \in \mathbb{R}^{n\times p}
-\]
-являются матрицами представлений данных в латентном пространстве низкой размерности.
-
-Оптимальные параметры $\theta_{\varphi_1}^{*}, \theta_{\psi_1}^{*}$ для функций кодирования $\varphi_1$  и $\psi_1$ находятся из следующей задачи параметрической оптимизации:
-\begin{equation}
-	(\theta_{\varphi_1}^{*}, \theta_{\psi_1}^{*}) = \argmax_{(\theta_{\varphi_1}, \theta_{\psi_1})} g\bigl( \varphi_1(\bX; \theta_{\varphi_1}), \psi_1(\bY; \theta_{\psi_1})\bigr).
-\label{eq:argmax}
-\end{equation}
-
 Так как параметры функции кодирования подбираются из условия максимизации функции согласования~\eqref{eq:argmax}, то после перехода в латентное пространство между $\mathbf{T}$ и $\mathbf{U}$ существует зависимость
 \begin{equation}
 	\bU = h(\bT) +  \boldsymbol{\eta},
@@ -518,65 +471,7 @@ $\widehat{\by} = \psi_2\bigl(h(\varphi_1(\bx))\bigr)$, то есть
 	g(\bT, \bU) \rightarrow \max_{\bW},
 	\label{concordance}
 \end{equation}
-где $\bW = \bigl\{\{\bW_\bx^i\}_{i=1}^L, \{\bW_\by^i\}_{i=1}^L, \{\bW_\bt^i\}_{i=1}^L, \{\bW_\bu^i\}_{i=1}^L\bigr\}$.
-
-\hrulefill
-
-\textbf{Неверная теорема}
-
-Рассмотрим случай квадратичной функции потерь:
-\[
-\cL(f, \bX, \bY) = \sum_{i=1}^m \| \by_i - f(\bx_i) \|^2.
-\]
-
-\begin{statement}
-	\label{ch1:st:decod_lip}
-	Пусть функция декодирования $\psi_d$ модели декодирования~$f$~\eqref{ch1:eq:def_decoding_function} Липшицева с константой $L$. Тогда 
-	\[
-		\cL(f, \bX, \bY) \leq L \cdot \cL(g, \bT, \bU).
-	\]
-\end{statement}
-
-\begin{proof}
-	\begin{multline*}
-		\cL(f, \bX, \bY) = \sum_{i=1}^m \| \psi_d (g (\phi_e(\bx_i))) - \by_i \|^2  = \sum_{i=1}^m \| \psi_d (g (\bt_i)) - \psi_d (\bu_i) \|^2 \\\leq L \sum_{i=1}^m \| g (\bt_i) - \bu_i \|^2 = L \cdot \cL(g, \bT, \bU).
-	\end{multline*}
-\end{proof}
-\begin{theorem}
-	Рассмотрим две модели:
-	\begin{enumerate}
-		\item Первая модель $f_1$ доставляет минимум ошибке $\cL(f, \bX, \bY)$
-		\[
-		f_1 = \argmin_f \cL(f, \bX, \bY).
-		\]
-		При этом $\bY = f_1(\bX) + \bE_1$, где $\bE_1 \in \bbR^{m \times r}$~--- матрица ошибок модели $f_1$.
-		
-		\item Вторая модель $f_2$~--- модель декодирования~\eqref{ch1:eq:def_decoding_function} c Липшецевой функцией декодирования $\psi_d$ с константой $L$ и функцией согласования, удовлетворяющей условию
-		\[
-			g = \argmin_g \cL(g, \bT, \bU).
-		\]
-		При этом $\bU = g(\bT) + \bE_2$, где $\bE_2 \in \bbR^{m \times s}$~--- матрица ошибок функции согласования $g$.
-	\end{enumerate}
-	Пусть для константы Липшица $L$ функции декодирования $\psi_d$ выполнено следующее условие
-	\begin{equation}
-		L \leq \frac{\|\bE_1\|_F^2}{\|\bE_2\|_F^2}.
-		\label{ch1:eq:lip_ineq}
-	\end{equation}
-	Тогда функция ошибки $\cL(f_2, \bX, \bY)$ модели $f_2$ не превосходит функции ошибки $\cL(f_1, \bX, \bY)$ модели $f_1$.
-\end{theorem}
-
-\begin{proof}
-	\[
-		\mathcal{L} (f_1, \bX, \bY) = \sum_{i=1}^m \| \mathbf{f}_1(\bx_i) - \by_i\|^2 = \| \bE_1 \|_F^2.
-	\]
-	\[
-	\mathcal{L} (g, \bT, \bU) = \sum_{i=1}^m \| \mathbf{g}(\bt_i) - \bu_i\|^2 = \| \bE_2 \|_F^2.
-	\]
-	Воспользуемся утверждением~\ref{ch1:st:decod_lip} и условием~\eqref{ch1:eq:lip_ineq}
-	\[
-		\mathcal{L} (f_2, \bX, \bY) \leq L \cdot \cL(g, \bT, \bU) = L \| \bE_2 \|_F^2 \leq \| \bE_1 \|_F^2 = \cL(f_1, \bX, \bY).
-	\]
-\end{proof}
+где $\bW = \bigl\{\bW_\bx^i, \bW_\by^i, \bW_\bt^i, \bW_\bu^i\bigr\}_{i=1}^L$.
 
 \hrulefill
 
