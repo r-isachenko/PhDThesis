@@ -5,19 +5,87 @@
 Вводятся понятия скрытого пространства, и процедура согласования образов.
 Доказываются теоремы об оптимальном выборе модели декодирования.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Процесс согласования моделей в пространстве высокой размерности}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \hrulefill
 
-Задача декодирования формулируется следующим образом. 
-Требуется построить регрессионную модель между объектами из двух пространств: $\bbX$ и $\bbY$.
-Пространства обладают высокой, избыточной размерностью. 
-Регрессионная модель оказывается неустойчивой.
-Для построения простой, точной и устойчивой модели предлагается учесть наличие внутренней структуры обоих пространств. 
-Применяются методы снижения размерности пространств для независимой и целевой переменной. 
-Итоговая регрессионная модель строится путём согласования образов исходных объектов в низкоразмерном пространстве. 
+Для постановки задачи декодирования введём предположения о структурах пространств $\bbX$ и $\bbY$.
+\begin{assumption}
+	Рассмотрим случай, когда пространства $\bbX$ и $\bbY$ имеют избыточную размерность. 
+	Это означает, что объекты $\bx$ и $\by$ принадлежат некоторым многообразиям низкой размерности. В простейшем случае такие многообразия могут являться вложениями, линейными подпространствами.
+\end{assumption}
 
-\hrulefill
+\begin{definition}
+	Назовём пространство $\bbT \subset \bbR^l$ \textit{скрытым пространством} для пространства $\bbX \subset \bbR^n$ ($l \leq n$), если существуют функция $\bphi_e: \bbX \to \bbT$ и функция $\bphi_d: \bbT  \to \bbX$ такие что
+	\[
+	\bx \in \bbX \quad \exists \bt \in \bbT: \bphi_d (\bphi_e(\bx)) = \bphi_d(\bt) = \bx.
+	\]
+	Функция $\bphi_e(\bx)$ называется \textit{функцией кодирования} объекта $\bx$, функция $\bphi_d(\bt)$  называется \textit{функцией декодирования}. 
+	
+	Аналогично введём определение \textit{скрытого пространства}~$\bbU \subset \bbR^s$ для целевого пространства $\bbY$, \textit{функции кодирования} $\bpsi_e: \bbY \to \bbU$ и \textit{декодирования} $\bpsi_d: \bbU  \to \bbY$
+	\[
+	 \by \in \bbY \quad  \exists \bu \in \bbU: \bpsi_d (\bpsi_e(\by)) = \bpsi_d(\bu) = \by.
+	\]
+\end{definition}
+
+\begin{definition}
+	Между пространствами $\bbX$ и $\bbY$ существует \textit{согласующее отображение}, если существуют пространства $\bbT$ и $\bbU$, являющиеся скрытыми для пространств $\bbX$ и $\bbY$ соответственно, и существует \textit{функция связи} $\bh: \bbT \rightarrow \bbU$, такая что
+	\[
+	\bu \in \bbU \quad \exists \bt:  \bu = \bh(\bt).
+	\]
+\end{definition}
+
+\begin{assumption}
+	Предположим, что в задаче предсказания~\eqref{ch1:eq:loss_min} пространства $\bbT$ и $\bbU$ являются скрытыми для пространств $\bbX$ и $\bbY$ соответственно. 
+	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует функция связи~$\bh: \bbT \rightarrow \bbU$. Тогда выполнено
+	\[
+		\forall \by \in \bbY \quad \exists \bx \in \bbX: \by = \bpsi_d(\bu) = \bpsi_d(\bh(\bt)) = \bpsi_d(\bh(\bphi_e(\bx))),
+	\]
+	и общая схема задачи декодирования принимает вид следующей коммутативной диаграммы:
+	\begin{equation}
+		\begin{tikzpicture}
+			\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
+			{
+				\bbX \subset \bbR^n & \bbY \subset \bbR^r \\
+				\bbT \subset \bbR^\ell & \bbU \subset \bbR^s \\};
+			\path[-stealth]
+			(m-1-1) edge [black] node [black, above] {$\mathbf{f}$} (m-1-2)
+			(m-2-1) edge [black, bend right=10] node [black, right] {$\bphi_d$} (m-1-1)
+			(m-2-2) edge [black, bend left=10] node [black, left] {$\bpsi_d$} (m-1-2)
+			(m-1-1) edge [black, bend right=10] node [black, left] {$\bphi_e$} (m-2-1)
+			(m-1-2) edge [black, bend left=10] node [black, right] {$\bpsi_e$} (m-2-2)
+			(m-2-1) edge [black] node [black, above] {$\mathbf{h}$} (m-2-2);
+		\end{tikzpicture}
+		\label{ch1:eq:decoding_scheme}
+	\end{equation}
+
+\begin{equation}
+	\begin{tikzpicture}
+		\matrix (m) [matrix of math nodes,row sep=3em,column sep=2em,minimum width=2em]
+		{
+			\bX \subset \bbR^n & & \bY \subset \bbR^r \\
+			& \bT, \bU \subset \bbR^l & \\};
+		\path[-stealth]
+		(m-1-1) edge node [above] {$\mathbf{f}$} (m-1-3)
+		(m-1-1) edge node [left=5] {$\bP$} (m-2-2)
+		(m-1-3) edge node [right=5] {$\bQ$} (m-2-2);
+	\end{tikzpicture}
+\end{equation}
+\end{assumption}
+
+\begin{definition}
+	Согласно диаграмме~\eqref{ch1:eq:decoding_scheme}, определим модель декодирования $f: \bbX \rightarrow \bbY$ как суперпозицию
+	\begin{equation}
+		f = \bpsi_d \circ \bh \circ \bphi_e.
+		\label{ch1:eq:def_decoding_function}
+	\end{equation}
+\end{definition}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Аддитивная суперпозиция моделей декодирования}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Рассмотрим модель~\eqref{ch1:eq:reg_model} вида
 \begin{equation}
@@ -117,81 +185,10 @@
 	 Доказательство следует из утверждений ???.
 \end{proof}
 
-\hrulefill
 
-Для постановки задачи декодирования введём предположения о структурах пространств $\bbX$ и $\bbY$.
-\begin{assumption}
-	Рассмотрим случай, когда пространства $\bbX$ и $\bbY$ имеют избыточную размерность. 
-	Это означает, что объекты $\bx$ и $\by$ принадлежат некоторым многообразиям низкой размерности. В простейшем случае такие многообразия могут являться вложениями, линейными подпространствами.
-\end{assumption}
-
-\begin{definition}
-	Назовём пространство $\bbT \subset \bbR^l$ \textit{скрытым пространством} для пространства $\bbX \subset \bbR^n$ ($l \leq n$), если существуют функция $\bphi_e: \bbX \to \bbT$ и функция $\bphi_d: \bbT  \to \bbX$ такие что
-	\[
-	\bx \in \bbX \quad \exists \bt \in \bbT: \bphi_d (\bphi_e(\bx)) = \bphi_d(\bt) = \bx.
-	\]
-	Функция $\bphi_e(\bx)$ называется \textit{функцией кодирования} объекта $\bx$, функция $\bphi_d(\bt)$  называется \textit{функцией декодирования}. 
-	
-	Аналогично введём определение \textit{скрытого пространства}~$\bbU \subset \bbR^s$ для целевого пространства $\bbY$, \textit{функции кодирования} $\bpsi_e: \bbY \to \bbU$ и \textit{декодирования} $\bpsi_d: \bbU  \to \bbY$
-	\[
-	 \by \in \bbY \quad  \exists \bu \in \bbU: \bpsi_d (\bpsi_e(\by)) = \bpsi_d(\bu) = \by.
-	\]
-\end{definition}
-
-\begin{definition}
-	Между пространствами $\bbX$ и $\bbY$ существует \textit{согласующее отображение}, если существуют пространства $\bbT$ и $\bbU$, являющиеся скрытыми для пространств $\bbX$ и $\bbY$ соответственно, и существует \textit{функция связи} $\bh: \bbT \rightarrow \bbU$, такая что
-	\[
-	\bu \in \bbU \quad \exists \bt:  \bu = \bh(\bt).
-	\]
-\end{definition}
-
-\begin{assumption}
-	Предположим, что в задаче предсказания~\eqref{ch1:eq:loss_min} пространства $\bbT$ и $\bbU$ являются скрытыми для пространств $\bbX$ и $\bbY$ соответственно. 
-	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует функция связи~$\bh: \bbT \rightarrow \bbU$. Тогда выполнено
-	\[
-		\forall \by \in \bbY \quad \exists \bx \in \bbX: \by = \bpsi_d(\bu) = \bpsi_d(\bh(\bt)) = \bpsi_d(\bh(\bphi_e(\bx))),
-	\]
-	и общая схема задачи декодирования принимает вид следующей коммутативной диаграммы:
-	\begin{equation}
-		\begin{tikzpicture}
-			\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
-			{
-				\bbX \subset \bbR^n & \bbY \subset \bbR^r \\
-				\bbT \subset \bbR^\ell & \bbU \subset \bbR^s \\};
-			\path[-stealth]
-			(m-1-1) edge [black] node [black, above] {$\mathbf{f}$} (m-1-2)
-			(m-2-1) edge [black, bend right=10] node [black, right] {$\bphi_d$} (m-1-1)
-			(m-2-2) edge [black, bend left=10] node [black, left] {$\bpsi_d$} (m-1-2)
-			(m-1-1) edge [black, bend right=10] node [black, left] {$\bphi_e$} (m-2-1)
-			(m-1-2) edge [black, bend left=10] node [black, right] {$\bpsi_e$} (m-2-2)
-			(m-2-1) edge [black] node [black, above] {$\mathbf{h}$} (m-2-2);
-		\end{tikzpicture}
-		\label{ch1:eq:decoding_scheme}
-	\end{equation}
-
-\begin{equation}
-	\begin{tikzpicture}
-		\matrix (m) [matrix of math nodes,row sep=3em,column sep=2em,minimum width=2em]
-		{
-			\bX \subset \bbR^n & & \bY \subset \bbR^r \\
-			& \bT, \bU \subset \bbR^l & \\};
-		\path[-stealth]
-		(m-1-1) edge node [above] {$\mathbf{f}$} (m-1-3)
-		(m-1-1) edge node [left=5] {$\bP$} (m-2-2)
-		(m-1-3) edge node [right=5] {$\bQ$} (m-2-2);
-	\end{tikzpicture}
-\end{equation}
-\end{assumption}
-
-\begin{definition}
-	Согласно диаграмме~\eqref{ch1:eq:decoding_scheme}, определим модель декодирования $f: \bbX \rightarrow \bbY$ как суперпозицию
-	\begin{equation}
-		f = \bpsi_d \circ \bh \circ \bphi_e.
-		\label{ch1:eq:def_decoding_function}
-	\end{equation}
-\end{definition}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Доказательство корректности работы алгоритмов PLS и CCA}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Псевдокод метода регрессии PLS приведен в Алгоритме~\ref{ch1:pls_pseudocode}.
 Алгоритм итеративно на каждом из $l$ шагов вычисляет по одному столбцу $\bt_k$, $\bu_k$, $\bp_k$, $\bq_k$ матриц $\bT$, $\bU$, $\bP$, $\bQ$ соответственно. 
@@ -426,7 +423,10 @@ $\widehat{\by} = \bpsi_2\bigl(\bh(\bphi_1(\bx))\bigr)$, то есть
 
 \hrulefill
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Анализ линейных методов проекции в скрытое пространство}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 Для проведения вычислительного эксперимента рассматриваются данные потребления электроэнергии.
 Временные ряды электроэнергии состоят из почасовых записей (52512 наблюдений). 
 Строка матрицы~$\bX$~--– локальная история сигнала за одну неделю $n = 24 \times 7$. 
@@ -507,7 +507,10 @@ $\widehat{\by} = \bpsi_2\bigl(\bh(\bphi_1(\bx))\bigr)$, то есть
 	\label{ch1:fig:ecog_prediction}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Анализ нелинейных зависимостей проекций в скрытое пространство}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 Цель вычислительного эксперимента~-- сравнительный анализ рассматриваемых моделей.
 Рассматриваются данные, для которых сложность класса линейных методов неадекватно низка.
 Нелинейные модели позволяют получить точный прогноз при адекватной сложности.
