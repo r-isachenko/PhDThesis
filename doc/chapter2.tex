@@ -36,12 +36,12 @@
 \end{definition}
 
 \begin{assumption}
-	Предположим, что в задаче предсказания~\eqref{ch1:eq:loss_min} пространства $\bbT$ и $\bbU$ являются скрытыми для пространств $\bbX$ и $\bbY$ соответственно. 
+	Предположим, что в задаче прогнозирования~\eqref{ch1:eq:loss_min} пространства $\bbT$ и $\bbU$ являются скрытыми для пространств $\bbX$ и $\bbY$ соответственно. 
 	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует функция связи~$\bh: \bbT \rightarrow \bbU$. Тогда выполнено
 	\[
 		\text{для любого } \by \in \bbY \quad \text{существует } \bx \in \bbX: \by = \bpsi_d(\bu) = \bpsi_d(\bh(\bt)) = \bpsi_d(\bh(\bphi_e(\bx))),
 	\]
-	и общая схема задачи декодирования принимает вид следующей коммутативной диаграммы:
+	и общая схема задачи поиска согласованной модели декодирования принимает вид следующей коммутативной диаграммы:
 	\begin{equation}
 		\begin{tikzpicture}
 			\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
@@ -61,12 +61,115 @@
 \end{assumption}
 
 \begin{definition}
-	Согласно диаграмме~\eqref{ch1:eq:decoding_scheme}, определим модель декодирования $\mathbf{f}: \bbX \rightarrow \bbY$ как суперпозицию
+	Согласно диаграмме~\eqref{ch1:eq:decoding_scheme}, определим \textit{согласованную} модель декодирования $\mathbf{f}: \bbX \rightarrow \bbY$ как суперпозицию
 	\begin{equation}
 		\mathbf{f} = \bpsi_d \circ \bh \circ \bphi_e.
 		\label{ch1:eq:def_decoding_function}
 	\end{equation}
 \end{definition}
+
+Таким образом задача прогнозирования~\eqref{ch1:eq:loss_min} сводится к поиску согласованной модели декодирования~\eqref{ch1:eq:def_decoding_function}. 
+Для поиска оптимальных параметров функций кодирования $\bphi_e$ и $\bpsi_e$, декодирования $\bphi_d$ и $\bpsi_d$, а также функции связи~$\bh$ ставится задача максимизации $\textit{функции согласования проекций}$
+\[
+	g: \bbT \times \bbU \rightarrow \bbR, \quad g(\bt, \bu) = g(\bphi_e(\bx), \bpsi_e(\by)) \rightarrow \max_{\bphi_e, \bpsi_e, \bh}.
+\]
+
+\hrulefill
+
+Метод главных компонент (PCA) снижает размерность данных и сохраняет максимальную дисперсию. Линейная модель PCA представляет собой ортогональное линейное преобразование исходного признакового пространства в новое пространство меньшей размерности. Первый базисный вектор строится так, чтобы выборочная дисперсия столбцов проекций матрицы~$\bX$ была максимальной:
+\begin{equation}
+	\bp = \argmax_{\|\bp\|_{2} = 1} [\text{var}(\bX \textbf{p})],
+	\label{eq:PCA}
+\end{equation}
+где $\text{var}(\bX \textbf{p}) = \frac{1}{n} (\bX \textbf{p})^{\T}\bX \textbf{p}$ обозначает выборочную дисперсию. Последующие базисные векторы находятся итеративно после вычитания проекции на все найденные ранее.
+
+Функция кодирования $\bphi_1: \mathbb{R}^{n \times m} \to \mathbb{R}^{n \times p}$ имеет вид
+\begin{equation}
+	\bphi_1(\bX) =  \underset{n \times m}\bX \cdot \underset{m \times p}\bP^{\T},
+	\label{eq:PCA2}
+\end{equation}
+где $\bP = [\bp_1, \dots, \bp_{p}].$
+Метод PCA не согласует независимые переменные и целевые переменные. Из-за этого зависимости в обоих пространствах не учитываются.
+
+\hrulefill
+
+В методе PLS  функции кодирования имеют вид
+\begin{equation*}
+	\bphi_1(\bX) = \bX \bW_{\bx}, \;\;
+	\bpsi_1(\bY) = \bY \bW_{\by},
+\end{equation*}
+где матрицы весов $\bW_{\bx} \in \mathbb{R}^{m \times p}, \bW_{\by} \in \mathbb{R}^{k \times p}$ находятся путем максимизации функции согласования $g(\bX \bW_{\bx},  \bY \bW_{\by}) = \textbf{Cov} (\bX \bW_{\bx},  \bY \bW_{\by})^{2}$:
+\begin{equation}
+	(\bW_{\bx}, \bW_{\by}) = \argmax_{\bW_{\by}, \bW_{\by}}[ \textbf{Cov}(\bX \bW_{\bx}, \bY \bW_{\by})^{2}],
+\label{eq:PLSpr3}
+\end{equation}
+где $\textbf{Cov}(\bX \bW_{\bx}, \bY \bW_{\by})$~--- выборочная ковариация.
+
+Функции восстановления принимают вид
+\begin{equation*}
+	\bphi_d(\bT) = \bT\bP^{\T}, \;\;
+	\bpsi_d(\bU) = \bU \bQ^{\T}.
+\end{equation*}
+
+\begin{equation*}
+	\begin{tikzpicture}
+		\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
+		{
+			\bbX \subset \bbR^n & \bbY \subset \bbR^r \\
+			\bbT \subset \bbR^\ell & \bbU \subset \bbR^s \\};
+		\path[-stealth]
+		(m-1-1) edge [black] node [black, above] {$\mathbf{f}$} (m-1-2)
+		(m-1-1) edge [black, bend right=10] node [black, left] {$\bW$} (m-2-1)
+		(m-2-1) edge [black, bend right=10] node [black, right] {$\bP$} (m-1-1)
+		(m-1-2) edge [black, bend left=10] node [black, right] {$\bC$} (m-2-2)
+		(m-2-2) edge [black, bend left=10] node [black, left] {$\bQ$} (m-1-2)
+		(m-2-1) edge [black] node [black, above] {$\bB$} (m-2-2);
+	\end{tikzpicture}
+\end{equation*}
+			
+\hrulefill
+
+Канонический анализ корреляций находит два набора базисных векторов $\{\bw_{\bx_i}\}_{i=1}^{p}$, $\bw_{\bx} \in \mathbb{R}^{m}$, и $\{\bw_{\by_i}\}_{i=1}^{p}, \; \bw_{\by} \in \mathbb{R}^{k}$, один для матрицы $\bX$, другой для матрицы $\bY$, так чтобы коэффициент корреляция между проекциями переменных на эти базисные векторы был максимальным. Функция согласования для CCA имеет вид
+\begin{equation*}
+	g(\bX \bW_{\bx}, \bY \bW_{\by}) = \text{corr}(\bX \bW_{\bx}, \bY \bW_{\by}),
+\end{equation*}
+\noindentгде $\textbf{corr}(\bX \bw_{\bx}, \bY \bw_{\by})$~-- коэффициент корреляции между векторами.
+
+Таким образом, функции кодирования имеют вид
+\begin{equation*}
+	\bphi_1(\bX) = \bX \bW_{\bx} , \;\;
+	\bpsi_1(\bY) = \bY \bW_{\by},
+\end{equation*}
+где первые столбцы матриц весов находятся как векторы, максимизирующие функцию согласования $g$. Далее ищутся векторы, максимизирующие $g$, но с ограничением, что они не коррелируют с первой парой векторов. Процедура продолжается до тех пор, пока число векторов не станет равным $p$.
+
+\textbf{Нелинейный канонический анализ корреляций}
+Помимо линейных моделей декодирования рассматриваются нелинейные методы. 
+В данном случае функции кодирования и декодирования являются нелинейными нейросетями вида
+\begin{align*}
+	\bT &= \bphi_e(\bX) =  \bW_\bx^L \sigma(\dots \sigma(\bW_\bx^2 \sigma(\bX \bW_\bx^1)) \dots ), \\
+	\bU &= \bpsi_e(\bY) =  \bW_\by^L \sigma(\dots \sigma(\bW_\by^2 \sigma(\bY \bW_\by^1)) \dots ), \\
+	\bX &= \bphi_d(\bT) =  \bW_\bt^L \sigma(\dots \sigma(\bW_\bt^2 \sigma(\bT \bW_\bt^1)) \dots ), \\
+	\bY &= \bpsi_d(\bU) =  \bW_\bu^L \sigma(\dots \sigma(\bW_\bu^2 \sigma(\bU \bW_\bu^1)) \dots ).
+\end{align*}
+Каждая нейросеть является суперпозицией последовательных умножений на матрицы параметров и применения поэлементных функций активаций.
+
+Требуется найти такие параметры, при которых функция согласования~$g$ достигает своего максимума:
+\begin{equation}
+	g(\bT, \bU) \rightarrow \max_{\bW},
+	\label{ch2:eq:concordance}
+\end{equation}
+где $\bW = \bigl\{\bW_\bx^i, \bW_\by^i, \bW_\bt^i, \bW_\bu^i\bigr\}_{i=1}^L$.
+
+Процесс согласования заключается в максимизации функции согласования $g(\bt, \bu)$ по параметрам нейросетей.
+В работе~\cite{andrew2013deep} рассматривается частный случай задачи~\eqref{ch2:eq:concordance}. 
+При использовании в качестве функции согласования корреляции между проекциями $g(\bt, \bu) = \textnormal{corr}(\bt, \bu)$ частная производная функции согласования по первому аргументу принимает вид
+\[
+	\frac{\partial g(\bt, \bu)}{\partial \bt} = \frac{1}{\ell - 1} \left(\bSigma_1^{-1/2} \bU \bV^{\T} \bSigma_2^{-1/2} \bU - \bSigma_1^{-1/2} \bU \bD \bV^{\T} \bSigma_1^{-1/2} \right),
+\]
+где $\bU, \bD, \bV = \textnormal{SVD}(\bSigma)$, \, $\bSigma = \bSigma_1^{-1/2} \bSigma_{12} \bSigma_2^{-1/2} $, \, $\bSigma_1 = \frac{1}{\ell - 1} \bT \bT^{\T}$, \, $\bSigma_2 = \frac{1}{\ell - 1} \bU \bU^{\T}$, \, $\bSigma_{12} = \frac{1}{\ell - 1} \bT \bU^{\T}$.
+Аналогичное выражение имеется частная производная по второму аргументу.
+Полученное выражение для градиента позволяет построить эффективный алгоритм для решения задачи с использованием градиентных методов оптимизации.
+\hrulefill
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Доказательство корректности работы алгоритмов PLS и CCA}
@@ -305,79 +408,6 @@
 \begin{proof}
 	 Доказательство следует из утверждений ???.
 \end{proof}
-
-\hrulefill
-
-\textbf{Алгоритмы PCA, PLS, CCA, DeepCCA в терминах задачи декодирования (работа Фаруха)}
-
-Метод главных компонент (PCA) снижает размерность данных и сохраняет максимальную дисперсию. Линейная модель PCA представляет собой ортогональное линейное преобразование исходного признакового пространства в новое пространство меньшей размерности. Первый базисный вектор строится так, чтобы выборочная дисперсия столбцов проекций матрицы~$\bX$ была максимальной:
-\begin{equation}
-	\bp = \argmax_{\|\bp\|_{2} = 1} [\text{var}(\bX \textbf{p})],
-	\label{eq:PCA}
-\end{equation}
-где $\text{var}(\bX \textbf{p}) = \frac{1}{n} (\bX \textbf{p})^{\T}\bX \textbf{p}$ обозначает выборочную дисперсию. Последующие базисные векторы находятся итеративно после вычитания проекции на все найденные ранее.
-
-Функция кодирования $\bphi_1: \mathbb{R}^{n \times m} \to \mathbb{R}^{n \times p}$ имеет вид
-\begin{equation}
-	\bphi_1(\bX) =  \underset{n \times m}\bX \cdot \underset{m \times p}\bP^{\T},
-	\label{eq:PCA2}
-\end{equation}
-где $\bP = [\bp_1, \dots, \bp_{p}].$
-Метод PCA не согласует независимые переменные и целевые переменные. Из-за этого зависимости в обоих пространствах не учитываются.
-
-\hrulefill
-
-В методе PLS  функции кодирования имеют вид
-\begin{equation*}
-	\bphi_1(\bX) = \bX \bW_{\bx}, \;\;
-	\bpsi_1(\bY) = \bY \bW_{\by},
-\end{equation*}
-где матрицы весов $\bW_{\bx} \in \mathbb{R}^{m \times p}, \bW_{\by} \in \mathbb{R}^{k \times p}$ находятся путем максимизации функции согласования $g(\bX \bW_{\bx},  \bY \bW_{\by}) = \textbf{Cov} (\bX \bW_{\bx},  \bY \bW_{\by})^{2}$:
-\begin{equation}
-	(\bW_{\bx}, \bW_{\by}) = \argmax_{\bW_{\by}, \bW_{\by}}[ \textbf{Cov}(\bX \bW_{\bx}, \bY \bW_{\by})^{2}],
-\label{eq:PLSpr3}
-\end{equation}
-где $\textbf{Cov}(\bX \bW_{\bx}, \bY \bW_{\by})$~--- выборочная ковариация.
-
-Функции восстановления принимают вид
-\begin{equation*}
-	\bphi_d(\bT) = \bT\bP^{\T}, \;\;
-	\bpsi_d(\bU) = \bU \bQ^{\T}.
-\end{equation*}
-
-Канонический анализ корреляций находит два набора базисных векторов $\{\bw_{\bx_i}\}_{i=1}^{p}$, $\bw_{\bx} \in \mathbb{R}^{m}$, и $\{\bw_{\by_i}\}_{i=1}^{p}, \; \bw_{\by} \in \mathbb{R}^{k}$, один для матрицы $\bX$, другой для матрицы $\bY$, так чтобы коэффициент корреляция между проекциями переменных на эти базисные векторы был максимальным. Функция согласования для CCA имеет вид
-\begin{equation*}
-	g(\bX \bW_{\bx}, \bY \bW_{\by}) = \text{corr}(\bX \bW_{\bx}, \bY \bW_{\by}),
-\end{equation*}
-\noindentгде $\textbf{corr}(\bX \bw_{\bx}, \bY \bw_{\by})$~-- коэффициент корреляции между векторами.
-
-Таким образом, функции кодирования имеют вид
-\begin{equation*}
-	\bphi_1(\bX) = \bX \bW_{\bx} , \;\;
-	\bpsi_1(\bY) = \bY \bW_{\by},
-\end{equation*}
-где первые столбцы матриц весов находятся как векторы, максимизирующие функцию согласования $g$. Далее ищутся векторы, максимизирующие $g$, но с ограничением, что они не коррелируют с первой парой векторов. Процедура продолжается до тех пор, пока число векторов не станет равным $p$.
-
-\textbf{Нелинейный канонический анализ корреляций}
-
-Нелинейный канонический анализ корреляций~--- нелинейная модификация CCA. Метод Deep CCA преобразует исходные данные с помощью нейронной сети таким образом, что результирующее представление становится согласованным. В данной работе рассматриваются следующие нелинейные функции кодирования и восстановления:
-
-\begin{align*}
-	\bT &= \bphi_e(\bX) =  \bW_\bx^L \sigma(\dots \sigma(\bW_\bx^2 \sigma(\bX \bW_\bx^1)) \dots ), \\
-	\bU &= \bpsi_e(\bY) =  \bW_\by^L \sigma(\dots \sigma(\bW_\by^2 \sigma(\bY \bW_\by^1)) \dots ), \\
-	\bX &= \bphi_d(\bT) =  \bW_\bt^L \sigma(\dots \sigma(\bW_\bt^2 \sigma(\bT \bW_\bt^1)) \dots ), \\
-	\bY &= \bpsi_d(\bU) =  \bW_\bu^L \sigma(\dots \sigma(\bW_\bu^2 \sigma(\bU \bW_\bu^1)) \dots ).
-\end{align*}
-Каждая функция представляет нейронную сеть с $L$ скрытыми слоями.
-
-Требуется найти такие параметры, при которых функция согласования~$g$ достигает своего максимума:
-\begin{equation}
-	g(\bT, \bU) \rightarrow \max_{\bW},
-	\label{concordance}
-\end{equation}
-где $\bW = \bigl\{\bW_\bx^i, \bW_\by^i, \bW_\bt^i, \bW_\bu^i\bigr\}_{i=1}^L$.
-
-\hrulefill
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Анализ линейных методов проекции в скрытое пространство}
