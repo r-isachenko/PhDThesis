@@ -57,19 +57,19 @@
 			(m-1-2) edge [black, bend left=10] node [black, right] {$\bpsi_e$} (m-2-2)
 			(m-2-1) edge [black] node [black, above] {$\mathbf{h}$} (m-2-2);
 		\end{tikzpicture}
-		\label{ch1:eq:decoding_scheme}
+		\label{ch2:eq:decoding_scheme}
 	\end{equation}
 \end{assumption}
 
 \begin{definition}
-	Согласно диаграмме~\eqref{ch1:eq:decoding_scheme}, определим \textit{согласованную} модель декодирования $\mathbf{f}: \bbX \rightarrow \bbY$ как суперпозицию
+	Согласно диаграмме~\eqref{ch2:eq:decoding_scheme}, определим \textit{согласованную} модель декодирования $\mathbf{f}: \bbX \rightarrow \bbY$ как суперпозицию
 	\begin{equation}
 		\mathbf{f} = \bpsi_d \circ \bh \circ \bphi_e.
-		\label{ch1:eq:def_decoding_function}
+		\label{ch2:eq:def_decoding_function}
 	\end{equation}
 \end{definition}
 
-Таким образом задача прогнозирования~\eqref{ch1:eq:loss_min} сводится к поиску согласованной модели декодирования~\eqref{ch1:eq:def_decoding_function}. 
+Таким образом задача прогнозирования~\eqref{ch1:eq:loss_min} сводится к поиску согласованной модели декодирования~\eqref{ch2:eq:def_decoding_function}. 
 Для поиска оптимальных параметров функций кодирования $\bphi_e$ и $\bpsi_e$, декодирования $\bphi_d$ и $\bpsi_d$, а также функции связи~$\bh$ ставится задача максимизации $\textit{функции согласования проекций}$
 \[
 	g: \bbT \times \bbU \rightarrow \bbR, \quad g(\bT, \bU) = g(\bphi_e(\bX), \bpsi_e(\bY)) \rightarrow \max_{\bphi_e, \bpsi_e, \bh}.
@@ -81,17 +81,16 @@
 Метод главных компонент снижает размерность исходных данных и сохраняет максимальную дисперсию между полученными проекциями. 
 Линейная модель PCA представляет собой ортогональное линейное преобразование исходного признакового пространства в скрытое пространство меньшей размерности. 
 Базисные вектора в скрытом пространстве строится так, чтобы выборочная дисперсия столбцов проекций матрицы~$\bX$ была максимальной:
-\begin{equation}
+\begin{equation*}
 	\bp = \argmax_{\|\bp\|_{2} = 1} [\text{var}(\bX \textbf{p})].
-	\label{eq:PCA}
-\end{equation}
+\end{equation*}
 Последующие базисные векторы находятся итеративно после вычитания проекции на все найденные ранее.
 
 Функции кодирования $\bphi_e: \bbR^m \to \bbR^l$ и декодирования $\bphi_d: \bbR^l \to \bbR^m$ имеют вид
-\begin{equation}
+\begin{equation*}
 	\bphi_e(\bX) =  \underset{n \times m}\bX \cdot \underset{m \times l}\bP^{\T}, \quad	\bphi_d(\bT) =  \underset{n \times l}\bT \cdot \underset{l \times m}\bP,
-	\label{eq:PCA2}
-\end{equation}
+	\label{ch2:eq:PCA2}
+\end{equation*}
 где $\bP = [\bp_1, \dots, \bp_l].$ Здесь матрица $\bP$ является ортогональной матрицей, то есть $\bP^{-1} = \bP^{\T}$.
 Метод PCA не согласует исходные переменные и целевые переменные. 
 А именно алгоритм PCA не находит функции кодирования $\bpsi_e$ и декодирования $\bpsi_d$, а также функцию связи $\bh$. 
@@ -105,7 +104,7 @@
 	\bphi_d(\bT) &= \bT \bP^{\T}, \quad \bpsi_d(\bU) = \bU \bQ^{\T},
 \end{align*}
 Функция связи имеет вид линейной модели, связывающей образы проекций в скрытом пространстве $\bu = \bh(\bt) = \bB^{\T} \bt$.
-В данном случае схема декодирования~\eqref{ch1:eq:decoding_scheme} принимает вид следующей коммутативной диаграммы
+В данном случае схема декодирования~\eqref{ch2:eq:decoding_scheme} принимает вид следующей коммутативной диаграммы
 \begin{equation*}
 	\begin{tikzpicture}
 		\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
@@ -121,7 +120,7 @@
 		(m-2-1) edge [black] node [black, above] {$\bB$} (m-2-2);
 	\end{tikzpicture}
 \end{equation*}
-Далее в этой главе приводится подробная процедура нахождения оптимальных матриц $\bP$, $\bQ$, $\bW$, $\bC$, $\bB$ с доказательством корректности.
+В разделе~\ref{sec:ch2:pls_proof} приводится подробная процедура нахождения оптимальных матриц $\bP$, $\bQ$, $\bW$, $\bC$, $\bB$ с доказательством корректности.
 
 \textbf{Канонический анализ корреляций.} Канонический анализ корреляций находит два набора базисных векторов $\{\bw_{\bx_i}\}_{i=1}^{p}$, $\bw_{\bx} \in \mathbb{R}^{m}$, и $\{\bw_{\by_i}\}_{i=1}^{p}, \; \bw_{\by} \in \mathbb{R}^{k}$, один для матрицы $\bX$, другой для матрицы $\bY$, так чтобы коэффициент корреляция между проекциями переменных на эти базисные векторы был максимальным. Функция согласования для CCA имеет вид
 \begin{equation*}
@@ -169,14 +168,14 @@
 \label{sec:ch2:pls_proof}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Псевдокод метода регрессии PLS приведен в алгоритме~\ref{ch1:pls_pseudocode}.
+Псевдокод метода регрессии PLS приведен в алгоритме~\ref{ch2:pls_pseudocode}.
 Алгоритм итеративно на каждом из $l$ шагов вычисляет по одному столбцу $\bt_k$, $\bu_k$, $\bp_k$, $\bq_k$ матриц $\bT$, $\bU$, $\bP$, $\bQ$ соответственно. 
 После вычисления следующего набора векторов из матриц $\bX$, $\bY$ вычитаются очередные одноранговые аппроксимации. 
 При этом предполагается, что исходные матрицы~$\bX$ и~$\bY$ нормированы (имеют нулевое среднее и единичное среднее отклонение).
 
 \begin{algorithm}[h]
 	\caption{Алгоритм PLS}
-	\label{ch1:pls_pseudocode}
+	\label{ch2:pls_pseudocode}
 	\begin{algorithmic}[1]
 		\REQUIRE $\bX, \bY, l$;
 		\ENSURE $\bT, \bP, \bQ$;
@@ -205,7 +204,7 @@
 	\end{algorithmic}
 \end{algorithm}
 
-Вектора $\bt_k$ и $\bu_k$ из внутреннего цикла aлгоритма~\ref{ch1:pls_pseudocode}
+Вектора $\bt_k$ и $\bu_k$ из внутреннего цикла aлгоритма~\ref{ch2:pls_pseudocode}
 содержат информацию о матрице объектов $\bX$ и матрице ответов $\bY$ соответственно. 
 Блоки из шагов (6)--(7) и шагов (8)--(9)~--- аналоги алгоритма PCA для матриц $\bX$ и $\bY$~\cite{geladi1988pls}. 
 Последовательное выполнение блоков позволяет учесть взаимную связь между матрицами $\bX$ и $\bY$.
@@ -223,7 +222,7 @@
 	корреляция между векторами отвечает взаимосвязи между $\bX$ и~$\bY$. 
 \end{proof}
 
-Во внутреннем цикле aлгоритма~\ref{ch1:pls_pseudocode} вычисляются нормированные вектора весов $\bw_k$ и $\bc_k$. 
+Во внутреннем цикле aлгоритма~\ref{ch2:pls_pseudocode} вычисляются нормированные вектора весов $\bw_k$ и $\bc_k$. 
 Из данных векторов строятся матрицы весов $\bW$ и $\bC$ соответственно.
 
 \begin{statement}
@@ -236,7 +235,7 @@
 		\bc_k \varpropto \bY_k^{\T} \bt_k \varpropto \bY_k^{\T} \bX_k \bw_k \varpropto \bY_k^{\T} \bX_k \bX_k^{\T} \bu_{k-1} \varpropto \bY_k^{\T} \bX_k \bX_k^{\T} \bY_k \bc_{k-1},
 	\end{equation*}
 	где символ $\varpropto$ означает равенство с точностью до мультипликативной константы. 
-	\label{st:eig}
+	\label{ch2:stat:eig}
 \end{statement}
 \begin{proof}
 	Утверждение следует из того факта, что правила обновления векторов $\bw_k$, $\bc_k$ совпадают с итерацией алгоритма поиска максимального собственного значения. 
@@ -251,7 +250,7 @@
 \end{proof}
 
 \begin{statement}
-	Обновление векторов по шагам (6)--(9) aлгоритма~\ref{ch1:pls_pseudocode} соответствует максимизации ковариации между векторами~$\bt_k$ и~$\bu_k$.
+	Обновление векторов по шагам (6)--(9) aлгоритма~\ref{ch2:pls_pseudocode} соответствует максимизации ковариации между векторами~$\bt_k$ и~$\bu_k$.
 \end{statement}
 \begin{proof}
 	Максимальная ковариация между векторами~$\bt_k$ и~$\bu_k$ равна максимальному собственному значению матрицы~$\bX_k^{\T} \bY_k \bY_k^{\T} \bX_k$:
@@ -261,17 +260,15 @@
 		& = \lambda_{\max} \left( \bX_k^{\T} \bY_k \bY_k^{\T} \bX_k \right),
 s	\end{align*}
 	где~$\lambda_{\max} (\mathbf{A})$~--- максимальное собственное значение матрицы $\mathbf{A}$.
-	Применяя утверждение~\ref{st:eig}, получаем требуемое.
+	Применяя утверждение~\ref{ch2:stat:eig}, получаем требуемое.
 \end{proof}
 
 После завершения внутреннего цикла на шаге (11) вычисляются вектора $\bp_k$, $\bq_k$ проецированием столбцов матриц $\bX_k$ и $\bY_k$ на вектор $\bt_k$. 
 Для перехода на следующий шаг необходимо вычесть из матриц $\bX_k$ и $\bY_k$ одноранговые аппроксимации $\bt_k \bp_k^{\T}$ и $\bt_k \bq_k^{\T}$
-\begin{equation*}
-	\bX_{k + 1} = \bX_{k} - \bt_k \bp_k^{\T} = \bX - \sum_k \bt_k \bp_k^{\T},
-\end{equation*}
-\begin{equation*}
-	\bY_{k + 1} = \bY_{k} - \bt_k \bq_k^{\T} = \bY - \sum_k \bt_k \bq_k^{\T}.
-\end{equation*}
+\begin{align*}
+	\bX_{k + 1} &= \bX_{k} - \bt_k \bp_k^{\T} = \bX - \sum_k \bt_k \bp_k^{\T}, \\
+	\bY_{k + 1} &= \bY_{k} - \bt_k \bq_k^{\T} = \bY - \sum_k \bt_k \bq_k^{\T}.
+\end{align*}
 При этом каждый следующий вектор~$\bt_k$ оказывается ортогонален всем векторам~$\bt_i$, $i=1, \dots, k$.
 
 Для получения прогнозов модели и нахождения параметров модели 
@@ -283,22 +280,21 @@ s	\end{align*}
 Линейное преобразование между объектами в исходном и латентном пространстве имеет вид
 \begin{equation}
 	\bT = \bX \bW^*,
-	\label{ch1:eq:W*}
+	\label{ch2:eq:W*}
 \end{equation}
 где $\bW^* = \bW (\bP^{\T} \bW)^{-1}$. 
 
-Матрица параметров модели~\ref{ch1:eq:lin_reg_model} находится из уравнений~\eqref{ch1:eq:PLS_Y},~\eqref{ch1:eq:W*}
-\begin{equation*}
-	\bY = \bT \bQ^{\T} + \bE = \bX \bW^* \bQ^{\T} + \bE = \bX \bTheta + \bE.
-	\label{ch1:eq:pls_model}
-\end{equation*}
-Таким образом, параметры модели~\eqref{ch1:eq:lin_reg_model} равны
+Матрица параметров модели~\ref{ch1:eq:lin_reg_model} находится из уравнений~\eqref{ch1:eq:PLS_Y},~\eqref{ch2:eq:W*}
 \begin{equation}
-	\bTheta = \bW (\bP^{\T} \bW)^{-1} \bQ^{\T}.
-	\label{ch1:eq:linear_regression_model_parameters}
+	\bY = \bT \bQ^{\T} + \bE = \bX \bW^* \bQ^{\T} + \bE = \bX \bTheta + \bE.
+	\label{ch2:eq:pls_model}
 \end{equation}
+Таким образом, параметры модели~\eqref{ch1:eq:lin_reg_model} равны
+\begin{equation*}
+	\bTheta = \bW (\bP^{\T} \bW)^{-1} \bQ^{\T}.
+\end{equation*}
 
-Финальная модель~\eqref{ch1:eq:pls_model} является линейной, низкоразмерной в скрытом пространстве. 
+Финальная модель~\eqref{ch2:eq:pls_model} является линейной, низкоразмерной в скрытом пространстве. 
 Это снижает избыточность данных и повышает стабильность модели.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -315,7 +311,7 @@ s	\end{align*}
 где объект $\bx = [\bx_1, \bx_2] \in \bbR^n$ состоит из двух подвекторов $\bx_1 \in \bbR^k$, $\bx_2 \in \bbR^{n - k}$. Тем самым матрица параметров $\bTheta \in \bbR^{n \times r}$ состоит из двух подматриц $\bTheta_1 \in \bbR^{k \times r}$, $\bTheta_2 \in \bbR^{n - k \times r}$. 
 
 \begin{statement}
-	\label{stat:two_modal_params}
+	\label{ch2:stat:two_modal_params}
 	Матрица параметров $\bTheta$ для модели~\eqref{ch2:eq:two_modal_reg_model}, доставляющая минимум функции ошибки~\eqref{ch1:eq:l2_loss_function}, имеет вид:
 	\begin{align*}
 		\bTheta_1 &= (\bX_1^{\T} \bM_{\bX_2} \bX_1)^{-1} \bX_1^{\T} \bM_{\bX_2} \bY, \\
@@ -354,23 +350,23 @@ s	\end{align*}
 Таким образом матрицы $\bM_{\bX_1}$ и $\bM_{\bX_2}$ являются матрицами проекций на ортогональные подпространства.
 
 \begin{statement}
-	\label{stat:two_modal_theta2}
+	\label{ch2:stat:two_modal_theta2}
 	Оптимальная подматрица $\bTheta_2$ в модели~\eqref{ch2:eq:two_modal_reg_model} является решением задачи регрессии
 	\begin{equation}
 		\| \bY_1 -  \bX_{21} \bTheta_2 \| \rightarrow \min_{\bTheta_2},
-		\label{eq:two_modal_fwl}
+		\label{ch2:eq:two_modal_fwl}
 	\end{equation}
 	где $\bY_1 = \bM_{\bX_1} \bY$, $\bX_{21} = \bM_{\bX_1} \bX_2$.
 \end{statement}
 
 \begin{proof}
 	Матрица $\bM_{\bX_1}$ является матрицей проекции на ортогональное подпространство, построенное на линейной оболочке столбцов матрицы $\bX_1$. Таким образом, матрица $\bM_{\bX_1}$ является идемпотентной ($\bM_{\bX_1}{\T} \bM_{\bX_1} = \bM_{\bX_1}$). 
-	Таким образом, используя утверждение~\ref{stat:two_modal_params},
+	Таким образом, используя утверждение~\ref{ch2:stat:two_modal_params},
 	\begin{multline*}
 		\bTheta_2 = (\bX_2^{\T} \bM_{\bX_1} \bX_2)^{-1} \bX_2^{\T} \bM_{\bX_1} \bY = (\bX_2^{\T} \bM_{\bX_1}^{\T} \bM_{\bX_1} \bX_2)^{-1} \bX_2^{\T} \bM_{\bX_1}^{\T} \bM_{\bX_1} \bY = \\
 		= ((\bM_{\bX_1} \bX_2)^{\T} (\bM_{\bX_1} \bX_2)^{\T})^{-1} (\bM_{\bX_1} \bX_2)^{\T} (\bM_{\bX_1} \bY) = (\bX_{21}^{\T} \bX_{21})^{-1} \bX_{21}^{\T} \bY_1.
 	\end{multline*}
-	Согласно теореме Гаусса-Маркова $\bTheta_2$ является решением задачи регрессии~\eqref{eq:two_modal_fwl}.
+	Согласно теореме Гаусса-Маркова $\bTheta_2$ является решением задачи регрессии~\eqref{ch2:eq:two_modal_fwl}.
 \end{proof}
 
 Таким образом для нахождении оптимальной модели декодирования $\mathbf{f}(\bx_2, \bTheta_2)$ необходимо спроецироватть матрицы $\bY$ и $\bX_2$ на подпространства, ортогональные подпространству, образованному линейной оболочкой столбцов матрицы $\bX_1$.
@@ -380,7 +376,7 @@ s	\end{align*}
 \begin{statement}
 	Если в задаче~\eqref{ch2:eq:two_modal_reg_model} $\text{span}(\bX_1) \cap \text{ span}(\bX_2) = \emptyset$, то есть столбцы матрицы $\bX_1$ ортогональны столбцам матрицы~$\bX_2$, то $\bTheta_2$ является решением задачи регрессии
 	\[
-			\| \bY -  \bX_{2} \bTheta_2 \| \rightarrow \min_{\bTheta_2}.
+		\| \bY -  \bX_{2} \bTheta_2 \| \rightarrow \min_{\bTheta_2}.
 	\]
 \end{statement}
 
@@ -389,7 +385,7 @@ s	\end{align*}
 	\begin{multline*}
 		(\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T} \bY = (\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T} (\bP_{\bX_1} + \bM_{\bX_1}) \bY = \\ = (\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T} \bM_{\bX_1} \bY  = (\bX_{21}^{\T} \bX_{21})^{-1} \bX_{21}^{\T} \bY_1
 	\end{multline*}
-	Используя утверждение~\autoref{stat:two_modal_theta2}, получаем требуемое утверждение.
+	Используя утверждение~\ref{ch2:stat:two_modal_theta2}, получаем требуемое утверждение.
 \end{proof}
 Данное утверждение показывает, что в случае независимых столбцов матриц $\bX_1$ и $\bX_2$ задача регрессии для аддитивной суперпозиции моделей~\eqref{ch2:eq:two_modal_reg_model} распадается на две независимые подзадачи.
 
@@ -440,57 +436,57 @@ s	\end{align*}
 
 Введём среднеквадратичную ошибку для некоторых матриц $\mathbf{A} = [a_{ij}]$ и $\mathbf{B} = [b_{ij}]$
 \[
-\text{MSE} (\mathbf{A}, \mathbf{B}) = \sum_{i,j} (a_{ij} - b_{ij})^2.
+	\text{MSE} (\mathbf{A}, \mathbf{B}) = \sum_{i,j} (a_{ij} - b_{ij})^2.
 \]
 Для оценивания качества аппроксимации вычисляется значение нормированной среднеквадратичной ошибки
 \begin{equation}
-\text{NMSE}(\bY,  \mathbf{\hat{Y}}) = \frac{\text{MSE} (\bY, \mathbf{\hat{Y}})}{\text{MSE} (\bY, \mathbf{\bar{Y}})},
-\label{ch1:eq:nmse}
+	\text{NMSE}(\bY,  \mathbf{\hat{Y}}) = \frac{\text{MSE} (\bY, \mathbf{\hat{Y}})}{\text{MSE} (\bY, \mathbf{\bar{Y}})},
+	\label{ch2:eq:nmse}
 \end{equation}
 где $\mathbf{\hat{Y}}$~--- прогноз модели, $\mathbf{\bar{Y}}$~--- константный прогноз средним значением по столбцам матрицы.
 
 \textbf{Результаты на данных электроэнергии.}
 Для нахождения оптимальной размерности $l$ латентного пространства все данные потребления электроэнергии были разбиты на обучающую и валидационную части. 
-Обучающая выборка состоит из $700$ объектов, валидационная из $370$. Зависимость нормированной квадратичной ошибки~\eqref{ch1:eq:nmse} от размерности $l$ латентного пространства представлена на Рис.~\ref{ch1:fig:energy_n_comp}. 
+Обучающая выборка состоит из $700$ объектов, валидационная из $370$. Зависимость нормированной квадратичной ошибки~\eqref{ch2:eq:nmse} от размерности $l$ латентного пространства представлена на Рис.~\ref{ch2:fig:energy_n_comp}. 
 Сначала ошибка резко падает при увеличении размерности скрытого пространства, а затем стабилизируется.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.75\linewidth]{figs/ch1/energy_n_comp}
+	\includegraphics[width=0.75\linewidth]{figs/ch2/energy_n_comp}
 	\caption{Прогноз потребления электроэнергии алгоритмом PLS при размерности латентного пространства $l$=14}
-	\label{ch1:fig:energy_n_comp}
+	\label{ch2:fig:energy_n_comp}
 \end{figure}
 
 Минимальная ошибка наблюдается при $l=14$. 
 Построим прогноз потребления электроэнергии при данном $l$. 
-Результат аппроксимации изображен на Рис.~\ref{ch1:fig:energy_prediction}. Алгоритм PLS восстановил авторегрессионную зависимость и обнаружил дневную сезонность.
+Результат аппроксимации изображен на Рис.~\ref{ch2:fig:energy_prediction}. Алгоритм PLS восстановил авторегрессионную зависимость и обнаружил дневную сезонность.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.95\textwidth]{figs/ch1/energy_prediction}
+	\includegraphics[width=0.95\textwidth]{figs/ch2/energy_prediction}
 	\caption{Зависимость ошибки от размерности латентного пространства для данных потребления электроэнергии}
-	\label{ch1:fig:energy_prediction}
+	\label{ch2:fig:energy_prediction}
 \end{figure}
 
 \textbf{Результаты на данных электрокортикограммы.}
-На Рис.~\ref{ch1:fig:ecog_n_comp} представлена зависимость нормированной квадратичной ошибки~\eqref{ch1:eq:nmse} от размерности латентного пространства. Ошибка аппроксимации меняется незначительно при $l > 5$.
+На Рис.~\ref{ch2:fig:ecog_n_comp} представлена зависимость нормированной квадратичной ошибки~\eqref{ch2:eq:nmse} от размерности латентного пространства. Ошибка аппроксимации меняется незначительно при $l > 5$.
 Таким образом совместное описание пространственно-временного спектрального представления объектов и пространственного положения руки может быть представлено вектором размерности $l \ll n$.
 Зафиксируем $l = 5$. 
-Пример аппроксимации положения руки изображен на Рис.~\ref{ch1:fig:ecog_prediction}. 
+Пример аппроксимации положения руки изображен на Рис.~\ref{ch2:fig:ecog_prediction}. 
 Сплошными линиями изображены истинные координаты руки по всем осям, пунктирными линиями показана аппроксимация методом PLS.
  
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.75\linewidth]{figs/ch1/ecog_n_comp}	
+	\includegraphics[width=0.75\linewidth]{figs/ch2/ecog_n_comp}	
 	\caption{Зависимость ошибки от размерности латентного пространства для данных ECoG}
-	\label{ch1:fig:ecog_n_comp}
+	\label{ch2:fig:ecog_n_comp}
 \end{figure}
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\textwidth]{figs/ch1/ecog_prediction}
+	\includegraphics[width=\textwidth]{figs/ch2/ecog_prediction}
 	\caption{Прогноз движения руки по данным ECoG алгоритмом PLS при размерности латентного пространства $l=5$}
-	\label{ch1:fig:ecog_prediction}
+	\label{ch2:fig:ecog_prediction}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -546,7 +542,7 @@ s	\end{align*}
 Авторы предполагают, что это связано с тем, что среднеквадратичная ошибка оказалась неадекватной метрикой в пространстве изображений.
 Нахождение оптимальной метрики для оценки качества предложенных алгоритмов может быть одним из возможных направлений развития текущей работы.
 
-\begin{table}[ht]
+\begin{table}[!ht]
 	\caption{Квадратичная ошибка для нелинейных моделей в задаче восстановления правой части изображения по левой}
 	\centering
 	\small
@@ -560,7 +556,7 @@ s	\end{align*}
 	\label{ch2:tbl:mnist_nn_error}
 \end{table}
 
-\begin{figure}[ht]
+\begin{figure}[!ht]
 	\centering 
 	\includegraphics[width=\linewidth]{figs/ch2/mnist_preds}
 	\caption{Пример реконструкции правой части изображения по левой для рассматриваемых моделей}

@@ -19,9 +19,9 @@
 Необходимо выбрать метки кластеров~$\{y_i\}_{i=1}^m$ таким образом, чтобы расстояния между кластерами были максимальными.
 Центроид~$\bmu$ множества объектов~$\bX$ и центроиды кластеров $\{\bmu_j\}_{j=1}^K$ вычисляются по формулам:
 \begin{equation}
-\label{mu}
-\boldsymbol{\mu} =\frac{1}{m} \sum_{i=1}^m\bx_i\,; \quad
-\boldsymbol{\mu}_j =\frac{ \sum_{i=1}^m [y_i = y_j]\bx_i } {\sum_{i=1}^m [y_i = y_j]}\,.
+	\label{ch5:eq:mu}
+	\boldsymbol{\mu} =\frac{1}{m} \sum_{i=1}^m\bx_i\,; \quad
+	\boldsymbol{\mu}_j =\frac{ \sum_{i=1}^m [y_i = y_j]\bx_i } {\sum_{i=1}^m [y_i = y_j]}\,.
 \end{equation}
 Введем на множестве объектов~$\bX$ расстояние Махаланобиса
 \begin{equation}
@@ -31,77 +31,77 @@
 где \textit{матрица трансформаций} $\mathbf{A} \in \bbR^{n \times n}$ является симметричной и неотрицательно определенной ($\mathbf{A}^{\T} = \mathbf{A}$, $\mathbf{A} \succeq 0$).
 Зададим в качестве матрицы трансформации матрицу выборочной ковариации
 \begin{equation}
-	\label{covMatrix}
+	\label{ch5:eq:covMatrix}
 	\bA = \frac{1}{m} \sum_{i=1}^m(\bx_i - \bmu)(\bx_i - \bmu)^{\T}.
 \end{equation}
 Функцией ошибки кластеризации назовем межкластерное расстояние:
 \begin{equation}
 	\cL \bigl(\{\bmu_j\}_{j=1}^K, \bX, \by\bigr)= - \sum_{j=1}^K N_j d_{\bA}^2(\bmu_j, \bmu),
-	\label{eq:cluster_error_function}
+	\label{ch5:eq:cluster_error_function}
 \end{equation}
 где $N_j = \sum_{i=1}^m [y_i = y_j]$~--- число объектов в кластере~$j$.
 
-Поставим задачу кластеризации как задачу минимизации функции ошибки~\eqref{eq:cluster_error_function}
+Поставим задачу кластеризации как задачу минимизации функции ошибки~\eqref{ch5:eq:cluster_error_function}
 \begin{equation}
-	\label{Qmax}
+	\label{ch5:eq:Qmax}
 	\cL \bigl(\{\boldsymbol{\mu}_j\}_{j=1}^K, \bX, \by \bigr) \to \min_{\boldsymbol{\mu}_j \in \bbR^{\T}}.
 \end{equation}
 Для решения этой задачи предлагается применить метод метрического обучения к матрице трансформации~$\bA$.
 Найдем такую матрицу~$\bA$, для которой функционал качества принимает максимальное значение:
 \begin{equation}
-\label{Amax}
-\bA^* =\argmin_{\bA \in \bbR^{n \times n}} S \bigl(\{\bmu_j^*\}_{j=1}^K, \bX, \by \bigr)\,,
+	\label{ch5:eq:Amax}
+	\bA^* =\argmin_{\bA \in \bbR^{n \times n}} S \bigl(\{\bmu_j^*\}_{j=1}^K, \bX, \by \bigr)\,,
 \end{equation}
-где $\{\bmu_j^*\}_{j=1}^K$~--- решение задачи кластеризации~\eqref{Qmax}.
+где $\{\bmu_j^*\}_{j=1}^K$~--- решение задачи кластеризации~\eqref{ch5:eq:Qmax}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Алгоритм адаптивного метрического обучения}
 \label{sec:ch5:metric_learning_adaptive}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Для решения задач~\eqref{Qmax}, \eqref{Amax} используется алгоритм адаптивного метрического обучения.
+Для решения задач~\eqref{ch5:eq:Qmax}, \eqref{ch5:eq:Amax} используется алгоритм адаптивного метрического обучения.
 Предлагается понизить размерность пространства объектов~$\bX$ с помощью линейного ортогонального преобразования~$\bP \in \bbR^{l \times n}$, $\bP^{\T} \bP = \mathbf{I}$, где новая размерность $l < n$
 \[
-\bt_i = \bP \bx_i \in \bbR^l, \quad i = 1, \dots, m.
+	\bt_i = \bP \bx_i \in \bbR^l, \quad i = 1, \dots, m.
 \]
-Центроид~$\hat{\bmu}$ множества объектов~$\{\bt_i\}_{i=1}^m$ вычисляется по формуле~\eqref{mu}. 
-Расстояния между объектами вычисляются по формуле~\eqref{metric}, где в качестве матрицы~$\hat{\mathbf{A}}$ используется матрица ковариаций~\eqref{covMatrix} множества объектов $\{\hat{\bx}_i\}_{i=1}^m$
+Центроид~$\hat{\bmu}$ множества объектов~$\{\bt_i\}_{i=1}^m$ вычисляется по формуле~\eqref{ch5:eq:mu}. 
+Расстояния между объектами вычисляются по формуле~\eqref{ch5:eq:mahal_distance}, где в качестве матрицы~$\hat{\mathbf{A}}$ используется матрица ковариаций~\eqref{ch5:eq:covMatrix} множества объектов $\{\hat{\bx}_i\}_{i=1}^m$
 \[
-\hat{\mathbf{A}} =
-\frac{1}{m} \sum_{i=1}^m (\bt_i - \hat{\bmu})(\bt_i - \hat{\bmu})^{\T} =
-\frac{1}{m} \sum_{i=1}^m \bP(\bx_i - \bmu)(\bx_i - \bmu)^{\T} \bP^{\T} =  \bP \mathbf{A} \bP^{\T}.
+	\hat{\mathbf{A}} =
+	\frac{1}{m} \sum_{i=1}^m (\bt_i - \hat{\bmu})(\bt_i - \hat{\bmu})^{\T} =
+	\frac{1}{m} \sum_{i=1}^m \bP(\bx_i - \bmu)(\bx_i - \bmu)^{\T} \bP^{\T} =  \bP \mathbf{A} \bP^{\T}.
 \]
 \begin{definition}
 	Индикаторной матрицей назовем матрицу $\bY \in \bbR^{m \times K}$, где
 	\[
 	y_{ij} =
-	\begin{cases}
-	1, & \text{если $f(\bx_i) = y_j$;} \\
-	0, & \text{если $f(\bx_i) \neq y_j$.}
-	\end{cases}
+		\begin{cases}
+			1, & \text{если $f(\bx_i) = y_j$;} \\
+			0, & \text{если $f(\bx_i) \neq y_j$.}
+		\end{cases}
 	\]
 \end{definition}
 \begin{definition}
 	Взвешенной индикаторной матрицей назовем матрицу
 	$\mathbf{L} = \bY (\bY^{\T} \bY)^{-1/2} \in \bbR^{m \times K}$, элементы которой равны:
 	\[
-	l_{ij} =
-	\begin{cases}
-	\displaystyle    \frac{1}{\sqrt{N_j}}, & \text{если $f(\bx_i) = y_j$;} \\
-	0, & \text{если $f(\bx_i) \neq y_j$.}
-	\end{cases}
+		l_{ij} =
+		\begin{cases}
+			\displaystyle    \frac{1}{\sqrt{N_j}}, & \text{если $f(\bx_i) = y_j$;} \\
+			0, & \text{если $f(\bx_i) \neq y_j$.}
+		\end{cases}
 	\]
 \end{definition}
-В работе~\cite{ding2005equivalence} показано, что с использованием данных обозначений задача кластеризации~\eqref{Qmax} и~задача метрического обучения~\eqref{Amax} сводятся к общей задаче минимизации функции ошибки
+В работе~\cite{ding2005equivalence} показано, что с использованием данных обозначений задача кластеризации~\eqref{ch5:eq:Qmax} и~задача метрического обучения~\eqref{ch5:eq:Amax} сводятся к общей задаче минимизации функции ошибки
 \begin{multline}
 	\cL = -\frac{1}{m} \text{trace} (\mathbf{L}^{\T} \bX^{\T} \bP^{\T} \hat{\mathbf{A}}^{-1} \bP \bX \mathbf{L}) = \\ = - \frac{1}{m} \text{trace} (\mathbf{L}^{\T} \bX^{\T} \bP^{\T}
 	(\bP \mathbf{A} \bP^{\T})^{-1} \bP \bX \mathbf{L}) \to \min_{\bP, \mathbf{L}}.
-	\label{GLmax}
+	\label{ch5:eq:GLmax}
 \end{multline}
 
-Для решения задачи~\eqref{GLmax} используется EM алгоритм.
+Для решения задачи~\eqref{ch5:eq:GLmax} используется EM алгоритм.
 На каждом шаге итеративно вычисляются текущие оптимальные значения матриц~$\bP$ и~$\mathbf{L}$.
-На $E$-шаге необходимо найти матрицу~$\mathbf{L}$, которая является решением оптимизационной задачи~\eqref{GLmax} при фиксированной матрице~$\bP$.
+На $E$-шаге необходимо найти матрицу~$\mathbf{L}$, которая является решением оптимизационной задачи~\eqref{ch5:eq:GLmax} при фиксированной матрице~$\bP$.
 В качестве начального приближения получим взвешенную индикаторную матрицу~$\mathbf{L}$ с помощью алгоритма кластеризации $k$-средних с евклидовой метрикой.
 На $M$-шаге производится нахождение оптимального значения матрицы~$\bP$ при фиксированной матрице~$\mathbf{L}$.
 Алгоритм завершается при стабилизации функционала~$\cL$ на последовательности итераций.
@@ -111,51 +111,50 @@
 На первом шаге алгоритм выбирает из множества~$\bX$ случайным образом~$r$ объектов~$\{\bmu_j\}_{j=1}^K$~--- начальные центроиды кластеров.
 Для каждого объекта~$\bx_i$ вычисляется расстояние~\eqref{ch5:eq:mahal_distance} до каждого центроида кластера~$\bmu_j$ с единичной матрицей трансформаций~$\mathbf{A}$.
 Объект~$\bx_i$ относится к кластеру, расстояние до которого оказалось наименьшим.
-Далее производится вычисление новых центроидов кластеров по формуле~\eqref{mu}.
+Далее производится вычисление новых центроидов кластеров по формуле~\eqref{ch5:eq:mu}.
 Алгоритм завершается, если значения центроидов кластеров стабилизируются.
 
 \textbf{Оптимизация матрицы P с фиксированной матрицей L.}
 Для любых двух квадратных матриц~$\mathbf{A}$ и~$\mathbf{B}$ справедливо $\text{trace}(\mathbf{AB}) = \text{trace}(\mathbf{BA})$.
-Данное свойство позволяет переформулировать задачу~\eqref{GLmax} следующим образом:
+Данное свойство позволяет переформулировать задачу~\eqref{ch5:eq:GLmax} следующим образом:
 \[
 	\cL = -\frac{1}{m} \text{trace} (\mathbf{L}^{\T} \bX^{\T} \bP^{\T} (\bP \mathbf{A} \bP^{\T})^{-1} \bP \bX \mathbf{L}) = -\frac{1}{m} \text{trace} \bigl((\bP \mathbf{A} \bP^{\T})^{-1} \bP \bX \mathbf{LL}^{T} \bX^{\T} \bP^{\T}\bigr).
 \]
 \begin{statement}
 	Обозначим $\mathbf{B} = \bX \mathbf{LL}^{\T} \bX^{\T}$.
 	Обозначим через $\bP = [\mathbf{v}_1, \ldots, \mathbf{v}_r]^{\bT}$ матрицу, состоящую из $r$ собственных векторов матрицы $\mathbf{A}^{-1}\mathbf{B}$, отвечающих наибольшим собственным значениям.
-	Тогда решением~\eqref{GLmax} является ортогональная матрица, полученная QR-разложением матрицы~$\bP^{\T}$.
+	Тогда решением~\eqref{ch5:eq:GLmax} является ортогональная матрица, полученная QR-разложением матрицы~$\bP^{\T}$.
 \end{statement}
 \begin{proof}
-Функция ошибки~$\cL$~\ref{eq:cluster_error_function} зависит только от матрицы~$\bP$. Обозначим
+Функция ошибки~$\cL$~\ref{ch5:eq:cluster_error_function} зависит только от матрицы~$\bP$. Обозначим
 \[
-s(\bP) = \text{trace} \bigl((\bP \mathbf{A} \bP^{\T})^{-1} \bP \mathbf{B} \bP^{\T}\bigr).
+	s(\bP) = \text{trace} \bigl((\bP \mathbf{A} \bP^{\T})^{-1} \bP \mathbf{B} \bP^{\T}\bigr).
 \]
-На данном шаге задача~\eqref{GLmax} принимает вид:
+На данном шаге задача~\eqref{ch5:eq:GLmax} принимает вид:
 \begin{gather}
-\label{Gmax}
-\bP^* = \argmax_{\bP \in \bbR^{l \times n}} s(\bP)\,; \\
-\label{Gorth}
-\bP \bP^{\T} = \mathbf{I}\,.
+	\label{ch5:eq:Gmax}
+	\bP^* = \argmax_{\bP \in \bbR^{l \times n}} s(\bP)\,; \\
+	\label{ch5:eq:Gorth}
+	\bP \bP^{\T} = \mathbf{I}\,.
 \end{gather}
 Ранг произведения матриц не превосходит рангов сомножителей, поэтому ранг матрицы~$\mathbf{B}$ не превосходит $K$.
-Решением~\eqref{Gmax} является матрица $\bP = [\mathbf{v}_1, \ldots, \mathbf{v}_K]^{\T}$, состоящая
+Решением~\eqref{ch5:eq:Gmax} является матрица $\bP = [\mathbf{v}_1, \ldots, \mathbf{v}_K]^{\T}$, состоящая
 из~$K$ собственных векторов матрицы $\mathbf{A}^{-1}\mathbf{B}$, отвечающих наибольшим собственным значениям.
 Таким образом, размерность нового пространства объектов будет равна количеству кластеров $K$.
 
 В общем случае матрица $\bP$ не является ортогональной.
 Заметим, что для любой невырожденной матрицы $\bP$ верно $s(\bP) = s(\mathbf{M} \bP)$.
-Для учета условия ортогональности~\eqref{Gorth} найдем QR-разложение матрицы $\bP$.
+Для учета условия ортогональности~\eqref{ch5:eq:Gorth} найдем QR-разложение матрицы $\bP$.
 Тогда ортогональная матрица $\bQ$ является оптимальным значением $\bP^*$.
 \end{proof}
 
 \textbf{Оптимизация матрицы L с фиксированной матрицей P.}
 Обозначим $\hat{\mathbf{K}} = (1/N)\bX^{\T} \bP^{\T} \hat{\mathbf{A}}^{-1} \bP \bX$.
-В работе~\cite{shawe2004kernel} показано, что тогда задача~\eqref{GLmax} эквивалентна задаче кластеризации $k$-средних с заданным ядром $\hat{\mathbf{K}}$.
+В работе~\cite{shawe2004kernel} показано, что тогда задача~\eqref{ch5:eq:GLmax} эквивалентна задаче кластеризации $k$-средних с заданным ядром $\hat{\mathbf{K}}$.
 
-При фиксированной матрице $\bP$ задача~\eqref{GLmax} принимает вид:
+При фиксированной матрице $\bP$ задача~\eqref{ch5:eq:GLmax} принимает вид:
 \begin{equation*}
-%\label{Lmax}
-\text{trace} (\mathbf{L}^{\top} \hat{\mathbf{K}} \mathbf{L}) \to \max_{\mathbf{L} \in \bR^{m \times r}}.
+	\text{trace} (\mathbf{L}^{\top} \hat{\mathbf{K}} \mathbf{L}) \to \max_{\mathbf{L} \in \bR^{m \times r}}.
 \end{equation*}
 Матрица $\hat{\mathbf{K}}$ является симметричной и неотрицательно определенной, тем самым может быть выбрана в качестве ядра.
 
@@ -169,10 +168,9 @@ s(\bP) = \text{trace} \bigl((\bP \mathbf{A} \bP^{\T})^{-1} \bP \mathbf{B} \bP^{\
 
 Требуется построить точную, простую, устойчивую модель классификации $a: \bbR^n \to \bbY$.
 Данную модель представим в виде суперпозиции
-\begin{equation}
-\label{ch4:eq:classifiers}
-a(\mathbf{x}) = b \circ \mathbf{f} \circ G\bigl(\mathbf{x}, \{\mathbf{c}_e\}_{e = 1} ^ K\bigr),
-\end{equation}
+\begin{equation*}
+	a(\mathbf{x}) = b \circ \mathbf{f} \circ G\bigl(\mathbf{x}, \{\mathbf{c}_e\}_{e = 1} ^ K\bigr),
+\end{equation*}
 где $G$~--- процедура выравнивания временных рядов относительно центроидов классов~$\{\mathbf{c}_e\}_{e = 1} ^ K$, $\mathbf{f}$~--- алгоритм метрического обучения, $b$~--- алгоритм многоклассовой классификации.
 
 \textbf{Выравнивание временных рядов.}
@@ -181,16 +179,16 @@ a(\mathbf{x}) = b \circ \mathbf{f} \circ G\bigl(\mathbf{x}, \{\mathbf{c}_e\}_{e 
 Пусть $\mathbf{X}_e$ --- множество объектов обучающей выборки, принадлежащих одному классу $e \in \bbY$.
 Центроидом множества объектов $\mathbf{X}_e = \{\mathbf{x}_i|y_i=e\}_{i=1}^m$ по расстоянию $\rho$ назовем вектор $\mathbf{c}_e \in \mathbb{R}^n$ такой, что
 \begin{equation}
-\label{centroid_task}
-\mathbf{c}_e = \mathop{\text{argmin}}\limits_{{\mathbf{c} \in \mathbb{R}^n}}\sum_{\mathbf{x}_i \in \mathbf{X}_e}
-{\rho(\mathbf{x}_i ,\mathbf{c})}.
+	\label{ch5:eq:centroid_task}
+	\mathbf{c}_e = \mathop{\text{argmin}}\limits_{{\mathbf{c} \in \mathbb{R}^n}}\sum_{\mathbf{x}_i \in \mathbf{X}_e}
+	{\rho(\mathbf{x}_i ,\mathbf{c})}.
 \end{equation}
 
 Для нахождения центроида предлагается в качестве расстояния между временными рядами использовать путь наименьшей стоимости~\cite{berndt1994using,muller2007dynamic}, найденный методом динамической трансформации времени.
-Псевдокод решения оптимизационной задачи~(\ref{centroid_task}) приведен в алгоритме~\ref{DBA_pseudo}.
+Псевдокод решения оптимизационной задачи~\eqref{ch5:eq:centroid_task} приведен в алгоритме~\ref{ch5:alg:DBA_pseudo}.
 \begin{algorithm}[!t]
 	\caption{Нахождение центроида $\text{DBA}(\mathbf{X}_e, \text{n\_iter})$}
-	\label{DBA_pseudo}
+	\label{ch5:alg:DBA_pseudo}
 	\begin{algorithmic}[1]
 		\REQUIRE $\mathbf{X}_e$~--- множество временных рядов, принадлежащих одному и тому же классу, n\_iter~--- количество итераций алгоритма.
 		\ENSURE $\mathbf{c}$~--- центроид множества $\mathbf{X}_e$.
@@ -241,7 +239,7 @@ a(\mathbf{x}) = b \circ \mathbf{f} \circ G\bigl(\mathbf{x}, \{\mathbf{c}_e\}_{e 
 
 Расстояние $d_\mathbf{A} (\mathbf{x}_i, \mathbf{x}_j)$ есть евклидово расстояние между $\mathbf{Lx}_i$ и $\mathbf{Lx}_j$:
 \begin{multline*}
-d_\mathbf{A} (\mathbf{x}_i, \mathbf{x}_j) = \sqrt{(\mathbf{x}_i - \mathbf{x}_j)^{\T} \mathbf{L}^{\T} \mathbf{L} (\mathbf{x}_i - \mathbf{x}_j)} = \\= \sqrt{(\mathbf{L} (\mathbf{x}_i - \mathbf{x}_j))^{\T} (\mathbf{L} (\mathbf{x}_i - \mathbf{x}_j))} = \|\mathbf{L} (\mathbf{x}_i - \mathbf{x}_j)\|_2.
+	d_\mathbf{A} (\mathbf{x}_i, \mathbf{x}_j) = \sqrt{(\mathbf{x}_i - \mathbf{x}_j)^{\T} \mathbf{L}^{\T} \mathbf{L} (\mathbf{x}_i - \mathbf{x}_j)} = \\= \sqrt{(\mathbf{L} (\mathbf{x}_i - \mathbf{x}_j))^{\T} (\mathbf{L} (\mathbf{x}_i - \mathbf{x}_j))} = \|\mathbf{L} (\mathbf{x}_i - \mathbf{x}_j)\|_2.
 \end{multline*}
 
 В качестве алгоритма метрического обучения в данной работе был выбран алгоритм LMNN~\cite{weinberger2009distance}. 
@@ -249,28 +247,28 @@ d_\mathbf{A} (\mathbf{x}_i, \mathbf{x}_j) = \sqrt{(\mathbf{x}_i - \mathbf{x}_j)^
 Первая идея заключается в минимизации расстояний между $k$ ближайшими объектами, находящимися в одном классе. 
 Запишем функционал качества в виде
 \[
-Q_1(\mathbf{L}) = \sum_{j \rightsquigarrow i} \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 \rightarrow \min_{\mathbf{L}},
+	Q_1(\mathbf{L}) = \sum_{j \rightsquigarrow i} \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 \rightarrow \min_{\mathbf{L}},
 \]
 где $j \rightsquigarrow i$ означает, что $\mathbf{x}_j$ является одним из $k$ ближайших соседей для $\mathbf{x}_i$.
 Вторая идея состоит в максимизации расстояния между каждым объектом и его объектами-нарушителями. Объектом-нарушителем для $\mathbf{x}_i$ назовем объект~$\mathbf{x}_l$ такой, что
 \begin{equation}
-\label{impostor}
-\|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_l)\|^2 \leq \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 + 1, \quad \text{где $j \rightsquigarrow i$}.
+	\label{ch5:eq:impostor}
+	\|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_l)\|^2 \leq \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 + 1, \quad \text{где $j \rightsquigarrow i$}.
 \end{equation}
 Таким образом, необходимо минимизировать следующий функционал:
 \[
-Q_2(\mathbf{L}) = \sum_{j \rightsquigarrow i} \sum_l(1 - y_{il})\bigl[1 + \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 - \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_l)\|^2\bigr]_+ \rightarrow \min_{\mathbf{L}},
+	Q_2(\mathbf{L}) = \sum_{j \rightsquigarrow i} \sum_l(1 - y_{il})\bigl[1 + \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 - \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_l)\|^2\bigr]_+ \rightarrow \min_{\mathbf{L}},
 \]
 где $y_{il} = 1$, если $y_i = y_l$, и $y_{il} = 0$ в противном случае.
-Положительная срезка позволяет штрафовать только те объекты, которые удовлетворяют условию~(\ref{impostor}).
+Положительная срезка позволяет штрафовать только те объекты, которые удовлетворяют условию~\eqref{ch5:eq:impostor}.
 
 Задача метрического обучения состоит в нахождении линейного преобразования $\mathbf{f}(\mathbf{x}) = \mathbf{Lx}$, то есть нахождении матрицы $\mathbf{L}$ в виде решения оптимизационной задачи
 \begin{equation}
-\label{Qmin}
-Q(\mathbf{L}) = \mu Q_1(\mathbf{L}) + (1 - \mu) Q_2(\mathbf{L}) \rightarrow \min_{\mathbf{L}},
+	\label{ch5:eq:Qmin}
+	Q(\mathbf{L}) = \mu Q_1(\mathbf{L}) + (1 - \mu) Q_2(\mathbf{L}) \rightarrow \min_{\mathbf{L}},
 \end{equation}
 где $\mu \in (0, 1)$~--- весовой параметр, определяющий вклад каждого из функционалов.
-Задача~(\ref{Qmin}) представляет собой задачу полуопределенного программирования~\cite{vandenberghe1996semidefinite} и может быть решена существующими оптимизационными пакетами.
+Задача~\eqref{ch5:eq:Qmin} представляет собой задачу полуопределенного программирования~\cite{vandenberghe1996semidefinite} и может быть решена существующими оптимизационными пакетами.
 
 На Рис.~\ref{ch5:fig:metric_learning_toy_example} показан принцип работы алгоритма метрического обучения LMNN по сравнению с базовым методом, использующим евклидову метрику, для случая двумерных данных. 
 Алгоритм LMNN позволяет найти оптимальную матрицу трансформации $\mathbf{A}$, отдаляя объекты разных классов и притягивая объекты одного класса. 
@@ -278,7 +276,7 @@ Q(\mathbf{L}) = \mu Q_1(\mathbf{L}) + (1 - \mu) Q_2(\mathbf{L}) \rightarrow \min
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.9\linewidth]{figs/ch4/metric_learning_toy_example}
+	\includegraphics[width=0.9\linewidth]{figs/ch5/metric_learning_toy_example}
 	\caption{Сравнение оптимальной метрики Махаланобиса алгоритма LMNN с евклидовой метрикой в двумерном случае}
 	\label{ch5:fig:metric_learning_toy_example}
 \end{figure}
@@ -286,17 +284,17 @@ Q(\mathbf{L}) = \mu Q_1(\mathbf{L}) + (1 - \mu) Q_2(\mathbf{L}) \rightarrow \min
 \textbf{Классификация выравненных временных рядов в метрике Махаланобиса.}
 Пусть $\mathbf{x} \in \mathbf{X}$~--- неразмеченный временной ряд. Выравниваем временной ряд $\mathbf{x}$ относительно всех центроидов классов
 \[
-\mathbf{\hat{x}}_e = G(\mathbf{x}, \mathbf{c}_e), \quad \text{где} \quad e = \{1, \dots, K\}.
+	\mathbf{\hat{x}}_e = G(\mathbf{x}, \mathbf{c}_e), \quad \text{где} \quad e = \{1, \dots, K\}.
 \]
 Отнесем временной ряд к классу, для которого минимально расстояние до соответствующего центроида. В качестве расстояния используем обученную метрику Махаланобиса с фиксированной матрицей $\mathbf{A}$
 \[
-\hat{y} = \argmin_{e \in \bbY} d_\mathbf{A}(\mathbf{\hat{x}}_e, \mathbf{c}_e).
+	\hat{y} = \argmin_{e \in \bbY} d_\mathbf{A}(\mathbf{\hat{x}}_e, \mathbf{c}_e).
 \]
 После нахождения оптимальных центроидов классов и нахождения оптимальной матрицы трансформаций процедура классификации заключается в измерении расстояния между найденными центроидами и новыми неразмеченными объектами.
 
 Для оценки качества работы алгоритма будем вычислять ошибку классификации как долю неправильно классифицированных объектов тестовой выборки~$\{ \bx_i, y_i \}_{i=1}^{\hat{m}}$:
 \[
-\text{error} = \frac1{\hat{m}} \sum_{i = 1} ^ {\hat{m}} [a(\mathbf{x}_i) \ne y_i].
+	\text{error} = \frac1{\hat{m}} \sum_{i = 1} ^ {\hat{m}} [a(\mathbf{x}_i) \ne y_i].
 \]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -310,7 +308,7 @@ Q(\mathbf{L}) = \mu Q_1(\mathbf{L}) + (1 - \mu) Q_2(\mathbf{L}) \rightarrow \min
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=\linewidth]{figs/ch4/true_distribution}
+    \includegraphics[width=\linewidth]{figs/ch5/true_distribution}
     \caption{Истинное распределение двумерных модельных данных}
     \label{ch5:fig:true_distr}
 \end{figure}
@@ -319,7 +317,7 @@ Q(\mathbf{L}) = \mu Q_1(\mathbf{L}) + (1 - \mu) Q_2(\mathbf{L}) \rightarrow \min
 Результат кластеризации показан на Рис.~\ref{ch5:fig:kmeans_clustering}, где черным цветом выделены найденные центры классов и линии уровня функции распределения, построенной по выборочной матрице ковариаций.
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=1\linewidth]{figs/ch4/kmeans_clustering}
+    \includegraphics[width=1\linewidth]{figs/ch5/kmeans_clustering}
     \caption{Результат кластеризации модельных данных алгоритмом $k$-средних}
     \label{ch5:fig:kmeans_clustering}
 \end{figure}
@@ -329,7 +327,7 @@ Q(\mathbf{L}) = \mu Q_1(\mathbf{L}) + (1 - \mu) Q_2(\mathbf{L}) \rightarrow \min
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=1\linewidth]{figs/ch4/AML_clustering}
+    \includegraphics[width=1\linewidth]{figs/ch5/AML_clustering}
     \caption{Результат кластеризации модельных данных алгоритмом адаптивного метрического обучения}
     \label{ch5:fig:AML_clustering}
 \end{figure}
@@ -338,7 +336,7 @@ Q(\mathbf{L}) = \mu Q_1(\mathbf{L}) + (1 - \mu) Q_2(\mathbf{L}) \rightarrow \min
 Измеренная точность кластеризации алгоритма $k$-средних составила 0,76,
 алгоритма адаптивного метрического обучения~--- 0,94, что говорит об эффективности данного подхода.
 
-Таблица~\ref{ch4:tbl:clusteing_results} показывает результаты вычислительного эксперимента на реальных
+Таблица~\ref{ch5:tbl:clusteing_results} показывает результаты вычислительного эксперимента на реальных
 данных.
 Алгоритм был применен к $5$ выборкам, взятых из репозитория UCI~\cite{uci2017}.
 Оценкой качества кластеризации служит число правильно кластеризованных объектов.
@@ -347,7 +345,7 @@ Q(\mathbf{L}) = \mu Q_1(\mathbf{L}) + (1 - \mu) Q_2(\mathbf{L}) \rightarrow \min
 \begin{table}[!h]
 \centering
 \caption{Результаты кластеризации на множестве датасетов для методов $k$-средних и AML}
-\label{ch4:tbl:clusteing_results}
+\label{ch5:tbl:clusteing_results}
 
 \begin{tabular}{|l|l|l|}
 \hline
@@ -380,7 +378,7 @@ Breast Cancer Wisconsin                   & \textbf{0,960}                 & 0,9
 	Из рисунка видно, что процедура корректно определяет сдвиги временных рядов.
 	\begin{figure}[ht]
 		\centering
-		\includegraphics[width=0.5\linewidth]{figs/ch4/centroids_synthetic_noize}
+		\includegraphics[width=0.5\linewidth]{figs/ch5/centroids_synthetic_noize}
 		\caption{Примеры центроидов синтетических временных рядов}
 		\label{ch5:fig:centroids_synthetic}
 	\end{figure}
@@ -395,40 +393,40 @@ Breast Cancer Wisconsin                   & \textbf{0,960}                 & 0,9
 	Для проведения вычислительного эксперимента было выбрано по $200$ объектов каждого класса.
 	Длина каждого временного ряда равнялась $n = 128$ отсчетам времени.
 	
-	Построенные центроиды классов изображены на Рис.~\ref{centroids_real}.
+	Построенные центроиды классов изображены на Рис.~\ref{ch5:fig:centroids_real}.
 	Найденные центроиды обладают периодичностью, свойственной временным рядам показаний активности человека.
 	\begin{figure}[ht]
 		\centering
-		\includegraphics[width=1\linewidth]{figs/ch4/centroids_200_2}
+		\includegraphics[width=1\linewidth]{figs/ch5/centroids_200_2}
 		\caption{Примеры центроидов временных рядов акселерометра}
-		\label{centroids_real}
+		\label{ch5:fig:centroids_real}
 	\end{figure}
-	На Рис.~\ref{raw_ts} показаны примеры временных рядов каждого класса. Эти же временные ряды после процедуры выравнивания относительно построенных центроидов изображены на Рис.~\ref{aligned_ts}.
+	На Рис.~\ref{ch5:fig:raw_ts} показаны примеры временных рядов каждого класса. Эти же временные ряды после процедуры выравнивания относительно построенных центроидов изображены на Рис.~\ref{ch5:fig:aligned_ts}.
 	\begin{figure}[!ht]
 		\centering
-		\includegraphics[width=1\linewidth]{figs/ch4/raw_ts}
+		\includegraphics[width=1\linewidth]{figs/ch5/raw_ts}
 		\caption{Примеры временных рядов акселерометра}
-		\label{raw_ts}
+		\label{ch5:fig:raw_ts}
 	\end{figure}
 	\begin{figure}[!ht]
 		\centering
-		\includegraphics[width=1\linewidth]{figs/ch4/aligned_ts}
+		\includegraphics[width=1\linewidth]{figs/ch5/aligned_ts}
 		\caption{Выравненные временные ряды акселерометра}
-		\label{aligned_ts}
+		\label{ch5:fig:aligned_ts}
 	\end{figure}
 	
 	Ошибка классификации без использования метрического обучения составила~$37,5\%$.
 	Алгоритм LMNN позволяет настроить параметры: число ближайших соседей~$k$,
 	размерность преобразованного евклидова пространства~$p$.
 	Для выбора оптимальных параметров воспользуемся процедурой кросс-проверки.
-	На Рис.~\ref{heat_map} цветом показана ошибка классификации алгоритма в зависимости от его параметров.
+	На Рис.~\ref{ch5:fig:heat_map} цветом показана ошибка классификации алгоритма в зависимости от его параметров.
 	На данной выборке алгоритм LMNN оказывается слабо чувствителен к числу ближайших соседей,
 	и при уменьшении размерности пространства объектов ошибка классификации растет.
 	\begin{figure}[!ht]
 		\centering
-		\includegraphics[width=1\linewidth]{figs/ch4/heat_map}
+		\includegraphics[width=1\linewidth]{figs/ch5/heat_map}
 		\caption{Ошибка классификации метрического алгоритма в зависимости от размерности пространства и количества используемых ближайших соседей}
-		\label{heat_map}
+		\label{ch5:fig:heat_map}
 	\end{figure}
 	
 	Настроим алгоритм LMNN со следующими параметрами: число ближайших соседей $k = 30$, размерность
@@ -461,22 +459,22 @@ Breast Cancer Wisconsin                   & \textbf{0,960}                 & 0,9
 				5                 & 2     & 11    & 0     & 12    & 186  & 9    \\ \hline
 				6                 & 18    & 18    & 2     & 15    & 5    & 170  \\ \hline
 		\end{tabular}}
-		\label{confussion_matrix}
+		\label{ch5:tbl:confussion_matrix}
 	\end{table}
 	
-	В таблице~\ref{confussion_matrix} представлены матрицы несоответствий результатов классификации при использовании
+	В таблице~\ref{ch5:tbl:confussion_matrix} представлены матрицы несоответствий результатов классификации при использовании
 	евклидовой метрики и метрики Махаланобиса.
 	Столбцы соответствуют истинным меткам классов объектов, строки~--- предсказанным меткам.
 	Диагональное преобладание матрицы несоответствий указывает на высокую предсказательную способность алгоритма.
 	
-	В таблице~\ref{improvement} продемонстрировано увеличение точности классификации при использовании в качестве меры расстояния метрики Махаланобиса.
+	В таблице~\ref{ch5:tbl:improvement} продемонстрировано увеличение точности классификации при использовании в качестве меры расстояния метрики Махаланобиса.
 	Пересечение $i$-го столбца и $j$-й строки отвечает изменению доли объектов класса $i$, отнесенных к классу $j$. Положительное суммарное значение диагональных элементов таблицы соответствует увеличению качества классификации. Значительное улучшение предсказания происходит при классификации первых трех классов.
 	Данные классы соответствуют следующим видам физической активности: ходьба, ходьба вверх, ходьба вниз.
 	
 	\begin{table}[!h]
 		\centering
 		\caption{Прирост точности классификации при использовании адекватной оценки матрицы трансформаций}
-		\label{improvement}
+		\label{ch5:tbl:improvement}
 		\begin{tabular}{|l|l|l|l|l|l|l|}
 			\hline
 			\multirow{2}{*}{} & \multicolumn{6}{c|}{Истинные метки классов}       \\ \cline{2-7}
