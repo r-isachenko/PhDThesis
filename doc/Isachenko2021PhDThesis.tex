@@ -1,9 +1,5 @@
-
 % !TEX encoding = UTF-8 Unicode
 \documentclass{dissert}
-
-
-\bibliographystyle{unsrt}
 
 % В этом документе преамбула
 
@@ -78,12 +74,6 @@
 \renewcommand{\chaptername}{Глава}
 \renewcommand\thesection{\normalsize{\arabic{chapter}.\arabic{section}}}
 
-%%% Библиография %%%
-\makeatletter
-\bibliographystyle{utf8gost71u}     % Оформляем библиографию по ГОСТ 7.1 (ГОСТ Р 7.0.11-2011, 5.6.7)
-%\renewcommand{\@biblabel}[1]{#1.}   % Заменяем библиографию с квадратных скобок на точку
-\makeatother
-
 \usepackage{algorithm}
 \usepackage[noend]{algcompatible}
 \def\algorithmicrequire{\textbf{Вход:}}
@@ -103,8 +93,6 @@
 \def\algorithmiccomment#1{\quad// {\sl #1}}
 
 \input{newcommands.tex}
-
-\renewcommand{\figureautorefname}{Рис.}
 
 
 \begin{document}
@@ -150,6 +138,8 @@
 
 \clearpage
 \addcontentsline{toc}{section}{Список литературы}
+
+\bibliographystyle{unsrt}
 \bibliography{phd_bibliography.bib}
 
 

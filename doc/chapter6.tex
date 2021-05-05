@@ -11,7 +11,7 @@
 
 Временные ряды акселерометра образуют множество~$\mathcal{S}$ сегментов~$\bs$ фиксированной длины~$T$:
 \begin{equation}
-\bs = [x_1, \dots, x_T]^{T} \in \bbR^T.
+\bs = [x_1, \dots, x_T]^{\T} \in \bbR^T.
 \label{ch5:eq:time_series}
 \end{equation}
 Необходимо построить модель классификации~$f: \bbR^T \rightarrow Y$, которая будет ставить в соответствие каждому сегменту из множества~$\mathcal{S}$ метку класса из конечного множества~$Y$.
@@ -23,25 +23,25 @@
 исходная выборка, где $\bs_i \in \mathcal{S}$ и $y_i = f(\bs_i)\in Y$.
 
 Авторы предлагают построить модель~$f$ в в де суперпозиции $f=f(\mathbf{g})$.
-Функция $\mathbf{g}: \bbR^T \rightarrow \bbR^n$ является отображением из пространства~$\bbR^{T} $ в признаковое пространство~$G \subset \bbR^n$.
+Функция $\mathbf{g}: \bbR^T \rightarrow \bbR^n$ является отображением из пространства~$\bbR^{T} $ в признаковое пространство~$\mathbb{G} \subset \bbR^n$.
 Имея функцию порождения признаков~$\mathbf{g}$, преобразуем исходную выборку~\eqref{ch5:eq:sample} в
 \[
-	\mathcal{D}_G = \{(\mathbf{g}_i, y_i)\}_{i=1}^m,
+	\mathcal{D}_\mathbb{G} = \{(\mathbf{g}_i, y_i)\}_{i=1}^m,
 \]
-где $\mathbf{g}_i = \mathbf{g}(\bs_i) \in G$. 
+где $\mathbf{g}_i = \mathbf{g}(\bs_i) \in \mathbb{G}$. 
 
 Модель классификации $f=f(\mathbf{g}, \btheta)$ является параметрической функцией с вектором параметров~$\btheta$. 
 Оптимальные параметры~$\hat{\btheta}$ определяются оптимизацией функции ошибки классификации
 \begin{equation}
-\hat{\btheta} = \argmin_{\btheta} L(\btheta, \mathcal{D}_G, \mathbf{\mu}).
+\hat{\btheta} = \argmin_{\btheta} L(\btheta, \mathcal{D}_\mathbb{G}, \bmu).
 \label{ch5:eq:optimal_classification_params}
 \end{equation}
-Вектор~$\mathbf{\mu}$ является внешним параметром для заданной модели классификации. 
+Вектор~$\bmu$ является внешним параметром для заданной модели классификации. 
 Примеры таких параметров и функций ошибки для различных моделей классификации приведены ниже.
 
 Чтобы сравнить качество классификации с прошлыми результатами~\cite{karasikov2016feature,ivkin2015ts}, в качестве метрики качества используется точность классификации:
 \begin{equation}
-	\mathrm{accuracy} = \frac{1}{m} \sum_{i=1}^{m} \left[f\left(\mathbf{g}(s_i), \hat{\btheta} \right)= y_i\right].
+	\mathrm{accuracy} = \frac{1}{m} \sum_{i=1}^{m} \left[f\left(\mathbf{g}(\bs_i), \hat{\btheta} \right)= y_i\right].
 	\label{ch5:eq:accuracy}
 \end{equation}
 
@@ -106,7 +106,7 @@ x_t = w_0 + \sum_{j=1}^{n-1} w_j x_{t-j} + \epsilon_t,
 
 \subsubsection{Анализ сингулярного спектра.}
 Альтернативной гипотезой порождения признакового пространства для временного ряда является анализ сингулярного спектра (Singular Spectrum Analysis, SSA)~\cite{hassani2007singular}. 
-Для каждого временного ряда~$\bs$ из выборки $\mathcal{D}$ строится траекторная матрица:
+Для каждого временного ряда~$\bs$ из исходной выборки~$\mathcal{D}$ строится траекторная матрица:
 \[
 \mathbf{X} = 
 \begin{pmatrix}
@@ -173,12 +173,12 @@ p_i(\xi_{i-1}) &= x_{i-1},\: p_i(\xi_i) = x_i, \quad i = 1, \dots, M.
 Оптимальные параметры модели $\hat{\mathbf{w}}, \hat{b}$  в случае логистической регрессии определяются минимизацией функции ошибки~\eqref{ch5:eq:optimal_classification_params}
 
 \begin{equation*}
-L(\btheta, \mathcal{D}_G, \mu) = \sum_{i=1}^{m} \log\bigl(1 + \exp(-y_i [\mathbf{w}^{\T} \mathbf{g}_i + b])\bigl) + \frac{\mu}{2} \|\mathbf{w}\|^2, \:\:\mbox{where}\:\: \btheta  = \begin{bmatrix}
+L(\btheta, \mathcal{D}_\mathbb{G}, \mu) = \sum_{i=1}^{m} \log\bigl(1 + \exp(-y_i [\mathbf{w}^{\T} \mathbf{g}_i + b])\bigl) + \frac{\mu}{2} \|\mathbf{w}\|^2, \:\:\mbox{where}\:\: \btheta  = \begin{bmatrix}
 \mathbf{w} \\ b
 \end{bmatrix}.
 \end{equation*}
 
-Решающее правило $f(\mathbf{g}, \btheta)$~--- знак линейной комбинации описания объекта $\mathbf{g}$ и параметров $\hat{\btheta}$
+Решающее правило $f(\mathbf{g}, \btheta)$~--- знак линейной комбинации описания объекта~$\mathbf{g}$ и параметров $\hat{\btheta}$
 \begin{equation*}
 \hat{y} = f(\mathbf{g}, \hat{\btheta}) = \sgn(\mathbf{g}^{\T} \hat{\mathbf{w}} + \hat{b}).
 \end{equation*}
@@ -192,7 +192,7 @@ L(\btheta, \mathcal{D}_G, \mu) = \sum_{i=1}^{m} \log\bigl(1 + \exp(-y_i [\mathbf
 \mbox{s.t.} \:\: &y_i \left(\mathbf{w}^{\T} \mathbf{g}_i + b\right) \geq 1 - \xi_i,\\
 &\xi_i \geq 0, \quad 1 \leq i \leq m.
 \end{align*}
-Целевая функция соответствует функции ошибки классификации $L(\btheta, \mathcal{D}_G, \mu)$.
+Целевая функция соответствует функции ошибки классификации $L(\btheta, \mathcal{D}_\mathbb{G}, \mu)$.
 Предсказание для нового объекта вычисляется аналогично $
 \hat{y} = \sgn (\mathbf{g}^{\T} \hat{\mathbf{w}} + \hat{b})$.
 
@@ -292,7 +292,7 @@ CV(K) = \frac{1}{K}\sum_{k=1}^{K} L(f_k, \mathcal{D}\setminus \mathcal{C}_k),
 где $\mathcal{C}_k$~---$\frac{K-1}{K}$ доля от всей выборки, используемая для обучения модели $f_k$.
 Гиперпараметры $\boldsymbol{\mu}$ моделей классификации были настроены той же процедурой кросс-валидации.
 
-Первый подход к порождению признаков временных рядов~---экспертные функции.
+Первый подход к порождению признаков временных рядов~--- экспертные функции.
 Основной недостаток такого подхода необходимость экспертного задания функций и возможности их вычисления для конкретного набора данных.
 
 Авторегрессионная модель требует задания параметра длины модели $n$. 
