@@ -4,6 +4,7 @@
 |---------|------| 
 | PhDThesis | [github](https://github.com/r-isachenko/PhDThesis/blob/master/doc/Isachenko2021PhDThesis.pdf) | 
 | PhDPres | [github](https://github.com/r-isachenko/PhDThesis/blob/master/pres/Isachenko2021PhDThesisPres.pdf) | 
+| PhDAutoAbstract | [github](https://github.com/r-isachenko/PhDThesis/blob/master/doc/Isachenko2021AutoAbstract.pdf) | 
 | IDP2020Pres | [github](https://github.com/r-isachenko/PhDThesis/blob/master/idp2020/Isachenko2020PhDThesisPres.pdf) | 
 
 ### Полезные ссылки
