@@ -1,4 +1,4 @@
-% !TEX encoding = UTF-8 Unicode
+\part{% !TEX encoding = UTF-8 Unicode}
 \documentclass{dissert}
 
 % В этом документе преамбула
@@ -62,8 +62,13 @@
 \geometry{top=2.0cm}
 \geometry{bottom=2.0cm}
 
-%\def\BibUrl#1.{}
-%\bibliographystyle{gost2008} 
+
+%https://tex.stackexchange.com/questions/163451/total-number-of-citations
+\usepackage{totcount}
+\newtotcounter{citnum} %From the package documentation
+\def\oldbibitem{} \let\oldbibitem=\bibitem
+\def\bibitem{\stepcounter{citnum}\oldbibitem}
+
 \theoremstyle{definition}
 \newtheorem{theorem}{Теорема}
 \newtheorem{lemma}{Лемма}
