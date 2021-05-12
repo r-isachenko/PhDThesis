@@ -226,39 +226,43 @@ QPFS предлагает явный способ построения функ�
 	\end{equation*}
 \end{proof}
 
-Для решения минимакс задачи~\eqref{ch3:eq:minmax}, зафиксируем некоторый~$\bz_x \in \mathbb{C}^n$. Для фиксированного вектора~$\bz_x$ решаем задачу
-\begin{equation}
-	\max_{\bz_y \in \mathbb{C}_r} f(\bz_x, \bz_y) = \max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \bigl[\alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y - \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \bigr].
-	\label{ch3:eq:fixed_ax}
-\end{equation}
-Лагранжиан для данной задачи:
-\begin{equation*}
-	L(\bz_x, \bz_y, \lambda, \bmu) = \alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y - \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y + \lambda \cdot  (\bOne_r^{\T} \bz_y - 1) + \bmu^{\T} \bz_y.
-\end{equation*}
-Здесь вектор множителей Лагранжа~$\bmu$, который соответствует ограничениям на неравенства $\bz_y \geq \bZero_r$, является неотрицательным.
-Двойственной задачей является
-\begin{equation}
-	\min_{\lambda, \, \bmu \geq \bZero_r} g(\bz_x, \lambda, \bmu) = \min_{\lambda, \, \bmu \geq \bZero_r}  \left[\max_{\bz_y \in \bbR^r} L(\bz_x, \bz_y, \lambda, \bmu) \right].
-	\label{ch3:eq:dual}
-\end{equation}
-Для задачи квадратичного программирования~\eqref{ch3:eq:fixed_ax} с положительно определенными матрицами~$\bQ_x$ и~$\bQ_y$ выполняются условия сильной двойственности. Таким образом, оптимальное значение~\eqref{ch3:eq:fixed_ax} равно оптимальному значению~\eqref{ch3:eq:dual}. Это позволяет перейти от решения задачи~\eqref{ch3:eq:minmax} к решению задачи
-\begin{equation}
-\min_{\bz_x \in \mathbb{C}^n, \, \lambda, \, \bmu \geq \bZero_r} g(\bz_y, \lambda, \bmu).
-\label{ch3:eq:dual_maxmin}
-\end{equation}
-
-Полагая градиент~$\nabla_{\bz_y} L(\bz_x, \bz_y, \lambda, \bmu)$ равным нулю, получим оптимальное значение~$\bz_y$:
-\begin{equation*}
-	\bz_y = \frac{1}{2\alpha_3} \bQ_y^{-1} \left( - \alpha_2 \cdot \bB^{\T} \bz_x +\lambda \cdot \bOne_r + \bmu \right).
-\end{equation*}
-Двойственная функция принимает вид
-\begin{multline}
-	g(\bz_x, \lambda, \bmu)
-	= \max_{\bz_y \in \bbR^r} L(\bz_x, \bz_y, \lambda, \bmu) =
-	\bz_x^{\T} \left( - \frac{\alpha_2^2}{4\alpha_3} \cdot \bB \bQ_y^{-1} \bB^{\T} - \alpha_1 \cdot \bQ_x\right) \bz_x \\ - \frac{1}{4 \alpha_3} \lambda^2 \cdot \bOne_r^{\T} \bQ_y^{-1} \bOne_r - \frac{1}{4 \alpha_3} \cdot \bmu^{\T} \bQ_y^{-1} \bmu + \frac{\alpha_2}{2 \alpha_3} \lambda \cdot \bOne_r^{\T} \bQ_y^{-1} \bB^{\T} \bz_x \\ - \frac{1}{2 \alpha_3} \lambda \cdot \bOne_r^{\T} \bQ_y^{-1} \bmu + \frac{\alpha_2}{2 \alpha_3} \cdot \bmu^{\T} \bQ_y^{-1} \bB^{\T} \bz_x + \lambda.
-	\label{ch3:eq:dual_quadratic_form}
-\end{multline}
-Тем самым задача~\eqref{ch3:eq:dual_maxmin} является квадратичной задачей с~$n + r + 1$ переменными.
+\begin{statement}
+	Минимаксная задача~\eqref{ch3:eq:minmax} эквивалентна задаче квадратичного программирования с~$n + r + 1$ переменными.
+\end{statement}
+\begin{proof}
+	Для решения минимакс задачи~\eqref{ch3:eq:minmax}, зафиксируем некоторый~$\bz_x \in \mathbb{C}^n$. Для фиксированного вектора~$\bz_x$ решаем задачу
+	\begin{equation}
+		\max_{\bz_y \in \mathbb{C}_r} f(\bz_x, \bz_y) = \max_{\substack{\bz_y \geq \bZero_r \\ \bOne_r^{\T}\bz_y=1}} \bigl[\alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y - \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \bigr].
+		\label{ch3:eq:fixed_ax}
+	\end{equation}
+	Лагранжиан для данной задачи:
+	\begin{equation*}
+		L(\bz_x, \bz_y, \lambda, \bmu) = \alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y - \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y + \lambda \cdot  (\bOne_r^{\T} \bz_y - 1) + \bmu^{\T} \bz_y.
+	\end{equation*}
+	Здесь вектор множителей Лагранжа~$\bmu$, который соответствует ограничениям на неравенства $\bz_y \geq \bZero_r$, является неотрицательным.
+	Двойственной задачей является
+	\begin{equation}
+		\min_{\lambda, \, \bmu \geq \bZero_r} g(\bz_x, \lambda, \bmu) = \min_{\lambda, \, \bmu \geq \bZero_r}  \left[\max_{\bz_y \in \bbR^r} L(\bz_x, \bz_y, \lambda, \bmu) \right].
+		\label{ch3:eq:dual}
+	\end{equation}
+	Для задачи квадратичного программирования~\eqref{ch3:eq:fixed_ax} с положительно определенными матрицами~$\bQ_x$ и~$\bQ_y$ выполняются условия сильной двойственности. Таким образом, оптимальное значение~\eqref{ch3:eq:fixed_ax} равно оптимальному значению~\eqref{ch3:eq:dual}. Это позволяет перейти от решения задачи~\eqref{ch3:eq:minmax} к решению задачи
+	\begin{equation}
+	\min_{\bz_x \in \mathbb{C}^n, \, \lambda, \, \bmu \geq \bZero_r} g(\bz_y, \lambda, \bmu).
+	\label{ch3:eq:dual_maxmin}
+	\end{equation}
+	
+	Полагая градиент~$\nabla_{\bz_y} L(\bz_x, \bz_y, \lambda, \bmu)$ равным нулю, получим оптимальное значение~$\bz_y$:
+	\begin{equation*}
+		\bz_y = \frac{1}{2\alpha_3} \bQ_y^{-1} \left( - \alpha_2 \cdot \bB^{\T} \bz_x +\lambda \cdot \bOne_r + \bmu \right).
+	\end{equation*}
+	Двойственная функция принимает вид
+	\begin{multline}
+		g(\bz_x, \lambda, \bmu)
+		= \max_{\bz_y \in \bbR^r} L(\bz_x, \bz_y, \lambda, \bmu) =
+		\bz_x^{\T} \left( - \frac{\alpha_2^2}{4\alpha_3} \cdot \bB \bQ_y^{-1} \bB^{\T} - \alpha_1 \cdot \bQ_x\right) \bz_x \\ - \frac{1}{4 \alpha_3} \lambda^2 \cdot \bOne_r^{\T} \bQ_y^{-1} \bOne_r - \frac{1}{4 \alpha_3} \cdot \bmu^{\T} \bQ_y^{-1} \bmu + \frac{\alpha_2}{2 \alpha_3} \lambda \cdot \bOne_r^{\T} \bQ_y^{-1} \bB^{\T} \bz_x \\ - \frac{1}{2 \alpha_3} \lambda \cdot \bOne_r^{\T} \bQ_y^{-1} \bmu + \frac{\alpha_2}{2 \alpha_3} \cdot \bmu^{\T} \bQ_y^{-1} \bB^{\T} \bz_x + \lambda.
+		\label{ch3:eq:dual_quadratic_form}
+	\end{multline}
+\end{proof}
 
 \textbf{Несимметричный учёт значимостей признаков и целевых переменных.}
 Естественным способом преодоления проблемы метода SymImp является добавление штрафа для целевых векторов, которые коррелируют с признаками.
@@ -300,17 +304,16 @@ QPFS предлагает явный способ построения функ�
 	\end{align}
 	Здесь, в~\eqref{ch3:eq:asymimp_balance1} уравновешены $\text{Sim}(\bX)$ с первым слагаемым~$\text{Rel}(\bX, \bY)$, а в~\eqref{ch3:eq:asymimp_balance2} уравновешены $\text{Sim}(\bY)$  с~$\text{Rel}(\bX, \bY)$.
 \end{proof}
-\begin{statement}
-	Для случая $r=1$, предложенные функции~\eqref{ch3:eq:symimp},~\eqref{ch3:eq:minmax} и~\eqref{ch3:eq:asymimp} совпадают с оригинальным методом QPFS~\eqref{ch3:eq:qpfs_problem}.
-	
-	\begin{proof}
-		Если $r$ равно 1, то $\bQ_y = q_y$~--- скаляр, $\bz_y = 1$ и $\bB = \bb$. Задачи~\eqref{ch3:eq:symimp},~\eqref{ch3:eq:minmax} и~\eqref{ch3:eq:asymimp} принимают вид
-		\begin{equation*}
-		\alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bb \rightarrow \min_{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1} .
-		\end{equation*}
-		При $\alpha = \frac{\alpha_2}{\alpha_1 + \alpha_2}$ последняя задачи принимает вид~\eqref{ch3:eq:qpfs_problem}.
-	\end{proof}
-\end{statement}
+\begin{theorem}
+	В случае скалярной целевой переменной ($r=1$) предлагаемые методы выбора признаков SymImp~\eqref{ch3:eq:symimp}, MinMax~\eqref{ch3:eq:minmax}, AsymImp~\eqref{ch3:eq:asymimp} совпадают с оригинальным методом QPFS~\eqref{ch3:eq:qpfs_problem}.
+\end{theorem}	
+\begin{proof}
+	Если $r$ равно 1, то $\bQ_y = q_y$~--- скаляр, $\bz_y = 1$ и $\bB = \bb$. Задачи~\eqref{ch3:eq:symimp},~\eqref{ch3:eq:minmax} и~\eqref{ch3:eq:asymimp} принимают вид
+	\begin{equation*}
+	\alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bb \rightarrow \min_{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1} .
+	\end{equation*}
+	При $\alpha = \frac{\alpha_2}{\alpha_1 + \alpha_2}$ последняя задачи принимает вид~\eqref{ch3:eq:qpfs_problem}.
+\end{proof}
 
 Таблица~\ref{ch3:tbl:summary} демонстрирует основные идеи и функции ошибок для каждого метода. 
 RelAgg является базовой стратегией и не учитывает корреляции в целевом пространстве.

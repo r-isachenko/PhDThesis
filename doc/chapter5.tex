@@ -71,17 +71,11 @@
 	\frac{1}{m} \sum_{i=1}^m \bP(\bx_i - \bmu)(\bx_i - \bmu)^{\T} \bP^{\T} =  \bP \mathbf{A} \bP^{\T}.
 \]
 \begin{definition}
-	Индикаторной матрицей назовем матрицу $\bY \in \bbR^{m \times K}$, где
-	\[
-	y_{ij} =
-		\begin{cases}
-			1, & \text{если $f(\bx_i) = y_j$;} \\
-			0, & \text{если $f(\bx_i) \neq y_j$.}
-		\end{cases}
-	\]
+	\textit{Индикаторной матрицей} назовем матрицу $\bY \in \bbR^{m \times K}$, где
+	$y_{ij} =[f(\bx_i) = y_j]$.
 \end{definition}
 \begin{definition}
-	Взвешенной индикаторной матрицей назовем матрицу
+	\textit{Взвешенной индикаторной матрицей} назовем матрицу
 	$\mathbf{L} = \bY (\bY^{\T} \bY)^{-1/2} \in \bbR^{m \times K}$, элементы которой равны:
 	\[
 		l_{ij} =
@@ -175,13 +169,15 @@
 \textbf{Выравнивание временных рядов.}
 Для повышения качества и устойчивости алгоритма классификации предлагается провести выравнивание временных рядов каждого класса относительно центроида.
 
-Пусть $\mathbf{X}_e$~--- множество объектов обучающей выборки, принадлежащих одному классу $e \in \bbY$.
-Центроидом множества объектов $\mathbf{X}_e = \{\mathbf{x}_i|y_i=e\}_{i=1}^m$ по расстоянию $\rho$ назовем вектор $\mathbf{c}_e \in \mathbb{R}^n$ такой, что
-\begin{equation}
-	\label{ch5:eq:centroid_task}
-	\mathbf{c}_e = \mathop{\text{argmin}}\limits_{{\mathbf{c} \in \mathbb{R}^n}}\sum_{\mathbf{x}_i \in \mathbf{X}_e}
-	{\rho(\mathbf{x}_i ,\mathbf{c})}.
-\end{equation}
+\begin{definition}
+	\textit{Центроидом} множества объектов $\bX_e$ по расстоянию $\rho$ назовем вектор $\mathbf{c}_e \in \mathbb{R}^n$ такой, что
+	\begin{equation}
+		\label{ch5:eq:centroid_task}
+		\mathbf{c}_e = \mathop{\text{argmin}}\limits_{{\mathbf{c} \in \mathbb{R}^n}}\sum_{\mathbf{x}_i \in \mathbf{X}_e}
+		{\rho(\mathbf{x}_i ,\mathbf{c})}.
+	\end{equation}
+	Здесь $\bX_e = \{\bx_i: i=1, \dots, m, \, y_i=e\}$~--- множество объектов выборки, принадлежащих одному классу $e \in \bbY$.
+\end{definition}
 
 Для нахождения центроида предлагается в качестве расстояния между временными рядами использовать путь наименьшей стоимости~\cite{berndt1994using,muller2007dynamic}, найденный методом динамической трансформации времени.
 Псевдокод решения оптимизационной задачи~\eqref{ch5:eq:centroid_task} приведен в алгоритме~\ref{ch5:alg:DBA_pseudo}.
@@ -233,7 +229,7 @@
 
 \textbf{Метрическое обучение.}
 Введем на множестве выравненных временных рядов расстояние Махаланобиса $d_{\bA}$~\ref{ch5:eq:mahal_distance}.
-Представим матрицу трансформации $\mathbf{A}$ в виде разложения $\mathbf{A}^{-1} = \mathbf{L}^{\T}  \mathbf{L}$.
+Представим матрицу трансформации~$\bA$ в виде разложения $\mathbf{A}^{-1} = \mathbf{L}^{\T}  \mathbf{L}$.
 Матрица $\mathbf{L} \in \bbR^{p \times n}$~--- матрица линейного преобразования, где $p$ задает размерность преобразованного пространства. Если параметр $p < n$, то происходит снижение размерности признакового пространства.
 
 Расстояние $d_\mathbf{A} (\mathbf{x}_i, \mathbf{x}_j)$ есть евклидово расстояние между $\mathbf{Lx}_i$ и $\mathbf{Lx}_j$:
@@ -248,17 +244,20 @@
 \[
 	Q_1(\mathbf{L}) = \sum_{j \rightsquigarrow i} \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 \rightarrow \min_{\mathbf{L}},
 \]
-где $j \rightsquigarrow i$ означает, что $\mathbf{x}_j$ является одним из $k$ ближайших соседей для $\mathbf{x}_i$.
-Вторая идея состоит в максимизации расстояния между каждым объектом и его объектами-нарушителями. Объектом-нарушителем для $\mathbf{x}_i$ назовем объект~$\mathbf{x}_l$ такой, что
-\begin{equation}
-	\label{ch5:eq:impostor}
-	\|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_l)\|^2 \leq \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 + 1, \quad \text{где $j \rightsquigarrow i$}.
-\end{equation}
+где запись $j \rightsquigarrow i$ означает, что $\mathbf{x}_j$ является одним из $k$ ближайших соседей для $\mathbf{x}_i$.
+Вторая идея состоит в максимизации расстояния между каждым объектом и его объектами-нарушителями. 
+
+\begin{definition}
+	\textit{Объектом-нарушителем} для $\mathbf{x}_i$ назовем объект~$\mathbf{x}_l$ такой, что
+	\begin{equation}
+		\label{ch5:eq:impostor}
+		\|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_l)\|^2 \leq \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 + 1, \quad \text{где $j \rightsquigarrow i$}.
+	\end{equation}
+\end{definition}
 Таким образом, необходимо минимизировать следующий функционал:
 \[
-	Q_2(\mathbf{L}) = \sum_{j \rightsquigarrow i} \sum_l(1 - y_{il})\bigl[1 + \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 - \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_l)\|^2\bigr]_+ \rightarrow \min_{\mathbf{L}},
+	Q_2(\mathbf{L}) = \sum_{j \rightsquigarrow i} \sum_l [y_i \neq y_l] \bigl[1 + \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)\|^2 - \|\mathbf{L}(\mathbf{x}_i - \mathbf{x}_l)\|^2\bigr]_+ \rightarrow \min_{\mathbf{L}}.
 \]
-где $y_{il} = 1$, если $y_i = y_l$, и $y_{il} = 0$ в противном случае.
 Положительная срезка позволяет штрафовать только те объекты, которые удовлетворяют условию~\eqref{ch5:eq:impostor}.
 
 Задача метрического обучения состоит в нахождении линейного преобразования $\mathbf{f}(\mathbf{x}) = \mathbf{Lx}$, то есть нахождении матрицы $\mathbf{L}$ в виде решения оптимизационной задачи
