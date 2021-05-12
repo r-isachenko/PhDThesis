@@ -13,15 +13,15 @@
 \[
 	\bs = [x_1, \dots, x_T]^{\T} \in \bbR^T.
 \]
-Необходимо построить модель классификации~$f: \bbR^T \rightarrow Y$, которая будет ставить в соответствие каждому сегменту из множества~$\mathcal{S}$ метку класса из конечного множества~$Y$.
+Необходимо построить модель классификации~$a: \bbR^T \rightarrow \bbY$, которая будет ставить в соответствие каждому сегменту из множества~$\mathcal{S}$ метку класса из конечного множества~$\bbY = \{1, \dots, K\}$.
 Обозначим за
 \begin{equation}
 	\mathcal{D} = \{(\bs_i, y_i)\}_{i=1}^m
 	\label{ch6:eq:sample}
 \end{equation}
-исходную выборку, где $\bs_i \in \mathcal{S}$ и $y_i = f(\bs_i)\in Y$.
+исходную выборку, где $\bs_i \in \mathcal{S}$ и $y_i = a(\bs_i)\in \bbY$.
 
-В работе предлагается построить модель~$f$ в виде суперпозиции $f \circ \mathbf{g}$.
+В работе предлагается построить модель~$a$ в виде суперпозиции $a = f \circ \mathbf{g}$.
 \begin{definition}
 	\textit{Порождающей функцией} будем называть функцию $\mathbf{g}: \bbR^T \rightarrow \mathbb{X}$, отображающую исходные временные ряды $\bs$ из пространства~$\bbR^{T} $ в признаковое пространство~$\bbX \subset \bbR^n$.
 \end{definition}
@@ -32,9 +32,9 @@
 где $\bx_i = \mathbf{g}(\bs_i) \in \bbX$. 
 
 Модель классификации $f=f(\bx, \btheta)$ является параметрической функцией с вектором параметров~$\btheta$. 
-Оптимальные параметры~$\hat{\btheta}$ определяются оптимизацией функции ошибки классификации
+Оптимальные параметры~$\btheta^*$ определяются оптимизацией функции ошибки классификации
 \begin{equation}
-	\hat{\btheta} = \argmin_{\btheta} L(\btheta, \mathcal{D}_\bbX, \bmu).
+	\btheta^* = \argmin_{\btheta} L(\btheta, \mathcal{D}_\bbX, \bmu).
 	\label{ch6:eq:optimal_classification_params}
 \end{equation}
 Вектор~$\bmu$ является внешним параметром для заданной модели классификации. 
@@ -42,7 +42,7 @@
 
 Чтобы сравнить качество классификации с прошлыми результатами~\cite{karasikov2016feature,ivkin2015ts}, в качестве метрики качества используется точность классификации:
 \begin{equation}
-	\mathrm{accuracy} = \frac{1}{m} \sum_{i=1}^{m} \left[f\left(\mathbf{g}(\bs_i), \hat{\btheta} \right)= y_i\right].
+	\mathrm{accuracy} = \frac{1}{m} \sum_{i=1}^{m} \left[f\left(\mathbf{g}(\bs_i), \btheta^* \right)= y_i\right].
 	\label{ch6:eq:accuracy}
 \end{equation}
 
@@ -86,11 +86,11 @@
 	x_t = w_0 + \sum_{j=1}^{n-1} w_j x_{t-j} + \epsilon_t,
 \end{equation*}
 где $\epsilon_t$~--- регрессионные остатки.
-Оптимальные параметры $\hat{\mathbf{w}}$ авторегрессионной модели используются как признаки $\mathbf{g}(\bs)$.
+Оптимальные параметры $\mathbf{w}^*$ авторегрессионной модели используются как признаки $\mathbf{g}(\bs)$.
 Данные параметры минимизируют квадратичную ошибку аппроксимации временного ряда и предсказания модели
 
 \begin{equation}
-	\bx = \mathbf{g}(\bs) = \hat{\mathbf{w}} = \argmin_{\mathbf{w} \in \bbR^{n}} \left( \sum_{t=n}^{T} \|x_t - \hat{x}_t\|^2\right).
+	\bx = \mathbf{g}(\bs) = \mathbf{w}^* = \argmin_{\mathbf{w} \in \bbR^{n}} \left( \sum_{t=n}^{T} \|x_t - \hat{x}_t\|^2\right).
 	\label{ch6:eq:autoregressive_description}
 \end{equation}
 Задача~\eqref{ch6:eq:autoregressive_description} эквивалентна задаче линейной регрессии.
@@ -117,10 +117,11 @@
 \]
 Здесь ширина окна $n$ является внешним структурным параметром.
 Сингулярное разложение матрицы $\mathbf{X}^{\T} \mathbf{X}$:
+
 \[
-	\bS^{\T} \bS = \mathbf{U} \mathbf{\Lambda} \mathbf{U}^{\T},
+\bS^{\T} \bS = \bU \boldsymbol{\Lambda} \bU^{\T},
 \]
-где $\mathbf{U}$~--- унитарная матрица и $\Lambda = \mathrm{diag}(\lambda_1, \dots, \lambda_n)$ причём $\lambda_i$ собственные значения $\bS^{\T} \bS$. 
+где $\mathbf{U}$~--- унитарная матрица и $\boldsymbol{\Lambda} = \mathrm{diag}(\lambda_1, \dots, \lambda_n)$ причём $\lambda_i$ собственные значения $\bS^{\T} \bS$. 
 Признаковое описание объекта~$\bs$ задаётся спектром матрицы~$\bS^{\T} \bS$:
 \[
 	\bx = \mathbf{g}(\bs) = \left[\lambda_1, \dots, \lambda_n\right]^{\T}.
@@ -169,7 +170,7 @@
 Использовались три модели классификации: логистическая регрессия, SVM и случайный лес.
 
 \subsubsection{Логистическая регрессия.}
-Оптимальные параметры модели $\hat{\mathbf{w}}, \hat{b}$  в случае логистической регрессии определяются минимизацией функции ошибки~\eqref{ch6:eq:optimal_classification_params}
+Оптимальные параметры модели $\mathbf{w}^*, b^*$  в случае логистической регрессии определяются минимизацией функции ошибки~\eqref{ch6:eq:optimal_classification_params}
 
 \begin{equation*}
 	L(\btheta, \mathcal{D}_\bbX, \mu) = \sum_{i=1}^{m} \log\bigl(1 + \exp(-y_i [\mathbf{w}^{\T} \bx_i + b])\bigl) + \frac{\mu}{2} \|\mathbf{w}\|^2, \:\:\mbox{where}\:\: \btheta  = \begin{bmatrix}
@@ -177,19 +178,19 @@
 	\end{bmatrix}.
 \end{equation*}
 
-Решающее правило $f(\bx, \btheta)$~--- знак линейной комбинации описания объекта~$\bx$ и параметров $\hat{\btheta}$
+Решающее правило $f(\bx, \btheta)$~--- знак линейной комбинации описания объекта~$\bx$ и параметров $\btheta^*$
 \begin{equation*}
-	\hat{y} = f(\bx, \hat{\btheta}) = \sgn(\bx^{\T} \hat{\mathbf{w}} + \hat{b}).
+	\hat{y} = f(\bx, \btheta^*) = \sgn(\bx^{\T} \mathbf{w}^* + b^*).
 \end{equation*}
 
 \subsubsection{SVM.}
 Оптимизационная задача метода SVM имеет вид
 \begin{align*}
-	\hat{\btheta}  = 
+	\btheta^*  = 
 	\begin{pmatrix}
-	\hat{\mathbf{w}} \\ 
-	\hat{b} \\ 
-	\hat{\mathbf{\xi}}
+		\mathbf{w}^* \\ 
+		b^* \\ 
+		\hat{\mathbf{\xi}}
 	\end{pmatrix}
 	= \argmin_{\mathbf{w}, b, \mathbf{\xi}}  \frac{1}{2} \|\mathbf{w}\|^2 + \mu \sum_{i=1}^{m} \xi_i,\:\:
 	\mbox{s.t.} \:\: &y_i \left(\mathbf{w}^{\T} \bx_i + b\right) \geq 1 - \xi_i,\\
@@ -197,7 +198,7 @@
 \end{align*}
 Целевая функция соответствует функции ошибки классификации $L(\btheta, \mathcal{D}_\bbX, \mu)$.
 Предсказание для нового объекта вычисляется аналогично $
-\hat{y} = \sgn (\bx^{\T} \hat{\mathbf{w}} + \hat{b})$.
+\hat{y} = \sgn (\bx^{\T} \mathbf{w}^* + b^*)$.
 
 \subsubsection{Случайный лес.}
 Случайный лес использует идею бэггинга. 
