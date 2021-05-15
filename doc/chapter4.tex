@@ -37,7 +37,7 @@
 Данная задача полностью соответствует рассмотренной задаче~\eqref{ch1:eq:loss_min_param} для случая скалярной целевой переменной ($r=1$).
 В качестве функции ошибки~$\cL (\btheta, \bX, \by)$ рассматриваются квадратичная ошибка для задачи регрессии:
 \begin{equation}
-	\cL(\btheta, \bX, \by) = \frac 12 \| \by - \mathbf{f}(\bX, \btheta) \|_2^2 = \frac 12 \sum_{i=1}^m \bigl( y_i - f(\bx_i,  \btheta)\bigr)^2,
+	\cL(\btheta, \bX, \by) = \frac 12 \| \by - \mathbf{f}(\bX, \btheta) \|^2 = \frac 12 \sum_{i=1}^m \bigl( y_i - f(\bx_i,  \btheta)\bigr)^2,
 	\label{ch4:eq:squared_error}
 \end{equation}
 и функция кросс-энтропии для задачи бинарной классификации: 
