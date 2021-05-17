@@ -307,14 +307,15 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Пусть $\mathbf{f}_1(\bx_1, \bTheta_1)$, $\mathbf{f}_2(\bx_2, \bTheta_2)$~--- линейные модели декодирования сигналов. 
-Рассмотрим аддитивную суперпозицию моделей декодирования, 
+Рассмотрим аддитивную суперпозицию моделей декодирования.
 \begin{definition}
 	Назовём \textit{аддитивной суперпозицией} моделей декодирования модель~\eqref{ch1:eq:lin_reg_model} вида
 	\begin{equation}
 		\bY = \mathbf{f}(\bx, \bTheta) + \bepsilon = \mathbf{f}_1(\bx_1, \bTheta_1) + \mathbf{f}_2(\bx_2, \bTheta_2) + \bepsilon = \bTheta_1^{\T} \bx_1 + \bTheta_2^{\T} \bx_2 + \bepsilon,
 		\label{ch2:eq:two_modal_reg_model}
 	\end{equation}
-	где объект $\bx = [\bx_1, \bx_2] \in \bbR^n$ состоит из двух подвекторов $\bx_1 \in \bbR^k$, $\bx_2 \in \bbR^{n - k}$. Тем самым матрица параметров $\bTheta \in \bbR^{n \times r}$ состоит из двух подматриц $\bTheta_1 \in \bbR^{k \times r}$, $\bTheta_2 \in \bbR^{n - k \times r}$. 
+	где объект $\bx = [\bx_1, \bx_2] \in \bbR^n$ состоит из двух подвекторов $\bx_1 \in \bbR^k$, $\bx_2 \in \bbR^{n - k}$. 
+	Тем самым матрица параметров $\bTheta \in \bbR^{n \times r}$ состоит из двух подматриц $\bTheta_1 \in \bbR^{k \times r}$, $\bTheta_2 \in \bbR^{n - k \times r}$. 
 \end{definition}
 
 \begin{statement}

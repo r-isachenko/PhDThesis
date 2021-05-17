@@ -99,9 +99,10 @@ QPFS выбирает подмножество параметров~$\ba$ для
 где $\bH = \nabla^2 S(\btheta)$ является матрицой Гессиана функции ошибки $S(\btheta)$.
 
 Итерация~\eqref{ch4:eq:update_rule} метода Ньютона имеет вид
-\[
+\begin{equation}
 	\btheta^k = \btheta^{k-1} - \bH^{-1} \nabla S(\btheta).
-\]
+	\label{ch4:eq:newton_step}
+\end{equation}
 На каждой итерации требуется обращать матрицу Гессиана $\bH$.
 Мерой плохой обусловленности для матрицы Гессиана~$\bH$ является число обусловленности
 \[
@@ -120,38 +121,42 @@ QPFS выбирает подмножество параметров~$\ba$ для
 	S(\btheta^{k - 1} + \eta \Delta \btheta^{k - 1}) < S(\btheta^{k - 1}) + \gamma \eta \nabla S^{\T}(\btheta^{k-1})\btheta^{k - 1}, \quad \gamma \in [0, 0.5].
 \]
 
-\textbf{Модель нелинейной регрессии.}
-Предположим, что модель $f (\bx , \btheta)$ близка к линейной в окрестности точки $\btheta + \Delta \btheta$
-\[
-	\mathbf{f}(\bX , \btheta + \Delta \btheta) \approx \mathbf{f}(\bX , \btheta) + \bJ \cdot \Delta  \btheta,
-\]
-где $\mathbf{J} \in \bbR^{m \times p}$ является матрицой Якоби
-\begin{equation*}
-	\bJ = 
-	\begin{pmatrix}
-		\frac{\partial f(\bx_1 , \btheta)}{\partial \theta_1} & \dots & 
-		\frac{\partial f(\bx_1 , \btheta)}{\partial \theta_p} \\
-		\dots & \dots & \dots \\
-		\frac{\partial f(\bx_m , \btheta)}{\partial \theta_1} & \dots & 
-		\frac{\partial f(\bx_m , \btheta)}{\partial \theta_p}
-	\end{pmatrix}.
-\end{equation*}
-В соответствии с этим предположением градиент~$\nabla S(\btheta)$ и Гессиан матрицы~$\bH$ функции ошибки~\eqref{ch4:eq:squared_error} равняются
-\begin{equation}
-	\nabla S(\btheta) = \bJ^{\T} (\by - \mathbf{f}), \quad \bH = \bJ^{\T} \bJ.
-	\label{ch4:eq:nonlin_reg_deriv}
-\end{equation}
-Данные предположения приводят к методу Гаусса-Ньютона и правилу обновления~\eqref{ch4:eq:update_rule}
-\[
-	\btheta^k = \btheta^{k - 1} + (\bJ^{\T} \bJ)^{-1}\bJ^{\T}(\mathbf{f} - \by).
-\]
-Вектор обновления~$\Delta \btheta$ является решением задачи линейной регрессии
-\begin{equation}
-	\| \be - \bF \Delta \btheta \|_2^2 \rightarrow \min_{\Delta \btheta \in \bbR^{p}},
-	\label{ch4:eq:lin_reg_nonlin_reg}
-\end{equation}
-где $\be = \mathbf{f} - \by$ и $\bF = \bJ$.
-
+\begin{theorem}
+	Пусть модель $f (\bx , \btheta)$ близка к линейной в окрестности точки $\btheta + \Delta \btheta$
+	\begin{equation}
+		\mathbf{f}(\bX , \btheta + \Delta \btheta) \approx \mathbf{f}(\bX , \btheta) + \bJ \cdot \Delta  \btheta,
+		\label{ch4:eq:linearization}
+	\end{equation}
+	где $\mathbf{J} \in \bbR^{m \times p}$ является матрицой Якоби
+	\begin{equation*}
+		\bJ = 
+		\begin{pmatrix}
+			\frac{\partial f(\bx_1 , \btheta)}{\partial \theta_1} & \dots & 
+			\frac{\partial f(\bx_1 , \btheta)}{\partial \theta_p} \\
+			\dots & \dots & \dots \\
+			\frac{\partial f(\bx_m , \btheta)}{\partial \theta_1} & \dots & 
+			\frac{\partial f(\bx_m , \btheta)}{\partial \theta_p}
+		\end{pmatrix}.
+	\end{equation*}
+	Тогда вектор обновления~$\Delta \btheta$ для функции ошибки~\eqref{ch4:eq:squared_error} является решением задачи линейной регрессии
+	\begin{equation}
+		\| \be - \bF \Delta \btheta \|_2^2 \rightarrow \min_{\Delta \btheta \in \bbR^{p}},
+		\label{ch4:eq:lin_reg_nonlin_reg}
+	\end{equation}
+	где $\be = \mathbf{f} - \by$ и $\bF = \bJ$.
+\end{theorem}
+\begin{proof}
+	В соответствии предположением~\eqref{ch4:eq:linearization} градиент~$\nabla S(\btheta)$ и матрица Гессиана~$\bH$ имеют вид
+	\begin{equation}
+		\nabla S(\btheta) = \bJ^{\T} (\by - \mathbf{f}), \quad \bH = \bJ^{\T} \bJ.
+		\label{ch4:eq:nonlin_reg_deriv}
+	\end{equation}
+	Тогда шаг метода Ньютона~\eqref{ch4:eq:newton_step} и правило обновления~\eqref{ch4:eq:update_rule} принимают вид
+	\[
+		\btheta^k = \btheta^{k - 1} + \Delta \btheta^{k - 1} = \btheta^{k - 1} + (\bJ^{\T} \bJ)^{-1}\bJ^{\T}(\mathbf{f} - \by).
+	\]
+	Таким образом, согласно теореме Гаусса-Маркова, вектор обновления~$\Delta \btheta$ является решением задачи регрессии~\eqref{ch4:eq:lin_reg_nonlin_reg}.
+\end{proof}
 В качестве нелинейной модели рассматривается модель двухслойной нейронной сети. В этом случае модель~$f (\bx, \btheta)$ принимает вид:
 \[
 	f(\bx, \btheta) = \sigma(\bx^{\T} \bW_1) \bw_2.
@@ -159,32 +164,37 @@ QPFS выбирает подмножество параметров~$\ba$ для
 Здесь~$\bW_1 \in \bbR^{m \times h}$~--- матрица параметров, которые соединяют исходные признаки с $h$ скрытыми нейронами. Функция нелинейности $\sigma(\cdot)$ применяется поэлементно. Параметры~$\bw_2 \in \bbR^{h \times 1}$ соединяют скрытые нейроны с выходом. 
 Вектор параметров модели~$\btheta$ представляет собой объединение векторизованных матриц~$\bW_1$, $\bw_2$.
 
-\textbf{Модель логистической регрессии.}
-Для логистической регрессии модель имеет вид $f(\bx , \btheta) = \sigma(\bx^{\T} \btheta)$ с сигмоидной функцией активации~$\sigma(\cdot)$.
-Градиент и Гессиан функции ошибки~\eqref{ch4:eq:log_loss} равны
-\begin{equation}
-	\nabla S(\btheta) = \bX^{\T} (\mathbf{f} - \by), \quad \bH = \bX^{\T} \bR \bX,
-	\label{ch4:eq:log_reg_deriv}
-\end{equation}
-где $\bR$~--- это диагональная матрица с диагональными элементами $f(\bx_i , \btheta) \cdot (1 - f(\bx_i , \btheta))$.
-
-Правило обновления~\eqref{ch4:eq:update_rule} в этом случае принимает вид
-\[
-	\btheta^k = \btheta^{k - 1} + (\bX^{\T} \bR \bX)^{-1} \bX^{\T} (\by - \mathbf{f}).
-\]
-Этот алгоритм известен как итеративный алгоритм взвешенных наименьших квадратов (IRLS)~\cite{holland1977robust}. Вектор обновлений $\Delta \btheta$ является решением задачи линейной регрессии
+\begin{theorem}
+Рассмотрим модель логистической регрессии вида $f(\bx , \btheta) = \sigma(\bx^{\T} \btheta)$ с сигмоидной функцией активации~$\sigma(\cdot)$. 
+Вектор обновлений $\Delta \btheta$ для функции ошибки~\eqref{ch4:eq:log_loss} является решением задачи линейной регрессии
 \begin{equation}
 	\| \be - \bF \Delta \btheta \|_2^2 \rightarrow \min_{\Delta \btheta \in \bbR^{p}},
 	\label{ch4:eq:lin_reg_log_reg}
 \end{equation}
 где $\be = \bR^{-1/2} (\by - \mathbf{f})$ и $\bF = \bR^{1/2}\bX$.
+\end{theorem}
+\begin{proof}
+	Градиент и Гессиан функции ошибки~\eqref{ch4:eq:log_loss} равны
+	\begin{equation}
+		\nabla S(\btheta) = \bX^{\T} (\mathbf{f} - \by), \quad \bH = \bX^{\T} \bR \bX,
+		\label{ch4:eq:log_reg_deriv}
+	\end{equation}
+	где $\bR$~--- это диагональная матрица с диагональными элементами $f(\bx_i , \btheta) \cdot (1 - f(\bx_i , \btheta))$.
+	
+	Правило обновления~\eqref{ch4:eq:update_rule} в этом случае принимает вид
+	\[
+		\btheta^k = \btheta^{k - 1} + (\bX^{\T} \bR \bX)^{-1} \bX^{\T} (\by - \mathbf{f}).
+	\]
+	Таким образом, согласно теореме Гаусса-Маркова, вектор обновления~$\Delta \btheta$ является решением задачи регрессии~\eqref{ch4:eq:lin_reg_nonlin_reg}.
+\end{proof}
+Данный алгоритм известен как итеративный алгоритм взвешенных наименьших квадратов (IRLS)~\cite{holland1977robust}. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Метод Ньютона с выбором параметров с помощью квадратичного программирования}
 \label{sec:ch4:newton_qpfs_algorithm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Предлагается адаптировать метод QPFS для решения задач~\eqref{ch4:eq:lin_reg_nonlin_reg} и \eqref{ch4:eq:lin_reg_log_reg}. 
+Предлагается адаптация метода QPFS для решения задач~\eqref{ch4:eq:lin_reg_nonlin_reg} и \eqref{ch4:eq:lin_reg_log_reg}. 
 Матрица парных взаимодействий~$\bQ$ и вектор релевантностей~$\bb$ имеют вид
 \[
 	\bQ = \text{Sim} (\bF), \quad \bb = \text{Rel} (\bF, \be).
