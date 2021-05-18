@@ -89,9 +89,9 @@ QPFS выбирает подмножество параметров~$\ba$ для
 \label{sec:ch4:newton_algorithm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Метод Ньютона использует условие оптимизации первого порядка для задачи~\eqref{ch4:eq:error_function} и линеаризует градиент $S (\btheta)$
+Метод Ньютона использует условие оптимизации первого порядка для задачи~\eqref{ch4:eq:error_function} и линеаризует градиент $S (\btheta)$:
 \[
-	\nabla S (\btheta + \Delta \btheta) = \nabla S(\btheta) + \bH \cdot \Delta \btheta = 0,
+	\nabla S (\btheta + \Delta \btheta) = \nabla S(\btheta) + \bH \cdot \Delta \btheta = \bZero,
 \]
 \[
 	\Delta \btheta = - \bH^{-1} \nabla S(\btheta).

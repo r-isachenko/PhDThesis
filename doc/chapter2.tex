@@ -19,27 +19,27 @@
 \begin{definition}
 	Назовём пространство $\bbT \subset \bbR^l$ \textit{скрытым пространством} для пространства $\bbX \subset \bbR^n$ ($l \leq n$), если существуют функция $\bphi_{\bx}: \bbX \to \bbT$ и функция $\bpsi_{\bx}: \bbT  \to \bbX$, такие что
 	\[
-		\text{для любого } \bx \in \bbX \quad \text{существует } \bt \in \bbT: \bpsi_{\bx} (\bphi_{\bx}(\bx)) = \bpsi_{\bx}(\bt) = \bx.
+		\text{для любого } \bx \in \bbX \quad \text{найдется } \bt \in \bbT: \bpsi_{\bx} (\bphi_{\bx}(\bx)) = \bpsi_{\bx}(\bt) = \bx.
 	\]
 	Функцию $\bphi_{\bx}(\bx)$ назовём \textit{функцией кодирования} объекта $\bx$, функцию $\bpsi_{\bx}(\bt)$  назовём \textit{функцией декодирования}. 
 	
 	Аналогично введём определение \textit{скрытого пространства}~$\bbU \subset \bbR^s$ для целевого пространства $\bbY$, \textit{функции кодирования} $\bphi_{\by}: \bbY \to \bbU$ и \textit{декодирования}~$\bpsi_{\by}: \bbU  \to \bbY$, такие что
 	\[
-	 	\text{для любого } \by \in \bbY \quad \text{существует } \bu \in \bbU: \bpsi_{\by} (\bphi_{\by}(\by)) = \bpsi_{\by}(\bu) = \by.
+	 	\text{для любого } \by \in \bbY \quad \text{найдется } \bu \in \bbU: \bpsi_{\by} (\bphi_{\by}(\by)) = \bpsi_{\by}(\bu) = \by.
 	\]
 \end{definition}
 
 Образы матрицы исходных объектов~$\bX$ и матрицы целевых объектов~$\bY$ в скрытых пространствах~$\bbT$ и $\bbU$ имеют вид
 \begin{align*}
 	\bT &= \bphi_{\bx} (\bX) = [\bt_1, \dots, \bt_n]^{\T} = [\btau_1, \dots, \btau_l], \\
-	\bU &= \bphi_{\by} (\bU) = [\bu_1, \dots, \bu_n]^{\T} = [\bnu_1, \dots, \bnu_s].
+	\bU &= \bphi_{\by} (\bY) = [\bu_1, \dots, \bu_n]^{\T} = [\bnu_1, \dots, \bnu_s].
 \end{align*}
 Здесь строки $\{\bt_i\}_{i=1}^n$ матрицы~$\bT$ и строки $\{\bu_i\}_{i=1}^n$ матрицы~$\bU$ являются образами исходных объектов $\{\bx_i\}_{i=1}^n$ и целевых объектов $\{\by_i\}_{i=1}^n$. Столбцы $\{\btau_j\}_{j=1}^l$ матрицы~$\bT$ и столбцы $\{\bnu_j\}_{j=1}^s$ матрицы~$\bU$ являются скрытыми векторами.
 
 \begin{definition}
-	Будем говорить, что скрытые пространства $\bbT$ и $\bbU$ являются \textit{согласованными}, если существует \textit{функция связи} $\bh: \bbT \rightarrow \bbU$, такая что
+	Скрытые пространства $\bbT$ и $\bbU$ являются \textit{согласованными}, если существует \textit{функция связи} $\bh: \bbT \rightarrow \bbU$, такая что
 	\[
-		\text{для любого } \bu \in \bbU \quad \text{существует } \bt \in \bbT:  \bu = \bh(\bt).
+		\text{для любого } \bu \in \bbU \quad \text{найдется } \bt \in \bbT:  \bu = \bh(\bt).
 	\]
 \end{definition}
 
@@ -47,9 +47,9 @@
 	Предположим, что в задаче прогнозирования~\eqref{ch1:eq:loss_min} пространства $\bbT$ и $\bbU$ являются скрытыми для пространств $\bbX$ и $\bbY$ соответственно. 
 	Предположим также, что для данных скрытых пространств $\bbT$ и $\bbU$ существует функция связи~$\bh: \bbT \rightarrow \bbU$. Тогда выполнено
 	\[
-		\text{для любого } \by \in \bbY \quad \text{существует } \bx \in \bbX: \by = \bpsi_{\by}(\bu) = \bpsi_{\by}(\bh(\bt)) = \bpsi_{\by}(\bh(\bphi_{\bx}(\bx))),
+		\text{для любого } \by \in \bbY \quad \text{найдется } \bx \in \bbX: \by = \bpsi_{\by}(\bu) = \bpsi_{\by}(\bh(\bt)) = \bpsi_{\by}(\bh(\bphi_{\bx}(\bx))),
 	\]
-	и общая схема задачи поиска согласованной модели декодирования принимает вид следующей коммутативной диаграммы:
+	и общая схема задачи поиска согласованной модели декодирования принимает вид коммутативной диаграммы:
 	\begin{equation}
 		\begin{tikzpicture}
 			\matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
@@ -135,14 +135,14 @@
 Для метода PLS функция согласования скрытых векторов имеет вид $g(\btau, \bnu) = \text{cov}(\btau, \bnu)$, а для метода CCA: $g(\btau, \bnu) = \text{corr}(\btau, \bnu)$.
 
 Помимо линейных моделей декодирования рассматриваются нелинейные методы. 
-В данном случае функции кодирования и декодирования являются нелинейными нейросетями вида
+В данном случае функции кодирования и декодирования являются нелинейными функциями вида
 \begin{align*}
 	\bT &= \bphi_{\bx}(\bX) =  \bW_\bx^L \sigma(\dots \sigma(\bW_\bx^2 \sigma(\bX \bW_\bx^1)) \dots ), \\
 	\bU &= \bphi_{\by}(\bY) =  \bW_\by^L \sigma(\dots \sigma(\bW_\by^2 \sigma(\bY \bW_\by^1)) \dots ), \\
 	\bX &= \bpsi_{\bx}(\bT) =  \bW_\bt^L \sigma(\dots \sigma(\bW_\bt^2 \sigma(\bT \bW_\bt^1)) \dots ), \\
 	\bY &= \bpsi_{\by}(\bU) =  \bW_\bu^L \sigma(\dots \sigma(\bW_\bu^2 \sigma(\bU \bW_\bu^1)) \dots ).
 \end{align*}
-Каждая нейросеть является суперпозицией последовательных умножений на матрицы параметров и применения поэлементных функций активаций.
+Каждая функция является нейросетью, т.е. суперпозицией линейных отображений и поэлементных функций активаций.
 
 Требуется найти такие параметры, при которых функция согласования~$g$ достигает своего максимума:
 \begin{equation}
@@ -223,24 +223,23 @@
 Из данных векторов строятся матрицы весов $\bW$ и $\bC$ соответственно.
 
 \begin{statement}
+	\label{ch2:stat:eig}
 	Вычисленные вектора $\bw_k$ и $\bc_k$ с помощью итеративной процедуры обновления:
 	\begin{align}
 		\btau_k &:= \frac{\bX_k \bw_k}{\|\bw_k\|}, \quad  \bw_k := \frac{\bX_k^{\T} \bnu_{k-1}}{\bnu_{k-1}^{\T} \bnu_{k-1}}; \label{ch2:eq:pls_step1}\\ 
 		\bnu_k &:= \frac{\bY_k \bc_k}{\| \bc_k \|}, \quad \bc_k := \frac{\bY_k^{\T} \btau_k}{\btau_k^{\T} \btau_k}. \label{ch2:eq:pls_step2}
 	\end{align}
 	будут собственными векторами матриц $\bX_k^{\T} \bY_k \bY_k^{\T} \bX_k$ и $\bY_k^{\T} \bX_k \bX_k^{\T} \bY_k$, соответствующими максимальным собственным значениям.
-	\begin{equation*}
-		\bw_k \varpropto \bX_k^{\T} \bnu_{k-1} \varpropto \bX_k^{\T} \bY_k \bc_{k-1} \varpropto \bX_k^{\T} \bY_k \bY_k^{\T} \btau_{k-1} \varpropto \bX_k^{\T} \bY_k \bY_k^{\T} \bX_k \bw_{k-1},
-	\end{equation*}
-	\begin{equation*}
-		\bc_k \varpropto \bY_k^{\T} \btau_k \varpropto \bY_k^{\T} \bX_k \bw_k \varpropto \bY_k^{\T} \bX_k \bX_k^{\T} \bnu_{k-1} \varpropto \bY_k^{\T} \bX_k \bX_k^{\T} \bY_k \bc_{k-1},
-	\end{equation*}
-	где символ $\varpropto$ означает равенство с точностью до мультипликативной константы. 
-	\label{ch2:stat:eig}
 \end{statement}
 \begin{proof}
-	Утверждение следует из того факта, что правила обновления векторов $\bw_k$, $\bc_k$ совпадают с итерацией алгоритма поиска максимального собственного значения. 
-	Данный алгоритм основан на следующем факте.
+	\begin{equation*}
+		\bw_k \propto \bX_k^{\T} \bnu_{k-1} \propto \bX_k^{\T} \bY_k \bc_{k-1} \propto \bX_k^{\T} \bY_k \bY_k^{\T} \btau_{k-1} \propto \bX_k^{\T} \bY_k \bY_k^{\T} \bX_k \bw_{k-1},
+	\end{equation*}
+	\begin{equation*}
+		\bc_k \propto \bY_k^{\T} \btau_k \propto \bY_k^{\T} \bX_k \bw_k \propto \bY_k^{\T} \bX_k \bX_k^{\T} \bnu_{k-1} \propto \bY_k^{\T} \bX_k \bX_k^{\T} \bY_k \bc_{k-1},
+	\end{equation*}
+	где символ $\varpropto$ означает равенство с точностью до мультипликативной константы. 
+	Утверждение следует из того факта, что правила обновления векторов $\bw_k$, $\bc_k$ совпадают с итерацией алгоритма поиска максимального собственного значения степенным методом.
 	Если матрица $\mathbf{A}$ диагонализуема, $\bx$~--- некоторый вектор, то
 	\[
 	\lim_{k \rightarrow \infty} \mathbf{A}^k \bx = \lambda_{\max}(\mathbf{A}) \cdot \mathbf{v}_{\max},
@@ -314,7 +313,7 @@
 		\bY = \mathbf{f}(\bx, \bTheta) + \bepsilon = \mathbf{f}_1(\bx_1, \bTheta_1) + \mathbf{f}_2(\bx_2, \bTheta_2) + \bepsilon = \bTheta_1^{\T} \bx_1 + \bTheta_2^{\T} \bx_2 + \bepsilon,
 		\label{ch2:eq:two_modal_reg_model}
 	\end{equation}
-	где объект $\bx = [\bx_1, \bx_2] \in \bbR^n$ состоит из двух подвекторов $\bx_1 \in \bbR^k$, $\bx_2 \in \bbR^{n - k}$. 
+	где вектор $\bx = [\bx_1, \bx_2] \in \bbR^n$ состоит из двух подвекторов $\bx_1 \in \bbR^k$, $\bx_2 \in \bbR^{n - k}$. 
 	Тем самым матрица параметров $\bTheta \in \bbR^{n \times r}$ состоит из двух подматриц $\bTheta_1 \in \bbR^{k \times r}$, $\bTheta_2 \in \bbR^{n - k \times r}$. 
 \end{definition}
 
@@ -325,7 +324,11 @@
 		\bTheta_1 &= (\bX_1^{\T} \bM_{\bX_2} \bX_1)^{-1} \bX_1^{\T} \bM_{\bX_2} \bY, \\
 		\bTheta_2 &= (\bX_2^{\T} \bM_{\bX_1} \bX_2)^{-1} \bX_2^{\T} \bM_{\bX_1} \bY,
 	\end{align*}
-	где $\bM_{\bX_1} = (\bI - \bP_{\bX_1})$, $\bM_{\bX_2} = (\bI - \bP_{\bX_2})$, $\bP_{\bX_1} = \bX_1 (\bX_1^{\T} \bX_1)^{-1} \bX_1^{\T}$, $\bP_{\bX_2} = \bX_2 (\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T}$.
+	где
+ 	\begin{align*}
+		\bM_{\bX_1} = (\bI - \bP_{\bX_1}), \quad \bP_{\bX_1} = \bX_1 (\bX_1^{\T} \bX_1)^{-1} \bX_1^{\T}, \\
+		\bM_{\bX_2} = (\bI - \bP_{\bX_2}), \quad \bP_{\bX_2} = \bX_2 (\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T}.
+	\end{align*}
 \end{statement}
 \begin{proof}
 	Домножим уравнение $\bY = \bX \bTheta$ слева на матрицу $\bX{\T}$
@@ -345,10 +348,10 @@
 	\]
 	Подставим полученные выражения для $\bTheta_1$ и $\bTheta_2$ в исходную систему:
 	\[
-				\begin{cases*}
-					\bX_1^{\T} \bP_{\bX_1} (\bY - \bX_2 \bTheta_2) + \bX_1^{\T} \bX_2 \bTheta_2 = \bX_1^{\T} \bY, \\
-					\bX_2^{\T} \bX_1 \bTheta_1 + \bX_2^{\T}\bP_{\bX_2} (\bY - \bX_1 \bTheta_1) = \bX_2^{\T} \bY.
-				\end{cases*}
+		\begin{cases*}
+			\bX_1^{\T} \bP_{\bX_1} (\bY - \bX_2 \bTheta_2) + \bX_1^{\T} \bX_2 \bTheta_2 = \bX_1^{\T} \bY, \\
+			\bX_2^{\T} \bX_1 \bTheta_1 + \bX_2^{\T}\bP_{\bX_2} (\bY - \bX_1 \bTheta_1) = \bX_2^{\T} \bY.
+		\end{cases*}
 	\]
 	Выразив матрицы параметров, получим требуемые выражения.
 \end{proof}
@@ -388,7 +391,7 @@
 \end{statement}
 
 \begin{proof}
-	Используя факт, что $\bI = \bP_{\bX_1} + \bM_{\bX_1}$ и $\bX_2^{\T} \bP_{\bX_1} = 0$, получаем
+	Используя факт, что $\bI = \bP_{\bX_1} + \bM_{\bX_1}$ и $\bX_2^{\T} \bP_{\bX_1} = \bZero$, получаем
 	\begin{multline*}
 		(\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T} \bY = (\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T} (\bP_{\bX_1} + \bM_{\bX_1}) \bY = \\ = (\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T} \bM_{\bX_1} \bY  = (\bX_{21}^{\T} \bX_{21})^{-1} \bX_{21}^{\T} \bY_1.
 	\end{multline*}
@@ -414,7 +417,7 @@
 	\label{ch2:stat:strict:two_model}
 	Пусть для аддитивной суперпозиции моделей~\eqref{ch2:eq:two_modal_reg_model} выполнены следующие условия
 	\[
-		\bY \neq \bP_{\bX_2} \bY, \quad \bX_1 \neq \bP_{\bX_2} \bX_1, \quad \bY^{\T} \bM_{\bX_2} \bX_1 \neq 0.
+		\bY \neq \bP_{\bX_2} \bY, \quad \bX_1 \neq \bP_{\bX_2} \bX_1, \quad \bY^{\T} \bM_{\bX_2} \bX_1 \neq \bZero.
 	\]
 	Тогда выполнено строгое неравенство
 	\[

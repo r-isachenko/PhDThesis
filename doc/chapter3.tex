@@ -92,7 +92,7 @@ QPFS предлагает явный способ построения функ�
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 В данном разделе описаны предлагаемые методы выбора признаков для случая векторной целевой переменной.
-В этом случае компоненты целевой переменной могут коррелировать между собой. 
+В этом случае компоненты целевой переменной коррелируют между собой. 
 Предлагаются методы, учитывающие зависимости как в исходном, так и в целевом пространствах.
 
 \subsubsection{Агрегация релевантностей целевых векторов.}
@@ -148,9 +148,7 @@ QPFS предлагает явный способ построения функ�
 \begin{statement}
 	Баланс между~$\text{Sim}(\bX)$, $\text{Rel}(\bX, \bY)$ и $\text{Sim}(\bY)$ в  задаче~\eqref{ch3:eq:symimp} достигается при:
 	\begin{equation}
-	\alpha_1 \propto \overline{\bQ}_y \overline{\bB}, \quad
-	\alpha_2 \propto \overline{\bQ}_x \overline{\bQ}_y, \quad
-	\alpha_3  \propto \overline{\bQ}_x \overline{\bB}.
+	[\alpha_1, \alpha_2, \alpha_3] = \frac{1}{\overline{\bQ}_y \overline{\bB} + \overline{\bQ}_x \overline{\bQ}_y + \overline{\bQ}_x \overline{\bB}}\bigl[\overline{\bQ}_y \overline{\bB}, \, \overline{\bQ}_x \overline{\bQ}_y, \, \overline{\bQ}_x \overline{\bB}\bigr].
 	\label{ch3:eq:alpha_3}
 	\end{equation}
 \end{statement}
@@ -288,9 +286,7 @@ QPFS предлагает явный способ построения функ�
 \begin{statement}
 	Баланс между членами~$\text{Sim}(\bX)$, $\text{Rel}(\bX, \bY)$ и $\text{Rel}(\bX, \bY)$ для задачи~\eqref{ch3:eq:asymimp} достигается при следующих коэффициентах:
 	\begin{equation*}
-		\alpha_1 \propto \overline{\bQ}_y \left( \overline{\bb} - \overline{\bB}\right), \quad
-		\alpha_2 \propto \overline{\bQ}_x \overline{\bQ}_y, \quad
-		\alpha_3  \propto \overline{\bQ}_x \overline{\bB}.
+		[\alpha_1, \alpha_2, \alpha_3] = \frac{1}{\overline{\bQ}_y \left( \overline{\bb} - \overline{\bB}\right) + \overline{\bQ}_x \overline{\bQ}_y + \overline{\bQ}_x \overline{\bB}} \bigl [\overline{\bQ}_y \left( \overline{\bb} - \overline{\bB}\right), \, \overline{\bQ}_x \overline{\bQ}_y, \, \overline{\bQ}_x \overline{\bB}\bigr].
 	\end{equation*}
 \end{statement}
 \begin{proof}
@@ -314,7 +310,7 @@ QPFS предлагает явный способ построения функ�
 	При $\alpha = \frac{\alpha_2}{\alpha_1 + \alpha_2}$ последняя задачи принимает вид~\eqref{ch3:eq:qpfs_problem}.
 \end{proof}
 
-Таблица~\ref{ch3:tbl:summary} демонстрирует основные идеи и функции ошибок для каждого метода. 
+Таблица~\ref{ch3:tbl:summary} демонстрирует основные задачи и функции ошибок для каждого метода. 
 RelAgg является базовой стратегией и не учитывает корреляции в целевом пространстве.
 SymImp штрафует попарные корреляции между целевыми векторами.
 MinMax более чувствителен к целевым векторам, которые трудно предсказать.
@@ -326,7 +322,7 @@ MinMax более чувствителен к целевым векторам, �
 	\small{
 		\begin{tabular}{c|c|c}
 			\hline
-			Метод & Идея & Функция ошибки $S(\bz | \bX, \bY)$ \\
+			Метод & Задача & Функция ошибки $S(\bz | \bX, \bY)$ \\
 			\hline && \\ [-.5em]
 			RelAgg & $\min \bigl[ \text{Sim}(\bX) - \text{Rel}(\bX, \bY) \bigr] $ & $\min\limits_{\bz_x} \bigl[ (1 - \alpha) \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha \cdot \bz_x^{\T} \bB \bOne_r \bigr] $ \\ &&\\[-.5em]
 			SymImp & $\begin{aligned} \min \, \bigl[ \text{Sim}(\bX) & - \text{Rel}(\bX, \bY) \\ & + \text{Sim}(\bY) \bigr] \end{aligned}$ & $ \min\limits_{\bz_x, \, \bz_y} \left[ \alpha_1 \cdot \bz_x^{\T} \bQ_x \bz_x - \alpha_2 \cdot \bz_x^{\T} \bB \bz_y + \alpha_3 \cdot \bz_y^{\T} \bQ_y \bz_y \right] $\\ &&\\ [-.5em]

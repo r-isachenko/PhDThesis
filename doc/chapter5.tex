@@ -39,7 +39,7 @@
 	d_{\bA} (\bx_i, \bx_j) = \sqrt{(\bx_i - \bx_j)^{\top} \bA^{-1} (\bx_i - \bx_j)},
 	\label{ch5:eq:mahal_distance}
 \end{equation}
-где \textit{матрица трансформаций} $\mathbf{A} \in \bbR^{n \times n}$ является симметричной и неотрицательно определенной ($\mathbf{A}^{\T} = \mathbf{A}$, $\mathbf{A} \succeq 0$).
+где \textit{матрица трансформаций} $\mathbf{A} \in \bbR^{n \times n}$ является симметричной и неотрицательно определенной ($\mathbf{A}^{\T} = \mathbf{A}$, $\mathbf{A} \succeq \bZero$).
 Зададим в качестве матрицы трансформации матрицу выборочной ковариации
 \begin{equation}
 	\label{ch5:eq:covMatrix}
@@ -127,7 +127,7 @@
 \]
 \begin{statement}
 	Обозначим $\mathbf{B} = \bX \mathbf{LL}^{\T} \bX^{\T}$.
-	Обозначим через $\bP = [\mathbf{v}_1, \ldots, \mathbf{v}_r]^{\bT}$ матрицу, состоящую из $r$ собственных векторов матрицы $\mathbf{A}^{-1}\mathbf{B}$, отвечающих наибольшим собственным значениям.
+	Обозначим через $\bP = [\mathbf{v}_1, \ldots, \mathbf{v}_r]^{\T}$ матрицу, состоящую из $r$ собственных векторов матрицы $\mathbf{A}^{-1}\mathbf{B}$, отвечающих наибольшим собственным значениям.
 	Тогда решением~\eqref{ch5:eq:GLmax} является ортогональная матрица, полученная QR-разложением матрицы~$\bP^{\T}$.
 \end{statement}
 \begin{proof}
