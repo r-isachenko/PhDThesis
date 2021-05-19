@@ -137,10 +137,10 @@
 Помимо линейных моделей декодирования рассматриваются нелинейные методы. 
 В данном случае функции кодирования и декодирования являются нелинейными функциями вида
 \begin{align*}
-	\bT &= \bphi_{\bx}(\bX) =  \bW_\bx^L \sigma(\dots \sigma(\bW_\bx^2 \sigma(\bX \bW_\bx^1)) \dots ), \\
-	\bU &= \bphi_{\by}(\bY) =  \bW_\by^L \sigma(\dots \sigma(\bW_\by^2 \sigma(\bY \bW_\by^1)) \dots ), \\
-	\bX &= \bpsi_{\bx}(\bT) =  \bW_\bt^L \sigma(\dots \sigma(\bW_\bt^2 \sigma(\bT \bW_\bt^1)) \dots ), \\
-	\bY &= \bpsi_{\by}(\bU) =  \bW_\bu^L \sigma(\dots \sigma(\bW_\bu^2 \sigma(\bU \bW_\bu^1)) \dots ).
+	\bt &= \bphi_{\bx}(\bx) =  \bW_\bx^L \sigma \bigl(\dots \sigma \bigl(\bW_\bx^2 \sigma(\bW_\bx^1 \bx) \bigr) \dots \bigr), \\
+	\bu &= \bphi_{\by}(\by) =  \bW_\by^L \sigma \bigl(\dots \sigma \bigl(\bW_\by^2 \sigma(\bW_\by^1 \by) \bigr) \dots \bigr), \\
+	\bx &= \bpsi_{\bx}(\bt) =  \bW_\bt^L \sigma \bigl(\dots \sigma \bigl(\bW_\bt^2 \sigma(\bW_\bt^1 \bt ) \bigr) \dots \bigr), \\
+	\by &= \bpsi_{\by}(\bu) =  \bW_\bu^L \sigma \bigl(\dots \sigma \bigl(\bW_\bu^2 \sigma(\bW_\bu^1 \bu ) \bigr) \dots \bigr).
 \end{align*}
 Каждая функция является нейросетью, т.е. суперпозицией линейных отображений и поэлементных функций активаций.
 
