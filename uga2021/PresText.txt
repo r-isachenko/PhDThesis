@@ -1,83 +1,82 @@
-Слайд 1:
-Здравствуйте! Темой моей диссертационной работы является снижение размерности пространства в задачах декодирования сигналов.
+Slide 1:
+Hello, everyone! My name is Roman Isachenko. I am PhD student at MIPT. The topic of my today talk is Dimensionality Reduction for Signal Decoding.
 
-Слайд 2:
-Рассматривается задача выбора оптимальной модели декодирования. 
-Процесс декодирования заключается в восстановлении зависимости между двумя гетерогенными наборами данных.
-Сложность задачи заключается в том, что рассматривается случай векторной целевой переменной. 
-Пространства исходных сигналов и целевых сигналов обладают избыточной размерность. 
-Методы снижения размерности, не учитывающие зависимости в целевом пространстве, являются не адекватными.
-Предлагается снизить размерность исходного и целевого пространств с помощью проецирования сигналов в скрытые пространства существенно меньшей размерности.
-Предлагаются линейные и нелинейные методы построения согласованных моделей.
+Slide 2:
+In this study we are considering the problem of selection of optimal decoding model.
+The decoding process essentially is a process restoring the dependencies between two heterogeneous data sets.
+The challenge is that we consider the case where target variable is a vector.
+The spaces of the input signals and target signals have excessive dimensionality.
+Dimensionality reduction methods that do not take into account dependencies in the target space are not adequate.
+We propose to reduce the dimensionality of the input and target spaces by projecting signals into hidden spaces of significantly smaller dimensionality.
+Linear and nonlinear methods for building concordant models are proposed.
 
-Слайд 3:
-Задача состоит в построении модели декодирования f, которая принимает на вход исходный сигнал x и прогнозирует целевой сигнал y. 
-На слайде приведён пример исходных и целевых временных рядов для задачи восстановления траектории движения конечности по сигналам электрокортикограммы.
-Исходный и целевой сигналы имеют различную природу и обладают высокой размерностью. 
-Точкой в пространстве x является сегмент исходного сигнала из пространства размерности n. 
-Точкой в целевом пространстве y является сегмент целевого сигнала из пространства размерности r.
-Сложность задачи заключается в том, что в каждый момент времени t прогностическая модель декодирования должна предсказать вектор, состоящий из последовательных компонент целевого сигнала.
-Для построения адекватной модели f предлагается процедура согласования зависимостей в скрытом пространстве.
-Для этого исходный и целевой сигналы проецируются в скрытое пространство, которое имеет меньшую размерность по сравнению с размерностью исходного описания данных.
-Операторы P и Q восстанавливают исходную и целевую переменные по проекциям скрытого пространства.
-При этом предлагается согласовать проекции таким образом, чтобы ковариация между проекциями была максимальна.
+Slide 3:
+Our goal is to build a decoding model f, which takes the input signal x and predicts the target signal y.
+The slide shows an example of the input and target time series for the task of restoring the hand trajectory based on the signals of the electrocorticogram.
+The input and target signals have a different nature and have a high dimensionality.
+A point in the x-space is a segment of the input signal from the space of dimension n.
+A point in the target space y is a segment of the target signal from the space of dimensionality r.
+The complexity of the problem lies in the fact that at each moment of time t, the forecasting decoding model have to predict a vector consisting of successive components of the target signal.
+To construct an adequate model f, a procedure for dependencies concordance  in a hidden space is proposed.
+In order to do this, the input and target signals are projected into the hidden space, which has a smaller dimensionality compared to the dimensionality of the original data description.
+The operators P and Q restore the input and target variables from the hidden space projections.
+At the same time, it is proposed to concord the projections in such a way that the covariance between the projections is maximal.
 
-Слайд 4:
-Рассматривается случай линейной модели декодирования сигналов. 
-Исходные и целевые переменные образуют матрицы X и Y.
-Параметры модели Тета представляют собой матрицу.
-В качестве функции потерь такой модели декодирования рассматривается квадратичная ошибка между целевой переменной и прогнозом.
-В случае наличия сильной мультикорреляции между столбцами матрицы признакового описания исходных сигналов модель декодирования оказывается неустойчивой.
-Предлагается метод проекции в скрытое пространство.
-Исходные матрицы X и Y проецируются в скрытые пространства. 
-Матрицы T и U являются образами исходных матриц.
-На коммутативной диаграмме показан принцип работы метода. 
-Необходимо найти отображения W и C из пространств X и Y в скрытые пространства T и U,
-А также обратные отображение P и Q. 
-Предлагается согласовывать проекции в скрытом пространстве.
-При этом находится оператор связи В в виде линейной модели согласования скрытых пространств.
-Финальная модель декодирования является линейной, но имеет низкоразмерное скрытое представление.
+Slide 4:
+Let consider the case of a linear signal decoding model.
+The input and target variables form the X and Y matrices.
+The model parameters Theta are a matrix.
+We will use the simple quadratic l2 loss function between the target variable and the forecast for this decoding model.
+If there is a strong multicorrelation between the columns of the matrix of the frequency domain of the input signals, the decoding model turns out to be unstable.
+In this moment we propose a method of projection data descriptions into a hidden space.
+The original matrices X and Y are projected into hidden spaces.
+The matrices T and U are the images of the original matrices.
+The commutative diagram shows how the method works.
+It finds the maps W and C from the spaces X and Y to the hidden spaces T and U, as well as the inverse mapping P and Q. 
+We propose to concord the projections in the hidden space.
+In this case, we find the link operator B in the form of a linear model for concording hidden spaces.
+The final decoding model is linear, but has a low-dimensional hidden representation.
 
-Слайд 5: 
-Особенностью решаемой задачи является избыточность описания переменных. 
-Для нахождения оптимального низкоразмерного многообразия вводится понятие скрытого пространства.
-Общая схема согласования зависимостей в задаче декодирования приведена на следующей коммутативной диаграмме.
-В случае существования взаимно обратимых функций кодирования phi_e, psi_e и функций декодирования phi_d и psi_d, будем говорить, что для исходного и целевого пространств X и Y существуют скрытые пространства T и U.
-При этом скрытые пространства являются согласованными, если существует функция связи h, отображающиеся объекты одного скрытого пространства в другое.
-Для нахождения функций кодирования и декодирования, а также функции связи ставится задача согласования проекций как максимизация функции согласования g.
+Slide 5: 
+We solve the problem in the assumption of high redundancy of the data description.
+To find the optimal low-dimensional manifold, we introduce a hidden space notion.
+The general scheme of concording dependencies for the decoding problem is shown in the following commutative diagram.
+If there exists invertible encoding functions phi_e and psi_e and decoding functions phi_d and psi_d, we will say that for the input and target spaces X and Y, there are hidden spaces T and U.
+In this case, hidden spaces are concordant if there is a link function h, which maps objects from one hidden space to another.
+To find the encoding and decoding functions, as well as the link function, the task of projection concordance is posed as maximizing the concordance function g.
 
-Слайд 6:
-В работе предложена итеративная процедура нахождения проекций, обладающих максимальной ковариацией.
-А также доказана теорема об оптимальных параметрах согласованной модели декодирования в случае использования в качестве функции согласования g ковариации между проекциями t и u.
+Slide 6:
+We propose the iterative procedure for finding projections with maximum covariance.
+A theorem on the optimality for model parameters of the concordant decoding model has been proved in the case of using the covariance between the projections t and u as a concordance function g.
 
-Слайд 7:
-Здесь на слайде приведен пример работы метода проекции в скрытое пространство в двумерном случае.
-Синими и зелеными точками изображены исходные переменные x и целевые переменные y. 
-Исходные переменные сгенерированы из нормального распределения с некоторой матрицей ковариации Sigma.
-Целевые переменные линейно зависят от второй главной компоненты и не зависят от первой компоненты матрицы X.
-Красным контуром показаны линии уровня матриц ковариаций распределений.
-Черные стрелки соответствуют векторам матриц кодирования W и C.
-При снижении размерности пространства исходных сигналов без учёта имеющихся зависимостей в целевом пространстве с помощью метода главных компонент, мы получаем неадекватное решение.
-Используя согласованное скрытое пространство, модель способна найти оптимальное скрытое подпространство размерности 1, задающееся операторами W и С. При этом учитывается взаимозависимость между образами матриц X и Y.
+Slide 7:
+Here on the slide one can see an example of how the projection method works in a hidden two-dimensional space.
+The blue and green dots represent the input variables x and the target variables y.
+The input variables are generated from a normal distribution with some Sigma covariance matrix.
+The target variables depend linearly on the second principal component and do not depend on the first principal component of the matrix X.
+The red contour shows the level lines of the covariance matrices distribution.
+The black arrows correspond to the vectors of the matrices W and C.
+When we reduce the dimensionality of the input space without taking into account the existing dependencies in the target space using the principal component method, we get an inadequate solution.
+Using a concordant hidden space, the model is able to find the optimal hidden subspace of dimension 1, given by the operators W and C. This takes into account the interdependence between the images of the X and Y matrices.
 
-Слайд 8:
-Для построения процедуры выбора модели рассматривается случай аддитивной суперпозиции моделей декодирования. 
-Общая модель декодирования представляет собой сумму двух отдельных моделей.
-Требуется получить алгоритм, отвечающий на вопрос о необходимости включения конкретной модели в общую суперпозицию.
-Доказано утверждение о виде оптимальных параметров каждой из моделей в суперпозиции.
-Также доказана теорема об оптимальности суперпозиции моделей над каждой частной моделью декодирования. 
-Предложена процедура выбора моделей в суперпозиции, основанная на анализе проекций подпространств, построенных на линейных оболочках исходных признаковых описаний.
+Slide 8:
+To build a model selection procedure, let consider the case of an additive superposition of decoding models.
+The overall decoding model is the sum of two separate models.
+The goal is to obtain an algorithm that answers the question about the need to include a specific model in the general superposition.
+We have proved the statement about optimal parameters of each of the models in a superposition.
+And also we have proved the theorem on the optimality of the model superposition over each particular decoding model.
+A procedure for selecting models in a superposition is proposed, based on the analysis of subspace projections constructed on linear span of the original data descriptions.
 
-Слайд 9:
-Помимо линейных моделей декодирования рассматриваются нелинейные методы. 
-В данном случае функции кодирования и декодирования являются нелинейными нейросетями. 
-Каждая нейросеть является суперпозицией последовательных умножений на матрицы параметров и применения поэлементных функций активаций.
-Процесс согласования заключается в максимизации функции согласования по параметрам нейросетей.
-С использованием нейросетевых функций модель декодирования способна учитывать существенно нелинейные зависимости как в исходном пространстве, так и в целевом пространстве.
-В случае использования корреляции в качестве функции согласования приводится выражение для градиента функции согласования.
-Полученное выражение для градиента позволяет построить эффективный алгоритм для решения задачи с использованием градиентных методов оптимизации.
+Slide 9:
+In addition to linear decoding models, we consider nonlinear methods.
+In this case, the encoding and decoding functions are deep neural networks.
+Each neural network is a superposition of matrixx multiplications and elementwise activation functions.
+The concordance process consists in maximizing the concordance function according to the parameters of the neural networks.
+Using neural networks, the decoding model is able to take into account significantly nonlinear dependencies both in the input space and in the target space.
+If correlation is used as a concordance function, we could get expression for the gradient of the concordance function.
+This expression for the gradient allows us to build an effective algorithm for solving the problem using gradient optimization methods.
 
-Слайд 10:
+Slide 10:
 Для получения простой модели и анализа значимостей конкретных признаков рассматривается задача выбора оптимального подмножества признаков.
 В задаче выбора признаков требуется найти бинарный вектор a, компоненты которого являются индикаторами выбранных признаков.
 Вводится функция ошибки S для задачи выбора признаков.
@@ -86,6 +85,7 @@
 Функция ошибки модели декодирования для данного случая учитывает только выбранные признаки.
 Для анализа зависимостей рассматривается фильтрационный метод выбора признаков с помощью квадратичного программирования.
 Данный алгоритм находит подмножество признаков с помощью квадратичной функции S, минимизируя парные взаимодействия исходных признаков и максимизируя релевантность исходных признаков к целевой переменной.
+
 Слайд 11:
 Доказано, что при использовании в качестве полуопределенной релаксации сдвига спектра матрицы парных взаимодействий Q, квадратичная задача выбора признаков имеет единственный глобальный минимум.
 Сложность рассматриваемой задачи заключается в учёте зависимостей в целевом пространстве.

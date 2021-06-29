@@ -48,12 +48,16 @@
 %\definecolor{beamer@blendedblue}{RGB}{15,120,80}
 %----------------------------------------------------------------------------------------------------------
 \title[\hbox to 56mm{  \hfill\insertframenumber\,/\,\inserttotalframenumber}]
-{\\ Dimensionality Reduction for Signal Decoding }
+{\\ 
+\vspace{1cm}
+Dimensionality Reduction for Signal Decoding }
 \author[Roman Isachenko]{\\ 
 	Roman Isachenko \\
-	\vspace{3mm}
+	\vspace{0.5cm}
 	\textbf{MIPT-UGA} \\ 
-	young researchers workshop
+	young researchers workshop \\
+	\vspace{0.5cm}
+	Supervisor: Vadim Strijov
 	}
 \date{June 28, 2021}
 %--------------------------------------------------------------------------------
@@ -65,18 +69,18 @@
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Dimensionality Reduction for Signal Decoding}
-	The problem of investigation is a model selection in the case of high hidden correlations in the input and target spaces.
+	The problem of investigation is a model selection in the input and target spaces of high hidden correlations.
 	\begin{block}{Challenge}
 		The target variable is a vector whose components are dependent.
 		Heterogeneous spaces of input and target variables have significantly excessive dimensionality.
 	\end{block}
 	
 	\begin{block}{Goal}
-		Build model that adequately describes the input and target spaces with the observed multicorrelation in both spaces.
+		To build a model, which adequately describes the input and target spaces according to the observed multicorrelation in both spaces.
 	\end{block}
 	
 	\begin{block}{Solution}
-		We propose the dimensionality reduction methods which project the input and target variables into the hidden low-dimensional space. 
+		We propose the methods of dimensionality reduction, which project the input and target variables into the hidden low-dimensional space. 
 		We propose linear and nonlinear methods of building concordant models in high-dimensional spaces.
 	\end{block}
 \end{frame}
@@ -204,7 +208,7 @@
 	\text{for each } \by \in \bbY &\quad  \text{exists } \bu \in \bbU: \bpsi_d \bigl(\bpsi_e(\by)\bigr) = \bpsi_d(\bu) = \by.
 	\end{align*}
 
-	The latent spaces $\bbT$ и $\bbU$ are called \textbf{concordant}, if there is \textit{link function} $\mathbf{h}: \bbT \rightarrow \bbU$:
+	The latent spaces $\bbT$ и $\bbU$ are called \textbf{concordant}, if there is \textit{a link function} $\mathbf{h}: \bbT \rightarrow \bbU$:
 	\vspace{-0.3cm}
 	\[
 		\by = \mathbf{f}(\bx) = \bpsi_d\Bigl(\mathbf{h}\bigl(\bphi_e(\bx)\bigr)\Bigr).
@@ -222,7 +226,7 @@
 %--------------------------------------------------------------------------------
 \begin{frame}{Latent space concordant function}
 	\begin{statement}[Isachenko, 2017]
-		Vectors $\bt_k$ и $\bu_k$ obtained by iterative procedure:
+		Vectors $\bt_k$ и $\bu_k$ obtained by the iterative procedure:
 		\vspace{-0.2cm}
 		\begin{align*}
 			\bt_k &:= \frac{\bX_k \bw_k}{\|\bw_k\|}, \quad  \bw_k := \bX_k^{\T} \bu_{k-1} / (\bu_{k-1}^{\T} \bu_{k-1}); \\ 
@@ -233,7 +237,7 @@
 	\end{statement}
 
 	\begin{theorem}[Isachenko, 2017]
-		In the case of linear encoding function $\bphi_e (\bT) = \bT \bP^{\T}$, $\bpsi_e (\bU) = \bU \bQ^{\T}$ and concordance function $g(\bt, \bu) = \textnormal{cov}(\bt, \bu)$ the model parameters
+		In the case of a linear encoding function $\bphi_e (\bT) = \bT \bP^{\T}$, a linear decoding function $\bpsi_e (\bU) = \bU \bQ^{\T}$ and a concordance function $g(\bt, \bu) = \textnormal{cov}(\bt, \bu)$ the model parameters
 		\[
 		\bTheta = \bW (\bP^{\T} \bW)^{-1} \bB \bQ^{\T}
 		\]
@@ -242,8 +246,8 @@
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Example of hidden space concordant projection}
-	Input variables $\bx_i \sim \mathcal{N}(0, \mathbf{\Sigma})$. \\ 
-	Target variables $\by_i$ linearly depend on $pc_2$ и does not depend on $pc_1$.
+	The input variables $\bx_i \sim \mathcal{N}(0, \mathbf{\Sigma})$. \\ 
+	The target variables $\by_i$ linearly depend on $pc_2$ и does not depend on $pc_1$.
 	\begin{figure}[h]
 	\centering
 	\includegraphics[width=\linewidth]{figs/pls_toy_example}
@@ -254,21 +258,21 @@
 \begin{frame}{Superposition of signal decoding models}
 	Let $\mathbf{f}_1(\bx_1, \bTheta_1)$, $\mathbf{f}_2(\bx_2, \bTheta_2)$ be linear signal decoding models
 	\begin{statement}[isachenko, 2021]
-		If decoding model is an additive superposition of linear models:
+		If the decoding model is an additive superposition of linear models:
 		\vspace{-0.3cm}
 		\[
 			\by = \mathbf{f}_1(\bx_1, \bTheta_1) + \mathbf{f}_2(\bx_2, \bTheta_2) + \boldsymbol{\varepsilon}_{\by} = \bTheta_1 \bx_1 + \bTheta_2 \bx_2 + \boldsymbol{\varepsilon}_{\by},
 		\]
-		then optimal parameters are
+		then the optimal parameters are
 		\vspace{-0.2cm}
 		\begin{align*}
 			\bTheta_1 &= (\bX_1^{\T} \bM_{\bX_2} \bX_1)^{-1} \bX_1^{\T} \bM_{\bX_2} \bY, \\
 			\bTheta_2 &= (\bX_2^{\T} \bM_{\bX_1} \bX_2)^{-1} \bX_2^{\T} \bM_{\bX_1} \bY,
 		\end{align*}
-		где \, $\bM_{\bX_1} = \bI - \bX_1 (\bX_1^{\T} \bX_1)^{-1} \bX_1^{\T}$, \, $\bM_{\bX_2} = \bI -\bX_2 (\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T}$.
+		where \, $\bM_{\bX_1} = \bI - \bX_1 (\bX_1^{\T} \bX_1)^{-1} \bX_1^{\T}$, \, $\bM_{\bX_2} = \bI -\bX_2 (\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T}$.
 	\end{statement}
 	\begin{theorem}[Isachenko, 2021]
-		If $\text{span}(\bX_1) \neq \text{span}(\bX_2)$, then the error of additive superpositionof linear decoding models is less or equal of each of the model:
+		If $\text{span}(\bX_1) \neq \text{span}(\bX_2)$, then the error of the additive superposition of linear decoding models is less or equal the error of each of the models:
 		\begin{align*}
 			\mathcal{L}_{\textnormal{sup}}(\bTheta_1^*, \bTheta_2^*, \bX_1, \bX_2, \bY) &\leq \mathcal{L}(\bTheta_1, \bX_1, \bY), \\
 			\mathcal{L}_{\textnormal{sup}}(\bTheta_1^*, \bTheta_2^*, \bX_1, \bX_2, \bY) &\leq \mathcal{L}(\bTheta_2, \bX_2, \bY).
@@ -277,7 +281,7 @@
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Nonlinear methods of hidden space concordance}
-	Let consider the case where encoding and decoding functions are deep neural networks:
+	Let encoding and decoding functions be deep neural networks:
 	\vspace{-0.1cm}
 	\begin{align*}
 		\bT &= \bphi_e(\bX) =  \bW_x^L \sigma(\dots \sigma(\bW_x^2 \sigma(\bX \bW_x^1)) \dots ) \\
@@ -293,15 +297,15 @@
 		\]
 	\end{block}	
 	\vspace{-0.3cm}
-		Gradient of concordance function $g(\bt, \bu) = \textnormal{corr}(\bt, \bu)$ is
+		The gradient of the concordance function $g(\bt, \bu) = \textnormal{corr}(\bt, \bu)$ is
 		\[
 			\frac{\partial g(\bt, \bu)}{\partial \bt} = \frac{1}{\ell - 1} \left(\bSigma_1^{-1/2} \bU \bV^{\T} \bSigma_2^{-1/2} \bU - \bSigma_1^{-1/2} \bU \bD \bV^{\T} \bSigma_1^{-1/2} \right),
 		\]
-		где $\bU, \bD, \bV = \textnormal{SVD}(\bSigma)$, \, $\bSigma = \bSigma_1^{-1/2} \bSigma_{12} \bSigma_2^{-1/2} $, \, $\bSigma_1 = \frac{1}{\ell - 1} \bT \bT^{\T}$, \, $\bSigma_2 = \frac{1}{\ell - 1} \bU \bU^{\T}$, \, $\bSigma_{12} = \frac{1}{\ell - 1} \bT \bU^{\T}$.
+		where $\bU, \bD, \bV = \textnormal{SVD}(\bSigma)$, \, $\bSigma = \bSigma_1^{-1/2} \bSigma_{12} \bSigma_2^{-1/2} $, \, $\bSigma_1 = \frac{1}{\ell - 1} \bT \bT^{\T}$, \, $\bSigma_2 = \frac{1}{\ell - 1} \bU \bU^{\T}$, \, $\bSigma_{12} = \frac{1}{\ell - 1} \bT \bU^{\T}$.
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Feature selection for signal decoding task}
-	$\bX = [\bchi_1, \dots, \bchi_n] \in \bbR^{m \times n}$~-- input variable matrix; $\bY = [\bnu_1, \dots, \bnu_r] \in \bbR^{m \times r}$~-- target variable matrix. \\
+	$\bX = [\bchi_1, \dots, \bchi_n] \in \bbR^{m \times n}$ is the input variable matrix; $\bY = [\bnu_1, \dots, \bnu_r] \in \bbR^{m \times r}$ is the target variable matrix. \\
 	The goal of feature selection is to find~$\ba = \{0, 1\}^n$, which components are the indicators of selected features. 
 	\begin{block}{Feature selection loss function}
 		\vspace{-0.3cm}
@@ -369,7 +373,7 @@
 	\alpha_1 + \alpha_2 + \alpha_3 = 1, \quad \alpha_i \geq 0.
 	\] 
 	\end{block}
-	SymImp penalizes correlated target vectors that are less explained by features.
+	SymImp penalizes correlated target vectors, which are less explained by features.
 		
 	\begin{block}{Assymetric Importance (AsymImp)}
 		\vspace{-0.2cm}
@@ -377,7 +381,7 @@
 		\alpha_1 \cdot \underbrace{\bz_x^{\T} \bQ_x \bz_x}_{\text{Sim}(\bX)} - \alpha_2 \cdot  \underbrace{\left(\bz_x^{\T} \bB \bz_y - \bb^{\T} \bz_y \right) }_{\text{Rel}(\bX, \bY)} + \alpha_3 \cdot \underbrace{\bz_y^{\T} \bQ_y \bz_y}_{\text{Sim}(\bY)} \rightarrow \min_{\substack{\bz_x \geq \bZero_n, \, \bOne_n^{\T}\bz_x=1 \\ \bz_y \geq \bZero_r, \, \bOne_r^{\T}\bz_y=1}}.
 		\end{equation*}
 		\vspace{-0.4cm} \\
-		In the case of $b_j = \max\limits_{i=1, \dots n} [\bB]_{i, j}$ components of~$\bz_y$ in~$\text{Rel}(\bX, \bY)$ are non-negative.
+		In the case of $b_j = \max\limits_{i=1, \dots n} [\bB]_{i, j}$ the components of~$\bz_y$ in~$\text{Rel}(\bX, \bY)$ are non-negative.
 	\end{block}
 \end{frame}
 %--------------------------------------------------------------------------------
@@ -407,7 +411,7 @@
 %--------------------------------------------------------------------------------
 \begin{frame}{Generalization of the proposed feature selection methods}
 	\begin{theorem}[Isachenko, 2018]
-		In the case of scalar target variable $r=1$, the proposed feature selection methods (SymImp, MinMax, MaxMin, AsymImp) coincide with the original task of minimizing the loss function $S(\bz, \bX, \bY)$.
+		In the case of the scalar target variable $r=1$, the proposed feature selection methods (SymImp, MinMax, MaxMin, AsymImp) coincide with the original problem of minimizing the loss function $S(\bz, \bX, \bY)$.
 	\end{theorem}
 	\begin{table}
 		\centering
@@ -486,7 +490,7 @@
 \begin{frame}{Electrocorticogram signal decoding task}
     \includegraphics[width=1.0\linewidth]{figs/slide3_1}
 	\begin{minipage}{.58\linewidth}
- 	Заданы: \\
+ 	There are given: \\
 	$\bX \in \bbR^{m \times (32 \cdot 27)}$ -- ECoG signals, \\
 	$\bY \in \bbR^{m \times 3k}$ -- hand trajectory, where
 	\vspace{0.1cm}
@@ -546,9 +550,9 @@
 	\vfill
 	\item We have proposed feature selection methods that take into account dependencies in both the input and target spaces. The proposed methods give stable and adequate solutions in high-dimensional spaces.
 	\vfill
-	Nonlinear methods for hidden space concordance for complex structured target variable are proposed .
+	\item Nonlinear methods for hidden space concordance for complex structured target variable are proposed.
 	\vfill
-	We have proposed the number of forecasting models for heterogeneous sets of signals that are suitable for the task of modelling brain computer interfaces.
+	\item We have proposed the number of forecasting models for heterogeneous sets of signals that are suitable for the task of modelling brain computer interfaces.
 \end{enumerate}
 \end{frame}
 %--------------------------------------------------------------------------------
