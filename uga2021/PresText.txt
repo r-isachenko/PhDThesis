@@ -7,7 +7,7 @@ The decoding process essentially is a process restoring the dependencies between
 The challenge is that we consider the case where target variable is a vector.
 The spaces of the input signals and target signals have excessive dimensionality.
 Dimensionality reduction methods that do not take into account dependencies in the target space are not adequate.
-We propose to reduce the dimensionality of the input and target spaces by projecting signals into hidden spaces of significantly smaller dimensionality.
+We propose to reduce the dimensionality of the input and target spaces by projecting signals into latent spaces of significantly smaller dimensionality.
 Linear and nonlinear methods for building concordant models are proposed.
 
 Slide 3:
@@ -17,9 +17,9 @@ The input and target signals have a different nature and have a high dimensional
 A point in the x-space is a segment of the input signal from the space of dimension n.
 A point in the target space y is a segment of the target signal from the space of dimensionality r.
 The complexity of the problem lies in the fact that at each moment of time t, the forecasting decoding model have to predict a vector consisting of successive components of the target signal.
-To construct an adequate model f, a procedure for dependencies concordance  in a hidden space is proposed.
-In order to do this, the input and target signals are projected into the hidden space, which has a smaller dimensionality compared to the dimensionality of the original data description.
-The operators P and Q restore the input and target variables from the hidden space projections.
+To construct an adequate model f, a procedure for dependencies concordance  in a latent space is proposed.
+In order to do this, the input and target signals are projected into the latent space, which has a smaller dimensionality compared to the dimensionality of the original data description.
+The operators P and Q restore the input and target variables from the latent space projections.
 At the same time, it is proposed to concord the projections in such a way that the covariance between the projections is maximal.
 
 Slide 4:
@@ -28,21 +28,21 @@ The input and target variables form the X and Y matrices.
 The model parameters Theta are a matrix.
 We will use the simple quadratic l2 loss function between the target variable and the forecast for this decoding model.
 If there is a strong multicorrelation between the columns of the matrix of the frequency domain of the input signals, the decoding model turns out to be unstable.
-In this moment we propose a method of projection data descriptions into a hidden space.
-The original matrices X and Y are projected into hidden spaces.
+In this moment we propose a method of projection data descriptions into a latent space.
+The original matrices X and Y are projected into latent spaces.
 The matrices T and U are the images of the original matrices.
 The commutative diagram shows how the method works.
-It finds the maps W and C from the spaces X and Y to the hidden spaces T and U, as well as the inverse mapping P and Q. 
-We propose to concord the projections in the hidden space.
-In this case, we find the link operator B in the form of a linear model for concording hidden spaces.
-The final decoding model is linear, but has a low-dimensional hidden representation.
+It finds the maps W and C from the spaces X and Y to the latent spaces T and U, as well as the inverse mapping P and Q. 
+We propose to concord the projections in the latent space.
+In this case, we find the link operator B in the form of a linear model for concording latent spaces.
+The final decoding model is linear, but has a low-dimensional latent representation.
 
 Slide 5: 
 We solve the problem in the assumption of high redundancy of the data description.
-To find the optimal low-dimensional manifold, we introduce a hidden space notion.
+To find the optimal low-dimensional manifold, we introduce a latent space notion.
 The general scheme of concording dependencies for the decoding problem is shown in the following commutative diagram.
-If there exists invertible encoding functions phi_e and psi_e and decoding functions phi_d and psi_d, we will say that for the input and target spaces X and Y, there are hidden spaces T and U.
-In this case, hidden spaces are concordant if there is a link function h, which maps objects from one hidden space to another.
+If there exists invertible encoding functions phi_e and psi_e and decoding functions phi_d and psi_d, we will say that for the input and target spaces X and Y, there are latent spaces T and U.
+In this case, latent spaces are concordant if there is a link function h, which maps objects from one latent space to another.
 To find the encoding and decoding functions, as well as the link function, the task of projection concordance is posed as maximizing the concordance function g.
 
 Slide 6:
@@ -50,14 +50,14 @@ We propose the iterative procedure for finding projections with maximum covarian
 A theorem on the optimality for model parameters of the concordant decoding model has been proved in the case of using the covariance between the projections t and u as a concordance function g.
 
 Slide 7:
-Here on the slide one can see an example of how the projection method works in a hidden two-dimensional space.
+Here on the slide one can see an example of how the projection method works in a latent two-dimensional space.
 The blue and green dots represent the input variables x and the target variables y.
 The input variables are generated from a normal distribution with some Sigma covariance matrix.
 The target variables depend linearly on the second principal component and do not depend on the first principal component of the matrix X.
 The red contour shows the level lines of the covariance matrices distribution.
 The black arrows correspond to the vectors of the matrices W and C.
 When we reduce the dimensionality of the input space without taking into account the existing dependencies in the target space using the principal component method, we get an inadequate solution.
-Using a concordant hidden space, the model is able to find the optimal hidden subspace of dimension 1, given by the operators W and C. This takes into account the interdependence between the images of the X and Y matrices.
+Using a concordant latent space, the model is able to find the optimal latent subspace of dimension 1, given by the operators W and C. This takes into account the interdependence between the images of the X and Y matrices.
 
 Slide 8:
 To build a model selection procedure, let consider the case of an additive superposition of decoding models.
@@ -77,75 +77,76 @@ If correlation is used as a concordance function, we could get expression for th
 This expression for the gradient allows us to build an effective algorithm for solving the problem using gradient optimization methods.
 
 Slide 10:
-Для получения простой модели и анализа значимостей конкретных признаков рассматривается задача выбора оптимального подмножества признаков.
-В задаче выбора признаков требуется найти бинарный вектор a, компоненты которого являются индикаторами выбранных признаков.
-Вводится функция ошибки S для задачи выбора признаков.
-Вектор z содержит значения значимости исходных признаков.
-Решение о включении признака в финальную модель принимается по отсечению значимости по порогу.
-Функция ошибки модели декодирования для данного случая учитывает только выбранные признаки.
-Для анализа зависимостей рассматривается фильтрационный метод выбора признаков с помощью квадратичного программирования.
-Данный алгоритм находит подмножество признаков с помощью квадратичной функции S, минимизируя парные взаимодействия исходных признаков и максимизируя релевантность исходных признаков к целевой переменной.
+To get a simple model and analyze the importance of specific features, let consider the problem of choosing the optimal feature subset.
+The goal of the feature selection problem is to find a binary vector a, whose components are indicators of the selected features.
+We introduce the loss function S for the feature selection problem.
+The vector z contains the importance values of the initial features.
+The decision to include a feature in the final model is made by cutting off the importances by the threshold.
+The loss function of the decoding model for this case takes into account only the selected features.
+To analyze the feature dependencies, we consider  filter method for feature selection features using quadratic programming approach.
+This method finds a feature subset using a quadratic function S, minimizing the pairwise similarities of the original features and maximizing the relevances of the original features to the target variable.
 
-Слайд 11:
-Доказано, что при использовании в качестве полуопределенной релаксации сдвига спектра матрицы парных взаимодействий Q, квадратичная задача выбора признаков имеет единственный глобальный минимум.
-Сложность рассматриваемой задачи заключается в учёте зависимостей в целевом пространстве.
-Для обобщения используемого метода на случай векторной целевой переменной в качестве базовой стратегии используется метод агрегирования релевантностей по целевым векторам.
-Таким образом вектор релевантностей b получается суммированием корреляций по всем целевым векторам.
-Недостаток данного метода заключается в отсутствии учёта зависимостей в пространстве целевой матрицы.
+Slide 11:
+We have proved that when using the spectrum shift of the similarity matrix Q as a semi-definite relaxation, the quadratic feature selection problem has a unique global minimum.
+The complexity of the problem that we consider is to take into account dependencies in the target space.
+To generalize the method to the case of a vector target variable, we use the method of aggregating relevancies by target vectors as a basic strategy.
+Thus, the relevance vector b is obtained by sumation of correlations across all target vectors.
+The disadvantage of this method is the lack of accounting for dependencies in the space of the target matrix Y.
 
-Слайд 12:
-Для учёта данных зависимостей предлагаются обобщения исходного метода.
-Симметричный учёт значимостей штрафует коррелированные целевые вектора с помощью введения матрицы парных взаимодействий Q_y для целевых векторов. 
-Таким образом кроме учёта взаимодействий исходных признаков, функция ошибки выбора признаков учитывает взаимодействия целевых векторов.
-Симметричный учёт значимостей приводит к малым значениям значимостей для целевых векторов, которые слабо коррелируют с признаками, и большим значениям для целевых векторов, которые сильно коррелируют с признаками. 
-Для учёта целевых векторов, слабо коррелирующих с исходными признаками, предлагается добавление штрафующего члена для целевых векторов, которые коррелируют с признаками.
-Вклад признаков и целевых векторов становится асимметричным.
+Slide 12:
+We propose generalizations of the original method to account for these dependencies.
+Symmetric importance strategy penalizes correlated target vectors by introducing a matrix of pairwise similarities Q_y for target vectors.
+Thus, in addition to taking into account the interactions of the initial features, the feature selection loss function takes into account the interactions of the target vectors.
+Symmetric importance strategy leads to small values of importances for target vectors that are weakly correlated with features, and large values for the target vectors that are strongly correlated with the features.
+To account for the target vectors that are weakly correlated with the initial features, it is proposed to add a penalty term for the target vectors that correlate with the features.
+The contribution of features and target vectors becomes asymmetric.
 
-Слайд 13: 
-Если в задаче есть целевые вектора, которые слабо коррелируют с исходными признаками, предлагается минимаксная задача выбора признаков. 
-Доказано, что в случае положительно определенных матриц парных взаимодействий мин макс и макс мин задачи имеют одинаковое решение.
-Также доказано, что минимаксная задача эквивалентна задаче квадратичного программирования.
-Для получения выпуклой задачи применяется полуопределенная релаксация.
+Slide 13: 
+If we have target vectors that are weakly correlated with the initial features, a minimax feature selection problem is proposed.
+It has been proved that in the case of positive definite matrices of pairwise similarities minmax and maxmin problems have the same solution.
+It has also been proved that the minimax problem is equivalent to the quadratic programming problem.
+To obtain a convex problem, a semi-definite relaxation could be used.
 
-Слайд 14:
-Помимо базового метода, предлагается 3 метода выбора признаков для учёта зависимостей в целевом пространстве. 
-Показано, что все предлагаемые стратегии являются обобщениями исходного метода для случая скалярной целевой переменной.
+Slide 14:
+To sum up, In addition to the basic method, we have proposed 3 methods for feature selection to account for dependencies in the target space.
+It has been shown that all the proposed strategies are generalizations of the original method for the case of a scalar target variable.
 
-Слайд 15:
-Также в работе предлагается алгоритм оптимизации нелинейных моделей с помощью рассмотренного метода квадратичного программирования.
-Для этого вводится понятие активного параметра модели.
-Активным считается параметр,  при уточнении которого  с помощью градиентного метода второго порядка, функция ошибки может уменьшиться.
-Доказана теорема о виде функции ошибки выбора активных параметров модели при использовании для оптимизации нелинейной модели метода Ньютона.
-На слайде изображен модельный двумерный пример выбора единственного активного параметра при оптимизации модели.
+Slide 15:
+We also propose an algorithm for optimizing nonlinear models using the considered quadratic programming method.
+For this purpose, we introduce the concept of the active parameter of the model.
+An active parameter is a parameter that is able to decrease the loss function using the second-order gradient optimization method.
+We have proved the theorem on the form of the loss function for the selection of the active model parameters when using the Newton method for optimization of a nonlinear model.
+The slide shows a two-dimensional model example of choosing a single active parameter when optimizing the model.
 
-Слайд 16:
-Для прикладного анализа предложенных методов вводятся внешние критерии качества. Нормированная среднеквадратичная ошибка говорит о качестве прогноза.
-Коэффициент мультикорреляции отвечает за устойчивость финальной модели.
-Байесовский информационный критерий является мерой сложности модели.
+Slide 16:
+For the practical analysis of the proposed methods, we introduce the following quality criteria. 
+The normalized error indicates the quality of the forecast.
+The multicorrelation coefficient is responsible for the stability of the final model.
+The Bayesian information criterion is a measure of the complexity of the model.
 
-Слайд 17:
-В качестве прикладной задачи рассматривается задача построения нейрокомпьютерного интерфейса.
-Требуется построить прогностическую модель декодирования, восстанавливающую траекторию конечности по сигналам электрокортикограммы.
-Как пространство исходных сигналов, так и пространство целевых сигналов обладают высокой размерностью, которая является избыточной.
-Исходные сигналы электрокортикограммы формируют матрицу X. 
-Целевые сигналы траектории движения конечности формируют авторегрессионную матрицу Y. Компоненты целевой переменной сильно скоррелированы по временной оси.
+Slide 17:
+We consider the problem of building a brain-computer interface as an applied problem.
+The goal is to build a forecasting decoding model that restores the hand trajectory from the signals of the electrocorticogram.
+Both the space of the input signals and the space of the target signals have a excessive dimensionality, which is redundant.
+The initial signals of the electrocorticogram form the matrix X.
+The target signals of the hand trajectory form an autoregressive matrix Y. The components of the target variable are strongly correlated along the time axis.
 
-Слайд 18: 
-На слайде показаны графики поведения описанных внешних критериев для всех рассматриваемых методов.
-Предложенные методы имеют меньшую ошибку, являются более устойчивыми и выбирают более простую модель по отношению к базовому алгоритму.
+Slide 18: 
+On this slide we show the described quality criteria for all the methods that we consider.
+The proposed methods have a smaller error, are more stable and choose a simpler model in relation to the basic algorithm.
 
-Слайд 19:
-Приводится сравнение метода проекции в скрытое пространство с методами выбора признаков.
-Слева на слайде показано, что для данной задачи оптимальная размерность скрытого пространства существенно меньше размерности исходных описаний данных.
-Предложенные методы достигают меньшей ошибки по сравнению с известными ранее методами.
-Наилучший результат достигается комбинацией двух подходов.
+Slide 19:
+We also compare the method of projection to the latent space is compared with the methods of feature selection.
+The picture on the left shows that for this problem, the optimal dimensionality of the latent space is significantly less than the dimensionality of the original data descriptions.
+The proposed methods achieve a smaller error compared to well known methods.
+The best result is achieved by a combination of two approaches.
 
-Слайд 20: 
-На защиту выносятся методы декодирования сигналов, учитывающие зависимости как в исходном, так и в целевом пространстве, методы выбора согласованных моделей в случае избыточной размерности пространств.
-Доказаны теоремы об оптимальности предлагаемых методов.
-Предложены методы выбора признаков, которые доставляют устойчивые и адекватные решения в коррелированных пространствах высокой размерности.
-Предложены нелинейные методы согласования скрытых пространств.
-Предложенные модели позволяют построить эффективную систему прогнозирования гетерогенных наборов данных для задачи построения нейрокомпьютерного интерфейса.
+Slide 20: 
+To conclude, we have propsoed the dethods for signal decoding that take into account dependencies in both the input and target spaces and methods for selecting concordant models in the case of excessive dimensionality of spaces.
+We have proved the theorems on the optimality of the proposed methods.
+We also have proposed the methods for feature selection that gives stable and adequate solutions in the correlated spaces of high dimensionality.
+We gave got nonlinear methods for concording latent spaces.
+The proposed models allow us to build an effective forecasting system for heterogeneous data sets, for example, for the buildinng brain-computer interface.
 
-Слайд 21:
-По теме диссертации было опубликовано 7 работ, 6 в журналах из списка ВАК. Благодарю за внимание. 
+Slide 21:
+Thank you for your attention.
