@@ -83,7 +83,7 @@ We introduce the loss function S for the feature selection problem.
 The vector z contains the importance values of the initial features.
 The decision to include a feature in the final model is made by cutting off the importances by the threshold.
 The loss function of the decoding model for this case takes into account only the selected features.
-To analyze the feature dependencies, we consider  filter method for feature selection features using quadratic programming approach.
+To analyze the feature dependencies, we consider  filter method for feature selection using quadratic programming approach.
 This method finds a feature subset using a quadratic function S, minimizing the pairwise similarities of the original features and maximizing the relevances of the original features to the target variable.
 
 Slide 11:
@@ -109,7 +109,7 @@ To obtain a convex problem, a semi-definite relaxation could be used.
 
 Slide 14:
 To sum up, In addition to the basic method, we have proposed 3 methods for feature selection to account for dependencies in the target space.
-It has been shown that all the proposed strategies are generalizations of the original method for the case of a scalar target variable.
+It has been shown that all proposed strategies are generalizations of the original method for the case of a scalar target variable.
 
 Slide 15:
 We also propose an algorithm for optimizing nonlinear models using the considered quadratic programming method.
@@ -136,16 +136,16 @@ On this slide we show the described quality criteria for all the methods that we
 The proposed methods have a smaller error, are more stable and choose a simpler model in relation to the basic algorithm.
 
 Slide 19:
-We also compare the method of projection to the latent space is compared with the methods of feature selection.
+We also compare the method of projection to the latent space with the methods of feature selection.
 The picture on the left shows that for this problem, the optimal dimensionality of the latent space is significantly less than the dimensionality of the original data descriptions.
 The proposed methods achieve a smaller error compared to well known methods.
 The best result is achieved by a combination of two approaches.
 
 Slide 20: 
-To conclude, we have propsoed the dethods for signal decoding that take into account dependencies in both the input and target spaces and methods for selecting concordant models in the case of excessive dimensionality of spaces.
+To conclude, we have propsoed the methods for signal decoding that take into account dependencies in both the input and target spaces and methods for selecting concordant models in the case of excessive dimensionality of spaces.
 We have proved the theorems on the optimality of the proposed methods.
 We also have proposed the methods for feature selection that gives stable and adequate solutions in the correlated spaces of high dimensionality.
-We gave got nonlinear methods for concording latent spaces.
+We have got nonlinear methods for concording latent spaces.
 The proposed models allow us to build an effective forecasting system for heterogeneous data sets, for example, for the buildinng brain-computer interface.
 
 Slide 21:
