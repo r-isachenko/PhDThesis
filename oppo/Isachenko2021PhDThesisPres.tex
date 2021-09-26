@@ -95,7 +95,7 @@
 	$\mathcal{S}_{\bx} = \{\bs_{\bx}^i\}_{i=1}^m$ -- множество временных рядов. \\
 	$\bx_t = ([\bs_{\bx}^1]_t, \dots, [\bs_{\bx}^m]_t) \in \bbR^m$ -- временное представление. \\
 	$\bX_{t,h} = [\bx_{t - h + 1}, \dots, \bx_{t}]^{\T} \in \bbR^{h \times m}$ -- представление предыстории. \\
-	$\bX_{t,p} = [\bx_{t + 1}, \dots, \bx_{t + p}]^{\T} \in \bbR^{p \times m}$ -- представление горизонта \\ прогнозирования.
+	$\bX_{t,p} = [\bx_{t + 1}, \dots, \bx_{t + p}]^{\T} \in \bbR^{p \times m}$ -- представление горизонта \\ прогнозирования. \\
 	$\mathbf{f}^{\text{AR}}_{\bx}: \bbR^{h \times m} \rightarrow \bbR^{p \times m}$ -- авторегрессионная модель. \\
 	$\mathbf{f}^{\text{R}}_{\bx\by}: \bbR^{h \times m} \rightarrow \bbR^{p \times r}$ -- регрессионная модель. \\
 	$\mathbf{f}_{\bx\by}: \bbR^{h_x \times m} \times \bbR^{h_y \times r} \rightarrow \bbR^{p \times r}$ -- модель декодирования модель.
@@ -263,6 +263,35 @@
 	\end{rustheorem}
 \end{frame}
 %--------------------------------------------------------------------------------
+\begin{frame}{Согласованная модель проекции в скрытое пространство}
+	\begin{block}{Principal Component Analysis}
+		\vspace{-0.3cm}
+		\[
+			\bphi_{\bx}(\bX) =  \underset{m \times n}\bX \cdot \underset{n \times l}\bP^{\T}, \quad	\bpsi_{\bx}(\bT) =  \underset{m \times l}\bT \cdot \underset{l \times n}\bP, \quad \bP \bP^{\T} = \bI.
+		\]
+		\[
+			\bp = \argmax_{\|\bp\|_{2} = 1} g(\btau) = \argmax_{\|\bp\|_{2} = 1} [\text{var}(\bX \textbf{p})],
+		\]
+		\vspace{-0.3cm}
+	\end{block}
+	\begin{block}{Partial Least Squares/Canonical Correlation Analysis}
+		\vspace{-0.7cm}
+		\begin{align*}
+			\bphi_{\bx}(\bX) &= \bX \bW, \quad \bphi_{\by}(\bY) = \bY \bC, \\
+			\bpsi_{\bx}(\bT) &= \bT \bP^{\T}, \quad \bpsi_{\by}(\bU) = \bU \bQ^{\T}.
+		\end{align*}
+		\[
+			g(\btau, \bnu) = \text{cov}(\btau, \bnu), \quad g(\btau, \bnu) = \text{corr}(\btau, \bnu).
+		\]
+	\end{block}
+	\begin{block}{Deep CCA}
+		\vspace{-0.7cm}
+		\begin{multline*}
+			\max_{\|\bp\|_{2}=\|\bq\|_{2}=1}\left[ \text{corr}(\bphi_{\bx}(\bX) \cdot \bp, \bphi_{\by}(\bY) \cdot \bq)^{2}\right] = \\ = \max_{\bp, \bq} \frac{\bp^{\T} \bphi_{\bx}(\bX)^{\T} \bphi_{\by}(\bY) \bq}{\sqrt{\bp^{\T} \bphi_{\bx}(\bX)^{\T}  \bphi_{\bx}(\bX, \bW_{\bx}) \bp} \sqrt{\bq^{\T} \bphi_{\by}(\bY)^{\T}  \bphi_{\by}(\bY) \bq}}.
+		\end{multline*}
+	\end{block}
+\end{frame}
+%--------------------------------------------------------------------------------
 \begin{frame}{Пример согласованной проекции в скрытое пространство}
 	Исходные переменные $\bx_i \sim \mathcal{N}(0, \mathbf{\Sigma})$. \\ 
 	Целевые переменные $\by_i$ линейно зависят от $pc_2$ и не зависят от $pc_1$.
@@ -280,12 +309,6 @@
 		\end{tabular}
 	\end{table} 
 	Согласование проекций матриц~$\bX$ и~$\bY$ находит оптимальное скрытое представление, отклоняя вектора~$\bw_k$ и~$\bc_k$ от направления главных компонент. 
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Пример прогноза движения руки по сигналам ECoG}
-	\begin{figure}
-		\includegraphics[width=0.9\linewidth]{figs/ecog_prediction}
-	\end{figure}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Суперпозиция моделей декодирования сигналов}
@@ -335,7 +358,7 @@
 		\]
 		Тогда выполнено строгое неравенство
 		\[
-			\cL(\bTheta^*, \bX, \bY) < \cL(\bTheta_2, \bX_2, \bY).
+			\cL_{\textnormal{sup}}(\bTheta_1^*, \bTheta_2^*, \bX_1, \bX_2, \bY) < \cL(\bTheta_2, \bX_2, \bY).
 		\]
 	\end{rustheorem}
 \end{frame}
@@ -715,6 +738,12 @@
 	\label{ch3:tbl:stability}
 \end{table}
 
+\end{frame}
+%--------------------------------------------------------------------------------
+\begin{frame}{Пример прогноза движения руки по сигналам ECoG}
+	\begin{figure}
+		\includegraphics[width=0.9\linewidth]{figs/ecog_prediction}
+	\end{figure}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Результаты, выносимые на защиту}
