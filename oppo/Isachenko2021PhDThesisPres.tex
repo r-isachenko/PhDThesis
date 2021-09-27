@@ -98,7 +98,7 @@
 	$\bX_{t,p} = [\bx_{t + 1}, \dots, \bx_{t + p}]^{\T} \in \bbR^{p \times m}$ -- представление горизонта \\ прогнозирования. \\
 	$\mathbf{f}^{\text{AR}}_{\bx}: \bbR^{h \times m} \rightarrow \bbR^{p \times m}$ -- авторегрессионная модель. \\
 	$\mathbf{f}^{\text{R}}_{\bx\by}: \bbR^{h \times m} \rightarrow \bbR^{p \times r}$ -- регрессионная модель. \\
-	$\mathbf{f}_{\bx\by}: \bbR^{h_x \times m} \times \bbR^{h_y \times r} \rightarrow \bbR^{p \times r}$ -- модель декодирования модель.
+	$\mathbf{f}_{\bx\by}: \bbR^{h_x \times m} \times \bbR^{h_y \times r} \rightarrow \bbR^{p \times r}$ -- модель декодирования.
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Восстановление зависимости в исходном и целевом пространствах}
@@ -185,7 +185,7 @@
 		Для получения согласованной модели в скрытом пространстве находится функция связи 
 		\vspace{-0.3cm}
 		\[
-			\bU = \bT \bB, \quad \bB = \text{diag}(\beta_k), \quad \beta_k = \bu_k^{\T}\bt_k / (\bt_k^{\T}\bt_k).
+			\bU = \bT \bB, \quad \bB = \text{diag}(\beta_k), \quad \beta_k = \bnu_k^{\T}\btau_k / (\btau_k^{\T}\btau_k).
 		\]
 		Финальная модель декодирования имеет вид
 		\vspace{-0.3cm}
@@ -213,29 +213,29 @@
 				\bbT \subset \bbR^\ell \& \bbU \subset \bbR^s \\};
 			\path[-stealth]
 			(m-1-1) edge [black] node [black, above] {$\mathbf{f}$} (m-1-2)
-			(m-2-1) edge [black, bend right=10] node [black, right] {$\bphi_d$} (m-1-1)
-			(m-2-2) edge [black, bend left=10] node [black, left] {$\bpsi_d$} (m-1-2)
-			(m-1-1) edge [black, bend right=10] node [black, left] {$\bphi_e$} (m-2-1)
-			(m-1-2) edge [black, bend left=10] node [black, right] {$\bpsi_e$} (m-2-2)
+			(m-2-1) edge [black, bend right=10] node [black, right] {$\bpsi_{\bx}$} (m-1-1)
+			(m-2-2) edge [black, bend left=10] node [black, left] {$\bpsi_{\by}$} (m-1-2)
+			(m-1-1) edge [black, bend right=10] node [black, left] {$\bphi_{\bx}$} (m-2-1)
+			(m-1-2) edge [black, bend left=10] node [black, right] {$\bphi_{\by}$} (m-2-2)
 			(m-2-1) edge [black] node [black, above] {$\mathbf{h}$} (m-2-2);
 		\end{tikzpicture}
 	\end{equation*}
-	$\bbT \subset \bbR^\ell$ и $\bbU \subset \bbR^s$ \textit{скрытые пространства} для $\bbX \in \bbR^n$ ($\ell \leq n$) и $\bbY \in \bbR^r (s \leq r)$, если существуют \textit{функции кодирования} $\bphi_e: \bbX \to \bbT$, $\bpsi_e: \bbY \to \bbU$ и \textit{декодирования} $\bphi_d: \bbT  \to \bbX$, $\bpsi_d: \bbU  \to \bbY$:
+	$\bbT \subset \bbR^\ell$ и $\bbU \subset \bbR^s$ \textit{скрытые пространства} для $\bbX \in \bbR^n$ ($\ell \leq n$) и $\bbY \in \bbR^r (s \leq r)$, если существуют \textit{функции кодирования} $\bphi_{\bx}: \bbX \to \bbT$, $\bphi_{\by}: \bbY \to \bbU$ и \textit{декодирования} $\bpsi_{\bx}: \bbT  \to \bbX$, $\bpsi_{\by}: \bbU  \to \bbY$:
 	\begin{align*}
-	\text{для любого } \bx \in \bbX &\quad \text{существует } \bt \in \bbT: \bphi_d \bigl(\bphi_e(\bx)\bigr) = \bphi_d(\bt) = \bx; \\
-	\text{для любого } \by \in \bbY &\quad  \text{существует } \bu \in \bbU: \bpsi_d \bigl(\bpsi_e(\by)\bigr) = \bpsi_d(\bu) = \by.
+	\text{для любого } \bx \in \bbX &\quad \text{существует } \bt \in \bbT: \bpsi_{\bx} \bigl(\bphi_{\bx}(\bx)\bigr) = \bpsi_{\bx}(\bt) = \bx; \\
+	\text{для любого } \by \in \bbY &\quad  \text{существует } \bu \in \bbU: \bpsi_{\by} \bigl(\bphi_{\by}(\by)\bigr) = \bpsi_{\by}(\bu) = \by.
 	\end{align*}
 
 	Cкрытыe пространства $\bbT$ и $\bbU$ называются \textbf{согласованными}, если существует \textit{функция связи} $\mathbf{h}: \bbT \rightarrow \bbU$:
 	\vspace{-0.3cm}
 	\[
-		\by = \mathbf{f}(\bx) = \bpsi_d\Bigl(\mathbf{h}\bigl(\bphi_e(\bx)\bigr)\Bigr).
+		\by = \mathbf{f}(\bx) = \bpsi_{\by}\Bigl(\mathbf{h}\bigl(\bphi_{\bx}(\bx)\bigr)\Bigr).
 	 \]
 	 \vspace{-0.5cm}
 	 \begin{block}{Функция согласования проекций}
 	 	\vspace{-0.3cm}
 	 	\[
-	 		g: \bbT \times \bbU \rightarrow \bbR, \quad g(\bt, \bu) = g(\bphi_e(\bx), \bpsi_e(\by)) \rightarrow \max_{\bphi_e, \bpsi_e, \bh}
+	 		g: \bbR^m \times \bbR^m \rightarrow \bbR, \quad g(\btau, \bnu) \rightarrow \max_{\bphi_{\bx}, \bphi_{\by}, \bh}
 	 	\]
 	 	\vspace{-0.3cm}
 	 \end{block}
@@ -244,18 +244,18 @@
 %--------------------------------------------------------------------------------
 \begin{frame}{Согласованная модель проекции в скрытое пространство}
 	\begin{statement}[Исаченко, 2017]
-		Вычисленные вектора $\bt_k$ и $\bu_k$ с помощью итеративной процедуры обновления:
+		Вычисленные вектора $\btau_k$ и $\bnu_k$ с помощью итеративной процедуры обновления:
 		\vspace{-0.2cm}
 		\begin{align*}
-			\bt_k &:= \frac{\bX_k \bw_k}{\|\bw_k\|}, \quad  \bw_k := \bX_k^{\T} \bu_{k-1} / (\bu_{k-1}^{\T} \bu_{k-1}); \\ 
-			\bu_k &:= \frac{\bY_k \bc_k}{\| \bc_k \|}, \quad \bc_k := \bY_k^{\T} \bt_k / (\bt_k^{\T} \bt_k).
+			\btau_k &:= \frac{\bX_k \bw_k}{\|\bw_k\|}, \quad  \bw_k := \bX_k^{\T} \bnu_{k-1} / (\bnu_{k-1}^{\T} \bnu_{k-1}); \\ 
+			\bnu_k &:= \frac{\bY_k \bc_k}{\| \bc_k \|}, \quad \bc_k := \bY_k^{\T} \btau_k / (\btau_k^{\T} \btau_k).
 		\end{align*}
 		\vspace{-0.5cm} \\
-		обладают максимальной ковариацией $\textnormal{cov}(\bt, \bu)$.
+		обладают максимальной ковариацией $\textnormal{cov}(\btau, \bnu)$.
 	\end{statement}
 
 	\begin{rustheorem}[Исаченко, 2017]
-		В случае линейных функций декодирования $\bphi_e (\bT) = \bT \bP^{\T}$, $\bpsi_e (\bU) = \bU \bQ^{\T}$ и функции согласования $g(\bt, \bu) = \textnormal{cov}(\bt, \bu)$ параметры
+		В случае линейных функций декодирования $\bphi_{\bx} (\bT) = \bT \bP^{\T}$, $\bphi_{\by} (\bU) = \bU \bQ^{\T}$ и функции согласования $g(\btau, \bnu) = \textnormal{cov}(\btau, \bnu)$ параметры
 		\[
 		\bTheta = \bW (\bP^{\T} \bW)^{-1} \bB \bQ^{\T}
 		\]
@@ -328,7 +328,7 @@
 		где \, $\bM_{\bX_1} = \bI - \bX_1 (\bX_1^{\T} \bX_1)^{-1} \bX_1^{\T}$, \, $\bM_{\bX_2} = \bI -\bX_2 (\bX_2^{\T} \bX_2)^{-1} \bX_2^{\T}$.
 	\end{statement}
 	\begin{rustheorem}[Исаченко, 2021]
-		Если $\text{span}(\bX_1) \neq \text{span}(\bX_2)$, то ошибка аддитивной суперпозиции линейных моделей декодирования не превышает ошибки отдельной модели:
+		Ошибка аддитивной суперпозиции линейных моделей декодирования не превышает ошибки отдельной модели:
 		\begin{align*}
 			\mathcal{L}_{\textnormal{sup}}(\bTheta_1^*, \bTheta_2^*, \bX_1, \bX_2, \bY) &\leq \mathcal{L}(\bTheta_1, \bX_1, \bY), \\
 			\mathcal{L}_{\textnormal{sup}}(\bTheta_1^*, \bTheta_2^*, \bX_1, \bX_2, \bY) &\leq \mathcal{L}(\bTheta_2, \bX_2, \bY).
@@ -367,10 +367,10 @@
 	Функции кодирования и декодирования являются глубокими нейросетями:
 	\vspace{-0.1cm}
 	\begin{align*}
-		\bT &= \bphi_e(\bX) =  \bW_x^L \sigma(\dots \sigma(\bW_x^2 \sigma(\bX \bW_x^1)) \dots ) \\
-		\bU &= \bpsi_e(\bY) =  \bW_y^L \sigma(\dots \sigma(\bW_y^2 \sigma(\bY \bW_y^1)) \dots ) \\
-		\bX &= \bphi_d(\bT) =  \bW_t^L \sigma(\dots \sigma(\bW_x^2 \sigma(\bT \bW_t^1)) \dots ) \\
-		\bY &= \bpsi_d(\bU) =  \bW_u^L \sigma(\dots \sigma(\bW_y^2 \sigma(\bU \bW_u^1)) \dots )
+		\bT &= \bphi_{\bx}(\bX) =  \bW_x^L \sigma(\dots \sigma(\bW_x^2 \sigma(\bX \bW_x^1)) \dots ) \\
+		\bU &= \bphi_{\by}(\bY) =  \bW_y^L \sigma(\dots \sigma(\bW_y^2 \sigma(\bY \bW_y^1)) \dots ) \\
+		\bX &= \bpsi_{\bx}(\bT) =  \bW_t^L \sigma(\dots \sigma(\bW_t^2 \sigma(\bT \bW_t^1)) \dots ) \\
+		\bY &= \bpsi_{\by}(\bU) =  \bW_u^L \sigma(\dots \sigma(\bW_u^2 \sigma(\bU \bW_u^1)) \dots )
 	\end{align*}
 	\vspace{-0.4cm}
 	\begin{block}{Согласование проекций}
@@ -380,9 +380,9 @@
 		\]
 	\end{block}	
 	\vspace{-0.3cm}
-		Градиент функции согласования $g(\bt, \bu) = \textnormal{corr}(\bt, \bu)$ имеет вид
+		Градиент функции согласования $g(\btau, \bnu) = \textnormal{corr}(\btau, \bnu)$ имеет вид
 		\[
-			\frac{\partial g(\bt, \bu)}{\partial \bt} = \frac{1}{\ell - 1} \left(\bSigma_1^{-1/2} \bU \bV^{\T} \bSigma_2^{-1/2} \bU - \bSigma_1^{-1/2} \bU \bD \bV^{\T} \bSigma_1^{-1/2} \right),
+			\frac{\partial g(\btau, \bnu)}{\partial \btau} = \frac{1}{\ell - 1} \left(\bSigma_1^{-1/2} \bU \bV^{\T} \bSigma_2^{-1/2} \bU - \bSigma_1^{-1/2} \bU \bD \bV^{\T} \bSigma_1^{-1/2} \right),
 		\]
 		где $\bU, \bD, \bV = \textnormal{SVD}(\bSigma)$, \, $\bSigma = \bSigma_1^{-1/2} \bSigma_{12} \bSigma_2^{-1/2} $, \, $\bSigma_1 = \frac{1}{\ell - 1} \bT \bT^{\T}$, \, $\bSigma_2 = \frac{1}{\ell - 1} \bU \bU^{\T}$, \, $\bSigma_{12} = \frac{1}{\ell - 1} \bT \bU^{\T}$.
 \end{frame}
@@ -493,7 +493,7 @@
 	\begin{rustheorem}[Исаченко, 2018]
 		Минимаксная задача эквивалентна задаче квадратичного программирования с $n + r + 1$ переменными.
 	\end{rustheorem}
-	Для получения выпуклой задачи применяется полуопределенная рекласация сдвига спектра.
+	Для получения выпуклой задачи применяется полуопределенная релаксация сдвига спектра.
 
 \end{frame}
 %--------------------------------------------------------------------------------
@@ -738,12 +738,6 @@
 	\label{ch3:tbl:stability}
 \end{table}
 
-\end{frame}
-%--------------------------------------------------------------------------------
-\begin{frame}{Пример прогноза движения руки по сигналам ECoG}
-	\begin{figure}
-		\includegraphics[width=0.9\linewidth]{figs/ecog_prediction}
-	\end{figure}
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Результаты, выносимые на защиту}
