@@ -396,7 +396,7 @@
 			\bz = \argmin_{\bz' \in [0, 1]^n} S(\bz', \bX, \bY), \quad 
 		a_j = [z_j > \tau].
 		\]
-		\vspace{-0.2cm}
+		\vspace{-0.4cm}
 	\end{block}
 	\begin{block}{Функция ошибки модели декодирования}
 		\vspace{-0.6cm}
@@ -410,11 +410,12 @@
 	\[
 	S(\bz, \bX, \bnu) = (1 - \alpha) \cdot \underbrace{\bz^{\T} \bQ \bz}_{\text{Sim}(\bX)} - \alpha \cdot \underbrace{\vphantom{()} \mathbf{b}^{\T} \bz}_{\text{Rel}(\bX, \bnu)} \rightarrow \min_{\substack{\bz \geq \bZero_n \\ \bOne_n^{\T} \bz=1}}.
 	\]
-	\vspace{-0.5cm}
+	\vspace{-0.6cm}
 	\end{block}
 		$\bz \in [0, 1]^n$ -- значимость признаков; \\
 		$\bQ = \bigl[\left|\text{corr}(\bchi_i, \bchi_j)\right|\bigr]_{i,j=1}^n \in \bbR^{n \times n}$ -- матрица парных взаимодействий признаков; \\
-		$\mathbf{b} = \bigl[\left|\text{corr}(\bchi_i, \bnu)\right|\bigr]_{i=1}^n \in \bbR^n$ -- вектор релевантностей признаков к целевой переменной. 
+		$\mathbf{b} = \bigl[\left|\text{corr}(\bchi_i, \bnu)\right|\bigr]_{i=1}^n \in \bbR^n$ -- вектор релевантностей признаков к целевой переменной. \\
+		$\alpha \in [0, 1]$ -- параметр метода.
 \end{frame}
 %--------------------------------------------------------------------------------
 \begin{frame}{Выбор признаков с помощью квадратичного программирования}
@@ -554,16 +555,16 @@
 			\mathbf{f}(\bX , \btheta + \Delta \btheta) \approx \mathbf{f}(\bX , \btheta) + \bJ \cdot \Delta  \btheta,
 		\]
 		где $\mathbf{J} \in \bbR^{m \times p}$ является матрицей Якоби.
-		Тогда вектор обновления~$\Delta \btheta$ для функции ошибки нелинейной регрессии является решением задачи
+		Тогда метод выбора признаков с помощью квадратичного программирования имеет параметры
 		\[
-			\| \be - \bF \Delta \btheta \|_2^2 \rightarrow \min_{\Delta \btheta \in \bbR^{p}}, \quad \be = \mathbf{f} - \by, \, \bF = \bJ.
+			\bQ = \textnormal{Sim}(\bJ), \quad \mathbf{b} = \textnormal{Rel}(\bJ, \by - \mathbf{f}).
 		\]
 	\end{rustheorem}
 	\begin{rustheorem}[Исаченко, 2018]
 		Пусть модель имеет вид $f(\bx , \btheta) = \sigma(\bx^{\T} \btheta)$. 
-		Вектор обновлений $\Delta \btheta$ для функции ошибки логистической регрессии является решением задачи
+		является Тогда метод выбора признаков с помощью квадратичного программирования для функции ошибки логистической регрессии имеет параметры
 		\[
-			\| \be - \bF \Delta \btheta \|_2^2 \rightarrow \min_{\Delta \btheta \in \bbR^{p}}, \quad \be = \bR^{-1/2} (\by - \mathbf{f}), \, \bF = \bR^{1/2}\bX.
+			\bQ = \textnormal{Sim}(\bR^{1/2} \bX), \quad \mathbf{b} = \textnormal{Rel}(\bR^{1/2} \bX, \bR^{-1/2} \by - \mathbf{f}).
 		\]
 	\end{rustheorem}
 \end{frame}
